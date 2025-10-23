@@ -1,13 +1,14 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Admin\CabangController;
+use App\Http\Controllers\Admin\RoleController;
+use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\Admin\RoleController;
-use App\Http\Controllers\Admin\UserController;
-use App\Http\Controllers\Admin\CabangController;
 use App\Http\Controllers\JenisPelanggansController;
+use App\Http\Controllers\PelanggansController;
 
 // Guest (belum login)
 Route::middleware('guest')->group(function () {
@@ -57,3 +58,12 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/kategori/deletekategori', [App\Http\Controllers\KategoriController::class, 'destroy'])->name('deletekategori');
 });
 
+// Pelanggan
+Route::middleware('auth')->group(function () {
+    Route::get('/pelanggan', [PelanggansController::class, 'index'])->name('pelanggan.index');
+    Route::get('/pelanggan/data', [PelanggansController::class, 'getData'])->name('pelanggan.data');
+    Route::get('/pelanggan/{id}/detail', [PelanggansController::class, 'show'])->name('pelanggan.show');
+    Route::post('/pelanggan/store', [PelanggansController::class, 'store'])->name('pelanggan.store');
+    Route::post('/pelanggan/update', [PelanggansController::class, 'update'])->name('pelanggan.update');
+    Route::post('/pelanggan/destroy', [PelanggansController::class, 'destroy'])->name('pelanggan.destroy');
+});

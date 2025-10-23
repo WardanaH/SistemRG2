@@ -7,14 +7,20 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class MJenisPelanggan extends Model
 {
-    protected $table = 'Jenispelanggans';
-    public $timestamps = true;
+    use SoftDeletes;
+
+    // ✅ Gunakan nama tabel dengan huruf kecil dan plural
+    protected $table = 'jenispelanggans';
 
     protected $fillable = [
-        'id',
         'jenis_pelanggan',
     ];
 
-    use SoftDeletes;
     protected $dates = ['deleted_at'];
+
+    // ✅ Relasi ke pelanggan
+    public function pelanggans()
+    {
+        return $this->hasMany(MPelanggans::class, 'jenispelanggan_id');
+    }
 }
