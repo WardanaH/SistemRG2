@@ -1,14 +1,15 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Admin\CabangController;
+use App\Http\Controllers\Admin\RoleController;
+use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\Admin\RoleController;
-use App\Http\Controllers\Admin\UserController;
-use App\Http\Controllers\Admin\CabangController;
 use App\Http\Controllers\JenisPelanggansController;
 use App\Http\Controllers\ProdukController;
+use App\Http\Controllers\PelanggansController;
 
 // Guest (belum login)
 Route::middleware('guest')->group(function () {
@@ -39,13 +40,15 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/supplier/deletesupplier', [SupplierController::class, 'destroy'])->name('deletesupplier');
 });
 
-//jenis pelanggans
-Route::middleware(['auth'])->group(function () {
-    Route::get('/jenispelanggan', [JenisPelanggansController::class, 'index'])->name('jenispelanggan.index');
-    Route::post('/jenispelanggan/store', [JenisPelanggansController::class, 'store'])->name('jenispelanggan.store');
-    Route::put('/jenispelanggan/update', [JenisPelanggansController::class, 'update'])->name('jenispelanggan.update');
-    Route::delete('/jenispelanggan/destroy', [JenisPelanggansController::class, 'destroy'])->name('jenispelanggan.destroy');
+// Jenis Pelanggan
+Route::controller(JenisPelanggansController::class)->group(function () {
+    Route::get('/jenispelanggan', 'index')->name('jenispelanggan.index');
+    Route::post('/jenispelanggan/store', 'store')->name('jenispelanggan.store');
+    Route::put('/jenispelanggan/update', 'update')->name('jenispelanggan.update');
+    Route::delete('/jenispelanggan/delete', 'destroy')->name('jenispelanggan.destroy');
+    Route::get('/jenispelanggan/cari', 'jenispelanggancari')->name('jenispelanggan.cari');
 });
+
 
 // Kategori
 Route::middleware(['auth'])->group(function () {
@@ -65,3 +68,12 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/produk/deleteproduk', [ProdukController::class, 'destroy'])->name('deleteproduk');
 });
 
+// Pelanggan
+Route::middleware('auth')->group(function () {
+    Route::get('/pelanggan', [PelanggansController::class, 'index'])->name('pelanggan.index');
+    Route::get('/pelanggan/data', [PelanggansController::class, 'getData'])->name('pelanggan.data');
+    Route::get('/pelanggan/{id}/detail', [PelanggansController::class, 'show'])->name('pelanggan.show');
+    Route::post('/pelanggan/store', [PelanggansController::class, 'store'])->name('pelanggan.store');
+    Route::post('/pelanggan/update', [PelanggansController::class, 'update'])->name('pelanggan.update');
+    Route::post('/pelanggan/destroy', [PelanggansController::class, 'destroy'])->name('pelanggan.destroy');
+});

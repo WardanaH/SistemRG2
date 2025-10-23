@@ -41,6 +41,7 @@
     @auth
     <div class="sidebar">
         <h5 class="text-white">Menu</h5>
+
         <a href="{{ route('dashboard') }}">🏠 Dashboard</a>
         <a href="{{ route('users.index') }}">👤 Manajemen User</a>
         <a href="{{ route('cabangs.index') }}">🏢 Manajemen Cabang</a>
@@ -49,12 +50,17 @@
         <a href="{{ route('managekategoriindex') }}">📂 Manajemen Kategori</a>
         <a href="{{ route('manageprodukindex') }}">🛒 Manajemen Produk</a>
         <a href="{{ route('jenispelanggan.index') }}">🧾 Manajemen Jenis Pelanggan</a>
+
+        {{-- 🔹 Tambahan menu pelanggan --}}
+        <a href="{{ route('pelanggan.index') }}">👥 Manajemen Pelanggan</a>
+
         <form action="{{ route('logout') }}" method="POST" class="mt-3">
             @csrf
             <button class="btn btn-light btn-sm w-100">Logout</button>
         </form>
     </div>
     @endauth
+
 
     <div class="main">
         @if(session('success'))
@@ -68,6 +74,7 @@
         @yield('content')
     </div>
 </body>
+@stack('scripts')
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
 </html>
