@@ -11,7 +11,6 @@ class ProdukController extends Controller
 {
     public function index()
     {
-        // ambil kategori untuk dropdown di modal
         $kategories = MKategories::select('id', 'Nama_Kategori')->get();
         return view('admin.produk.index', compact('kategories'));
     }
@@ -25,11 +24,11 @@ class ProdukController extends Controller
     public function store(Request $request)
     {
         $rules = [
-            'tambah_kategori' => 'required',
-            'tambah_nama_produk' => 'required',
-            'tambah_satuan' => 'required',
-            'tambah_harga_beli' => 'required|numeric',
-            'tambah_harga_jual' => 'required|numeric',
+            'kategori' => 'required',
+            'nama_produk' => 'required',
+            'satuan' => 'required',
+            'harga_beli' => 'required|numeric',
+            'harga_jual' => 'required|numeric',
         ];
 
         $validator = Validator::make($request->all(), $rules);
@@ -38,13 +37,13 @@ class ProdukController extends Controller
         }
 
         $produk = MProduks::create([
-            'kategori_id' => $request->tambah_kategori,
-            'nama_produk' => $request->tambah_nama_produk,
-            'satuan' => $request->tambah_satuan,
-            'harga_beli' => $request->tambah_harga_beli,
-            'harga_jual' => $request->tambah_harga_jual,
-            'hitung_luas' => in_array($request->tambah_satuan, ['CENTIMETER', 'METER']),
-            'keterangan' => $request->tambah_keterangan,
+            'kategori_id' => $request->kategori,
+            'nama_produk' => $request->nama_produk,
+            'satuan' => $request->satuan,
+            'harga_beli' => $request->harga_beli,
+            'harga_jual' => $request->harga_jual,
+            'hitung_luas' => in_array($request->satuan, ['CENTIMETER', 'METER']),
+            'keterangan' => $request->keterangan,
         ]);
 
         return response()->json($produk ? "Success" : "Failed");

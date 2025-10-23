@@ -17,6 +17,7 @@
             <th>Harga Beli</th>
             <th>Harga Jual</th>
             <th>Kategori</th>
+            <th>Hitung Luas</th>
             <th>Keterangan</th>
             <th>Aksi</th>
           </tr>
@@ -27,7 +28,7 @@
   </div>
 </div>
 
-{{-- =================== MODAL TAMBAH =================== --}}
+{{-- =============== MODAL TAMBAH =============== --}}
 <div id="addModal" class="modal fade" tabindex="-1">
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
@@ -39,16 +40,16 @@
         <div class="modal-body">
           <div class="row g-2">
             <div class="col-md-6">
-              <select name="tambah_kategori" class="form-select">
+              <select name="kategori" class="form-select">
                 <option value="">-- Pilih Kategori --</option>
                 @foreach($kategories as $k)
                   <option value="{{ $k->id }}">{{ $k->Nama_Kategori }}</option>
                 @endforeach
               </select>
             </div>
-            <div class="col-md-6"><input name="tambah_nama_produk" class="form-control" placeholder="Nama Produk"></div>
+            <div class="col-md-6"><input name="nama_produk" class="form-control" placeholder="Nama Produk"></div>
             <div class="col-md-6">
-              <select name="tambah_satuan" class="form-select">
+              <select name="satuan" class="form-select">
                 <option value="">-- Satuan --</option>
                 <option value="CENTIMETER">Centimeter</option>
                 <option value="METER">Meter</option>
@@ -56,9 +57,9 @@
                 <option value="PAKET">Paket</option>
               </select>
             </div>
-            <div class="col-md-6"><input name="tambah_harga_beli" type="number" class="form-control" placeholder="Harga Beli"></div>
-            <div class="col-md-6"><input name="tambah_harga_jual" type="number" class="form-control" placeholder="Harga Jual"></div>
-            <div class="col-md-12"><textarea name="tambah_keterangan" class="form-control" placeholder="Keterangan"></textarea></div>
+            <div class="col-md-6"><input name="harga_beli" type="number" class="form-control" placeholder="Harga Beli"></div>
+            <div class="col-md-6"><input name="harga_jual" type="number" class="form-control" placeholder="Harga Jual"></div>
+            <div class="col-md-12"><textarea name="keterangan" class="form-control" placeholder="Keterangan"></textarea></div>
           </div>
         </div>
         <div class="modal-footer">
@@ -70,7 +71,7 @@
   </div>
 </div>
 
-{{-- =================== MODAL EDIT =================== --}}
+{{-- =============== MODAL EDIT =============== --}}
 <div id="editModal" class="modal fade" tabindex="-1">
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
@@ -112,7 +113,7 @@
   </div>
 </div>
 
-{{-- =================== SCRIPT =================== --}}
+{{-- =============== SCRIPT =============== --}}
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
@@ -120,21 +121,19 @@ $(document).ready(function() {
     const addModal = new bootstrap.Modal(document.getElementById('addModal'));
     const editModal = new bootstrap.Modal(document.getElementById('editModal'));
 
-    // === Buka Modal Tambah ===
-    $('#openAddModal').on('click', function() {
-        addModal.show();
-    });
+    $('#openAddModal').on('click', () => addModal.show());
 
-    // === Load Data Produk ===
     loadProduk();
 
     function loadProduk() {
         $.get("{{ route('loadproduk') }}", function(res) {
             let rows = '';
             if (res.data.length === 0) {
-                rows = `<tr><td colspan="7" class="text-muted">Belum ada data produk.</td></tr>`;
+                rows = `<tr><td colspan="8" class="text-muted">Belum ada data produk.</td></tr>`;
             } else {
                 res.data.forEach(p => {
+                    const warna = p.hitung_luas ? 'text-success fw-bold' : 'text-danger fw-bold';
+                    const status = p.hitung_luas ? 'Ya' : 'Tidak';
                     rows += `
                     <tr>
                       <td>${p.nama_produk}</td>
@@ -142,6 +141,7 @@ $(document).ready(function() {
                       <td>Rp ${parseInt(p.harga_beli).toLocaleString('id-ID')}</td>
                       <td>Rp ${parseInt(p.harga_jual).toLocaleString('id-ID')}</td>
                       <td>${p.kategori?.Nama_Kategori ?? '-'}</td>
+                      <td class="${warna}">${status}</td>
                       <td>${p.keterangan ?? '-'}</td>
                       <td>
                         <button class="btn btn-success btn-sm editBtn" data-id="${p.id}">Edit</button>
@@ -154,31 +154,20 @@ $(document).ready(function() {
         });
     }
 
-    // === Tambah Produk ===
+    // Tambah
     $('#formAdd').on('submit', function(e) {
         e.preventDefault();
-        $.ajax({
-            url: "{{ route('storeproduk') }}",
-            method: "POST",
-            data: $(this).serialize(),
-            success: function(res) {
-                if (res === "Success") {
-                    alert('Produk berhasil ditambahkan!');
-                    $('#formAdd')[0].reset();
-                    addModal.hide();
-                    loadProduk();
-                } else {
-                    alert('Gagal menambahkan produk!');
-                }
-            },
-            error: function(err) {
-                console.error(err);
-                alert('Terjadi kesalahan server!');
-            }
+        $.post("{{ route('storeproduk') }}", $(this).serialize(), function(res) {
+            if (res === "Success") {
+                alert('Produk berhasil ditambahkan!');
+                $('#formAdd')[0].reset();
+                addModal.hide();
+                loadProduk();
+            } else alert('Gagal menambahkan produk!');
         });
     });
 
-    // === Edit Produk ===
+    // Edit
     $(document).on('click', '.editBtn', function() {
         const id = $(this).data('id');
         $.get("{{ route('loadproduk') }}", function(res) {
@@ -192,37 +181,23 @@ $(document).ready(function() {
                 $('#edit_harga_jual').val(p.harga_jual);
                 $('#edit_keterangan').val(p.keterangan);
                 editModal.show();
-            } else {
-                alert('Produk tidak ditemukan.');
             }
         });
     });
 
-    // === Simpan Edit ===
     $('#formEdit').on('submit', function(e) {
         e.preventDefault();
-        $.ajax({
-            url: "{{ route('updateproduk') }}",
-            method: "POST",
-            data: $(this).serialize(),
-            success: function(res) {
-                if (res === "Success") {
-                    alert('Produk berhasil diperbarui!');
-                    $('#formEdit')[0].reset();
-                    editModal.hide();
-                    loadProduk();
-                } else {
-                    alert('Gagal memperbarui produk!');
-                }
-            },
-            error: function(err) {
-                console.error(err);
-                alert('Terjadi kesalahan server!');
-            }
+        $.post("{{ route('updateproduk') }}", $(this).serialize(), function(res) {
+            if (res === "Success") {
+                alert('Produk berhasil diperbarui!');
+                $('#formEdit')[0].reset();
+                editModal.hide();
+                loadProduk();
+            } else alert('Gagal memperbarui produk!');
         });
     });
 
-    // === Hapus Produk ===
+    // Hapus
     $(document).on('click', '.deleteBtn', function() {
         const id = $(this).data('id');
         if (confirm('Yakin ingin menghapus produk ini?')) {
@@ -233,9 +208,7 @@ $(document).ready(function() {
                 if (res === "Success") {
                     alert('Produk berhasil dihapus!');
                     loadProduk();
-                } else {
-                    alert('Gagal menghapus produk!');
-                }
+                } else alert('Gagal menghapus produk!');
             });
         }
     });
