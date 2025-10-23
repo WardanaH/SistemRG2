@@ -8,6 +8,7 @@ use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\CabangController;
 use App\Http\Controllers\JenisPelanggansController;
+use App\Http\Controllers\ProdukController;
 
 // Guest (belum login)
 Route::middleware('guest')->group(function () {
@@ -53,5 +54,14 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/kategori/postkategori', [App\Http\Controllers\KategoriController::class, 'store'])->name('storekategori');
     Route::post('/kategori/updatekategori', [App\Http\Controllers\KategoriController::class, 'update'])->name('updatekategori');
     Route::post('/kategori/deletekategori', [App\Http\Controllers\KategoriController::class, 'destroy'])->name('deletekategori');
+});
+
+// produk
+Route::middleware(['auth'])->group(function () {
+    Route::get('/produk', [ProdukController::class, 'index'])->name('manageprodukindex');
+    Route::get('/produk/loadproduk', [ProdukController::class, 'loadproduk'])->name('loadproduk');
+    Route::post('/produk/postproduk', [ProdukController::class, 'store'])->name('storeproduk');
+    Route::post('/produk/updateproduk', [ProdukController::class, 'update'])->name('updateproduk');
+    Route::post('/produk/deleteproduk', [ProdukController::class, 'destroy'])->name('deleteproduk');
 });
 
