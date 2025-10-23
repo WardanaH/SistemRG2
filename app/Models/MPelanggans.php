@@ -7,8 +7,10 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class MPelanggans extends Model
 {
-    protected $table = 'Pelanggans';
-    public $timestamps = true;
+    use SoftDeletes;
+
+    // ✅ Gunakan huruf kecil dan plural
+    protected $table = 'pelanggans';
 
     protected $fillable = [
         'jenispelanggan_id',
@@ -26,6 +28,11 @@ class MPelanggans extends Model
         'status_pelanggan',
     ];
 
-    use SoftDeletes;
     protected $dates = ['deleted_at'];
+
+    // ✅ Tambahkan relasi ke Jenis Pelanggan
+    public function jenisPelanggan()
+    {
+        return $this->belongsTo(MJenisPelanggan::class, 'jenispelanggan_id');
+    }
 }

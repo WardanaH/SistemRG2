@@ -4,17 +4,54 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\MJenisPelanggan;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Response;
+use Yajra\DataTables\Facades\DataTables;
+use Illuminate\Support\Facades\Validator;
 
 class JenisPelanggansController extends Controller
 {
-    public function index()
+    /**
+     * Tampilkan halaman daftar jenis pelanggan.
+     */
+    public function index(Request $request)
     {
+        // Jika request dari DataTables (AJAX)
+        if ($request->ajax()) {
+            $tables = MJenisPelanggan::latest()->get();
+
+            return DataTables::of($tables)
+                ->addColumn('action', function ($row) {
+                    return '
+                        <div class="btn-group">
+                            <button type="button" class="modal_edit btn btn-info btn-sm"
+                                data-toggle="modal"
+                                data-id="' . encrypt($row->id) . '"
+                                data-jenis="' . e($row->jenis_pelanggan) . '"
+                                data-target="#modal_edit">
+                                <i class="fa fa-edit"></i>
+                            </button>
+                            <button type="button" class="modal_hapus btn btn-danger btn-sm"
+                                data-toggle="modal"
+                                data-id="' . encrypt($row->id) . '"
+                                data-jenis="' . e($row->jenis_pelanggan) . '"
+                                data-target="#modal_hapus">
+                                <i class="fa fa-trash"></i>
+                            </button>
+                        </div>';
+                })
+                ->rawColumns(['action'])
+                ->make(true);
+        }
+
+        // Jika bukan AJAX, tampilkan view biasa
         $jenispelanggans = MJenisPelanggan::latest()->get();
         return view('admin.jenispelanggan.index', compact('jenispelanggans'));
     }
 
     /**
-     * Simpan data jenis pelanggan baru.
+     * Tambah data jenis pelanggan baru.
      */
     public function store(Request $request)
     {
@@ -26,11 +63,16 @@ class JenisPelanggansController extends Controller
             'jenis_pelanggan' => $validated['tambah_jenispelanggan'],
         ]);
 
-        // (Opsional) logging aktivitas
+        // Logging (opsional)
         // if (method_exists($this, 'createlog') && Auth::check()) {
         //     $isi = Auth::user()->username . " menambahkan jenis pelanggan {$data->jenis_pelanggan}.";
         //     $this->createlog($isi, "add");
         // }
+
+        // Cek tipe request
+        if ($request->ajax()) {
+            return Response::json(['success' => true, 'message' => 'Jenis pelanggan berhasil ditambahkan.']);
+        }
 
         return redirect()
             ->route('jenispelanggan.index')
@@ -50,24 +92,22 @@ class JenisPelanggansController extends Controller
         try {
             $id = decrypt($validated['jenispelanggan_id']);
         } catch (\Exception $e) {
-            return redirect()
-                ->route('jenispelanggan.index')
-                ->withErrors('ID tidak valid.');
+            return $request->ajax()
+                ? Response::json(['success' => false, 'message' => 'ID tidak valid.'])
+                : redirect()->route('jenispelanggan.index')->withErrors('ID tidak valid.');
         }
 
         $data = MJenisPelanggan::findOrFail($id);
-        $data->update([
-            'jenis_pelanggan' => $validated['edit_jenispelanggan'],
-        ]);
+        $data->update(['jenis_pelanggan' => $validated['edit_jenispelanggan']]);
 
         // if (method_exists($this, 'createlog') && Auth::check()) {
         //     $isi = Auth::user()->username . " mengubah jenis pelanggan {$data->jenis_pelanggan}.";
         //     $this->createlog($isi, "edit");
         // }
 
-        return redirect()
-            ->route('jenispelanggan.index')
-            ->with('success', 'Jenis pelanggan berhasil diperbarui.');
+        return $request->ajax()
+            ? Response::json(['success' => true, 'message' => 'Jenis pelanggan berhasil diperbarui.'])
+            : redirect()->route('jenispelanggan.index')->with('success', 'Jenis pelanggan berhasil diperbarui.');
     }
 
     /**
@@ -82,9 +122,9 @@ class JenisPelanggansController extends Controller
         try {
             $id = decrypt($request->hapus_jenispelanggan_id);
         } catch (\Exception $e) {
-            return redirect()
-                ->route('jenispelanggan.index')
-                ->withErrors('ID tidak valid.');
+            return $request->ajax()
+                ? Response::json(['success' => false, 'message' => 'ID tidak valid.'])
+                : redirect()->route('jenispelanggan.index')->withErrors('ID tidak valid.');
         }
 
         $data = MJenisPelanggan::findOrFail($id);
@@ -96,8 +136,20 @@ class JenisPelanggansController extends Controller
         //     $this->createlog($isi, "delete");
         // }
 
-        return redirect()
-            ->route('jenispelanggan.index')
-            ->with('success', 'Jenis pelanggan berhasil dihapus.');
+        return $request->ajax()
+            ? Response::json(['success' => true, 'message' => 'Jenis pelanggan berhasil dihapus.'])
+            : redirect()->route('jenispelanggan.index')->with('success', 'Jenis pelanggan berhasil dihapus.');
+    }
+
+    /**
+     * API untuk select2 / pencarian jenis pelanggan.
+     */
+    public function jenispelanggancari()
+    {
+        $tags = MJenisPelanggan::select('id', 'jenis_pelanggan')->get();
+        $formatted_tags = $tags->map(function ($tag) {
+            return ['id' => $tag->id, 'text' => $tag->jenis_pelanggan];
+        });
+        return response()->json($formatted_tags);
     }
 }
