@@ -49,6 +49,8 @@
         <a href="{{ route('managesupplierindex') }}">📦 Manajemen Supplier</a>
         <a href="{{ route('managekategoriindex') }}">📂 Manajemen Kategori</a>
         <a href="{{ route('manageprodukindex') }}">🛒 Manajemen Produk</a>
+        <a href="{{ route('managebahanbakuindex') }}">🧱 Manajemen Bahan Baku</a>
+        <a href="{{ route('managerelasibahanbakuindex') }}">🧩 Aturan Bahan Baku</a>
         <a href="{{ route('jenispelanggan.index') }}">🧾 Manajemen Jenis Pelanggan</a>
 
         {{-- 🔹 Tambahan menu pelanggan --}}
