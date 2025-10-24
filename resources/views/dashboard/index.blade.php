@@ -12,6 +12,8 @@
         <a href="{{ route('managesupplierindex') }}" class="btn btn-outline-warning">Manajemen Supplier</a>
         <a href="{{ route('managekategoriindex') }}" class="btn btn-outline-warning">Manajemen Kategori</a>
         <a href="{{ route('manageprodukindex') }}" class="btn btn-outline-warning">Manajemen Produk</a>
+        <a href="{{ route('managebahanbakuindex') }}" class="btn btn-outline-warning">Manajemen Bahan Baku</a>
+        <a href="{{ route('managerelasibahanbakuindex') }}" class="btn btn-outline-warning">Manajemen Aturan Bahan Baku</a>
     </div>
 </div>
 @endsection

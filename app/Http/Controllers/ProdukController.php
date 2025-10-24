@@ -18,6 +18,7 @@ class ProdukController extends Controller
     public function loadproduk()
     {
         $produks = MProduks::with('kategori')->whereNull('deleted_at')->latest()->get();
+        // dd($produk);
         return response()->json(['data' => $produks]);
     }
 
