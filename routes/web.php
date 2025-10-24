@@ -8,7 +8,10 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\JenisPelanggansController;
+use App\Http\Controllers\ProdukController;
 use App\Http\Controllers\PelanggansController;
+use App\Http\Controllers\BahanBakuController;
+use App\Http\Controllers\RelasiBahanBakuController;
 
 // Guest (belum login)
 Route::middleware('guest')->group(function () {
@@ -58,6 +61,15 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/kategori/deletekategori', [App\Http\Controllers\KategoriController::class, 'destroy'])->name('deletekategori');
 });
 
+// produk
+Route::middleware(['auth'])->group(function () {
+    Route::get('/produk', [ProdukController::class, 'index'])->name('manageprodukindex');
+    Route::get('/produk/loadproduk', [ProdukController::class, 'loadproduk'])->name('loadproduk');
+    Route::post('/produk/postproduk', [ProdukController::class, 'store'])->name('storeproduk');
+    Route::post('/produk/updateproduk', [ProdukController::class, 'update'])->name('updateproduk');
+    Route::post('/produk/deleteproduk', [ProdukController::class, 'destroy'])->name('deleteproduk');
+});
+
 // Pelanggan
 Route::middleware('auth')->group(function () {
     Route::get('/pelanggan', [PelanggansController::class, 'index'])->name('pelanggan.index');
@@ -66,4 +78,23 @@ Route::middleware('auth')->group(function () {
     Route::post('/pelanggan/store', [PelanggansController::class, 'store'])->name('pelanggan.store');
     Route::post('/pelanggan/update', [PelanggansController::class, 'update'])->name('pelanggan.update');
     Route::post('/pelanggan/destroy', [PelanggansController::class, 'destroy'])->name('pelanggan.destroy');
+});
+
+
+// Bahan Baku 
+Route::middleware(['auth'])->group(function() {
+    Route::get('/bahanbaku', [BahanBakuController::class, 'index'])->name('managebahanbakuindex');
+    Route::get('/bahanbaku/loadbahanbaku', [BahanBakuController::class, 'loadbahanbaku'])->name('loadbahanbaku');
+    Route::post('/bahanbaku/postbahanbaku', [BahanBakuController::class, 'store'])->name('storebahanbaku');
+    Route::post('/bahanbaku/updatebahanbaku', [BahanBakuController::class, 'update'])->name('updatebahanbaku');
+    Route::post('/bahanbaku/deletebahanbaku', [BahanBakuController::class, 'destroy'])->name('deletebahanbaku');
+});
+
+// Relasi Bahan Baku
+Route::middleware(['auth'])->group(function () {
+    Route::get('/relasibahanbaku', [\App\Http\Controllers\RelasiBahanBakuController::class, 'index'])->name('managerelasibahanbakuindex');
+    Route::get('/relasibahanbaku/load', [\App\Http\Controllers\RelasiBahanBakuController::class, 'loadrelasibahanbaku'])->name('loadrelasibahanbaku');
+    Route::post('/relasibahanbaku/store', [\App\Http\Controllers\RelasiBahanBakuController::class, 'store'])->name('storerelasibahanbaku');
+    Route::post('/relasibahanbaku/update', [\App\Http\Controllers\RelasiBahanBakuController::class, 'update'])->name('updaterelasibahanbaku');
+    Route::post('/relasibahanbaku/delete', [\App\Http\Controllers\RelasiBahanBakuController::class, 'destroy'])->name('deleterelasibahanbaku');
 });
