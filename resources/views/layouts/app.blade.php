@@ -52,6 +52,7 @@
         <a href="{{ route('managebahanbakuindex') }}">🧱 Manajemen Bahan Baku</a>
         <a href="{{ route('managerelasibahanbakuindex') }}">🧩 Aturan Bahan Baku</a>
         <a href="{{ route('jenispelanggan.index') }}">🧾 Manajemen Jenis Pelanggan</a>
+        <a href="{{ route('stokbahanbaku.index') }}">📦 Daftar Stock Bahan Baku</a>
 
         {{-- 🔹 Tambahan menu pelanggan --}}
         <a href="{{ route('pelanggan.index') }}">👥 Manajemen Pelanggan</a>

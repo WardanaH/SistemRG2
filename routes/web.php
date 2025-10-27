@@ -11,7 +11,9 @@ use App\Http\Controllers\JenisPelanggansController;
 use App\Http\Controllers\ProdukController;
 use App\Http\Controllers\PelanggansController;
 use App\Http\Controllers\BahanBakuController;
+use App\Http\Controllers\StokBahanBakusController;
 use App\Http\Controllers\RelasiBahanBakuController;
+use App\Http\Controllers\KategoriController;
 
 // Guest (belum login)
 Route::middleware('guest')->group(function () {
@@ -54,11 +56,11 @@ Route::controller(JenisPelanggansController::class)->group(function () {
 
 // Kategori
 Route::middleware(['auth'])->group(function () {
-    Route::get('/kategori', [App\Http\Controllers\KategoriController::class, 'index'])->name('managekategoriindex');
-    Route::get('/kategori/loadkategori', [App\Http\Controllers\KategoriController::class, 'loadkategori'])->name('loadkategori');
-    Route::post('/kategori/postkategori', [App\Http\Controllers\KategoriController::class, 'store'])->name('storekategori');
-    Route::post('/kategori/updatekategori', [App\Http\Controllers\KategoriController::class, 'update'])->name('updatekategori');
-    Route::post('/kategori/deletekategori', [App\Http\Controllers\KategoriController::class, 'destroy'])->name('deletekategori');
+    Route::get('/kategori', [KategoriController::class, 'index'])->name('managekategoriindex');
+    Route::get('/kategori/loadkategori', [KategoriController::class, 'loadkategori'])->name('loadkategori');
+    Route::post('/kategori/postkategori', [KategoriController::class, 'store'])->name('storekategori');
+    Route::post('/kategori/updatekategori', [KategoriController::class, 'update'])->name('updatekategori');
+    Route::post('/kategori/deletekategori', [KategoriController::class, 'destroy'])->name('deletekategori');
 });
 
 // produk
@@ -80,9 +82,8 @@ Route::middleware('auth')->group(function () {
     Route::post('/pelanggan/destroy', [PelanggansController::class, 'destroy'])->name('pelanggan.destroy');
 });
 
-
-// Bahan Baku 
-Route::middleware(['auth'])->group(function() {
+// Bahan Baku
+Route::middleware(['auth'])->group(function () {
     Route::get('/bahanbaku', [BahanBakuController::class, 'index'])->name('managebahanbakuindex');
     Route::get('/bahanbaku/loadbahanbaku', [BahanBakuController::class, 'loadbahanbaku'])->name('loadbahanbaku');
     Route::post('/bahanbaku/postbahanbaku', [BahanBakuController::class, 'store'])->name('storebahanbaku');
@@ -92,9 +93,19 @@ Route::middleware(['auth'])->group(function() {
 
 // Relasi Bahan Baku
 Route::middleware(['auth'])->group(function () {
-    Route::get('/relasibahanbaku', [\App\Http\Controllers\RelasiBahanBakuController::class, 'index'])->name('managerelasibahanbakuindex');
-    Route::get('/relasibahanbaku/load', [\App\Http\Controllers\RelasiBahanBakuController::class, 'loadrelasibahanbaku'])->name('loadrelasibahanbaku');
-    Route::post('/relasibahanbaku/store', [\App\Http\Controllers\RelasiBahanBakuController::class, 'store'])->name('storerelasibahanbaku');
-    Route::post('/relasibahanbaku/update', [\App\Http\Controllers\RelasiBahanBakuController::class, 'update'])->name('updaterelasibahanbaku');
-    Route::post('/relasibahanbaku/delete', [\App\Http\Controllers\RelasiBahanBakuController::class, 'destroy'])->name('deleterelasibahanbaku');
+    Route::get('/relasibahanbaku', [RelasiBahanBakuController::class, 'index'])->name('managerelasibahanbakuindex');
+    Route::get('/relasibahanbaku/load', [RelasiBahanBakuController::class, 'loadrelasibahanbaku'])->name('loadrelasibahanbaku');
+    Route::post('/relasibahanbaku/store', [RelasiBahanBakuController::class, 'store'])->name('storerelasibahanbaku');
+    Route::post('/relasibahanbaku/update', [RelasiBahanBakuController::class, 'update'])->name('updaterelasibahanbaku');
+    Route::post('/relasibahanbaku/delete', [RelasiBahanBakuController::class, 'destroy'])->name('deleterelasibahanbaku');
+});
+
+// Stok Bahan Baku
+Route::middleware(['auth'])->group(function () {
+    Route::get('/stokbahanbaku', [StokBahanBakusController::class, 'index'])->name('stokbahanbaku.index');
+    Route::get('/stokbahanbaku/create', [StokBahanBakusController::class, 'create'])->name('stokbahanbaku.create');
+    Route::post('/stokbahanbaku', [StokBahanBakusController::class, 'store'])->name('stokbahanbaku.store');
+    Route::get('/stokbahanbaku/{id}/edit', [StokBahanBakusController::class, 'edit'])->name('stokbahanbaku.edit');
+    Route::put('/stokbahanbaku/{id}', [StokBahanBakusController::class, 'update'])->name('stokbahanbaku.update');
+    Route::delete('/stokbahanbaku', [StokBahanBakusController::class, 'destroy'])->name('stokbahanbaku.destroy');
 });
