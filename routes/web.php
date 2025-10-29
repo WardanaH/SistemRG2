@@ -1,19 +1,20 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Admin\CabangController;
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\ProdukController;
+use App\Http\Controllers\KategoriController;
+use App\Http\Controllers\SupplierController;
+use App\Http\Controllers\BahanBakuController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\UserController;
-use App\Http\Controllers\AuthController;
-use App\Http\Controllers\SupplierController;
-use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\JenisPelanggansController;
-use App\Http\Controllers\ProdukController;
 use App\Http\Controllers\PelanggansController;
-use App\Http\Controllers\BahanBakuController;
+use App\Http\Controllers\Admin\CabangController;
 use App\Http\Controllers\StokBahanBakusController;
+use App\Http\Controllers\JenisPelanggansController;
 use App\Http\Controllers\RelasiBahanBakuController;
-use App\Http\Controllers\KategoriController;
+use App\Http\Controllers\TransaksiBahanBakusController;
 
 // Guest (belum login)
 Route::middleware('guest')->group(function () {
@@ -108,4 +109,38 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/stokbahanbaku/{id}/edit', [StokBahanBakusController::class, 'edit'])->name('stokbahanbaku.edit');
     Route::put('/stokbahanbaku/{id}', [StokBahanBakusController::class, 'update'])->name('stokbahanbaku.update');
     Route::delete('/stokbahanbaku', [StokBahanBakusController::class, 'destroy'])->name('stokbahanbaku.destroy');
+});
+
+// Transaksi Stok Bahan Baku
+Route::middleware(['auth'])->group(function () {
+    Route::get('/transaksi/bahan', [TransaksiBahanBakusController::class, 'index'])
+        ->name('transaksibahanbaku.index');
+
+    // Form tambah transaksi
+    Route::get('/transaksi/bahan/create', [TransaksiBahanBakusController::class, 'create'])
+        ->name('transaksibahanbaku.create');
+
+    // Proses simpan transaksi baru
+    Route::post('/transaksi/bahan/store', [TransaksiBahanBakusController::class, 'store'])
+        ->name('transaksibahanbaku.store');
+
+    // Form edit transaksi (menampilkan data yang sudah ada)
+    Route::get('/transaksi/bahan/edit/{id}', [TransaksiBahanBakusController::class, 'show'])
+        ->name('transaksibahanbaku.edit');
+
+    // Proses update data transaksi
+    Route::put('/transaksi/bahan/update/{id}', [TransaksiBahanBakusController::class, 'update'])
+        ->name('transaksibahanbaku.update');
+
+    // Hapus transaksi (soft delete)
+    Route::get('/transaksi/bahan/delete/{id}', [TransaksiBahanBakusController::class, 'destroy'])
+        ->name('transaksibahanbaku.destroy');
+
+    // Menampilkan data transaksi yang sudah dihapus (soft deleted)
+    Route::get('/transaksi/bahan/deleted', [TransaksiBahanBakusController::class, 'indexdeleted'])
+        ->name('transaksibahanbaku.deleted');
+
+    // Mengembalikan data bahan baku
+    Route::get('/ajax/load-bahanbaku', [TransaksiBahanBakusController::class, 'loadBahanBaku'])
+        ->name('loadbahanbaku');
 });

@@ -4,7 +4,17 @@
 <head>
     <meta charset="UTF-8">
     <title>{{ config('app.name', 'Sistem Restu Guru Promosindo') }}</title>
+
+    {{-- Bootstrap & Font Awesome --}}
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" rel="stylesheet">
+
+    {{-- Select2 --}}
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+
+    {{-- Optional: SweetAlert2 modern --}}
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.0/dist/sweetalert2.min.css" rel="stylesheet">
+
     <style>
         body {
             background-color: #f8f9fa;
@@ -53,8 +63,7 @@
         <a href="{{ route('managerelasibahanbakuindex') }}">🧩 Aturan Bahan Baku</a>
         <a href="{{ route('jenispelanggan.index') }}">🧾 Manajemen Jenis Pelanggan</a>
         <a href="{{ route('stokbahanbaku.index') }}">📦 Daftar Stock Bahan Baku</a>
-
-        {{-- 🔹 Tambahan menu pelanggan --}}
+        <a href="{{ route('transaksibahanbaku.index') }}">📦 Transaksi Bahan Baku</a>
         <a href="{{ route('pelanggan.index') }}">👥 Manajemen Pelanggan</a>
 
         <form action="{{ route('logout') }}" method="POST" class="mt-3">
@@ -63,7 +72,6 @@
         </form>
     </div>
     @endauth
-
 
     <div class="main">
         @if(session('success'))
@@ -76,8 +84,21 @@
 
         @yield('content')
     </div>
+
+    {{-- jQuery wajib diletakkan sebelum script yang lain --}}
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+    {{-- Bootstrap Bundle --}}
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    {{-- Select2 --}}
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+    {{-- SweetAlert2 modern (optional) --}}
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.0/dist/sweetalert2.all.min.js"></script>
+
+    {{-- Tempat semua script tambahan dari child view --}}
+    @stack('scripts')
 </body>
-@stack('scripts')
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
 </html>
