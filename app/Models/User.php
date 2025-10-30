@@ -39,4 +39,9 @@ class User extends Authenticatable
     {
         return $this->belongsTo(Cabang::class, 'cabang_id')->withTrashed();
     }
+
+    // public function roles()
+    // {
+    //     return $this->belongsToMany(\Spatie\Permission\Models\Role::class);
+    // }
 }
