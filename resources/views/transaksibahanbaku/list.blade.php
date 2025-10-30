@@ -2,12 +2,12 @@
 
 @push('style')
 <meta name="csrf-token" content="{{ csrf_token() }}">
-<link rel="stylesheet" href="{{ asset('bower_components/bootstrap-daterangepicker/daterangepicker.css') }}">
-<link rel="stylesheet" href="{{ asset('bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css') }}">
-<link rel="stylesheet" href="{{ asset('bower_components/select2/dist/css/select2.min.css') }}">
-<link rel="stylesheet" href="{{ asset('bower_components/font-awesome/css/font-awesome.min.css') }}">
-<link rel="stylesheet" href="{{ asset('plugins/iCheck/all.css') }}">
-<link rel="stylesheet" href="{{ asset('dist/css/skins/_all-skins.min.css') }}">
+
+{{-- ✅ CDN untuk plugin yang kamu gunakan --}}
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.10.0/css/bootstrap-datepicker.min.css" rel="stylesheet" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet" />
+
 <style>
     .ui-autocomplete {
         position: absolute;
@@ -30,38 +30,38 @@
 
 @section('content')
 
-
 {{-- ✅ Alerts --}}
 @if (session('success'))
-<div class="alert alert-success alert-dismissible">
-    <button type="button" class="close" data-dismiss="alert">&times;</button>
-    <i class="icon fa fa-check"></i> {{ session('success') }}
+<div class="alert alert-success alert-dismissible fade show">
+    <i class="fa fa-check"></i> {{ session('success') }}
+    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
 </div>
 @endif
+
 @if (session('error'))
-<div class="alert alert-danger alert-dismissible">
-    <button type="button" class="close" data-dismiss="alert">&times;</button>
-    <i class="icon fa fa-ban"></i> {{ session('error') }}
+<div class="alert alert-danger alert-dismissible fade show">
+    <i class="fa fa-ban"></i> {{ session('error') }}
+    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
 </div>
 @endif
 
 <div class="row">
     {{-- 🔍 FILTER PANEL --}}
     <div class="col-md-3">
-        <div class="box box-primary">
-            <div class="box-header with-border">
-                <h3 class="box-title">Cari Transaksi</h3>
+        <div class="card shadow-sm mb-3">
+            <div class="card-header bg-primary text-white">
+                <h6 class="mb-0"><i class="fa fa-search"></i> Cari Transaksi</h6>
             </div>
             <form action="{{ route('transaksibahanbaku.index') }}" method="GET">
-                <div class="box-body">
-                    <div class="form-group">
+                <div class="card-body">
+                    <div class="mb-3">
                         <input type="text" name="no" value="{{ $no }}" class="form-control" placeholder="Nomor Nota">
                     </div>
-                    <div class="form-group">
+                    <div class="mb-3">
                         <input type="text" name="tanggal" id="tanggal" value="{{ $date }}" readonly class="form-control" placeholder="Tanggal">
                     </div>
-                    <div class="form-group">
-                        <select class="form-control select2" name="namabahanbaku" style="width:100%;">
+                    <div class="mb-3">
+                        <select class="form-select select2" name="namabahanbaku">
                             <option value="semua">Semua Bahan Baku</option>
                             @foreach ($bahanbakus as $bahanbaku)
                             <option value="{{ encrypt($bahanbaku->id) }}"
@@ -71,8 +71,8 @@
                             @endforeach
                         </select>
                     </div>
-                    <div class="form-group">
-                        <select class="form-control select2" name="cabangtujuan" style="width:100%;">
+                    <div class="mb-3">
+                        <select class="form-select select2" name="cabangtujuan">
                             <option value="semua">Semua Cabang</option>
                             @foreach ($cabangs as $cabang)
                             <option value="{{ encrypt($cabang->id) }}"
@@ -83,11 +83,11 @@
                         </select>
                     </div>
                 </div>
-                <div class="box-footer text-right">
+                <div class="card-footer text-end">
                     <button type="submit" class="btn btn-success btn-sm">
                         <i class="fa fa-search"></i> Tampilkan
                     </button>
-                    <a href="{{ route('transaksibahanbaku.index') }}" class="btn btn-default btn-sm">
+                    <a href="{{ route('transaksibahanbaku.index') }}" class="btn btn-secondary btn-sm">
                         <i class="fa fa-refresh"></i> Reset
                     </a>
                 </div>
@@ -97,83 +97,88 @@
 
     {{-- 📋 DATA TABLE --}}
     <div class="col-md-9">
-        <div class="box box-primary">
-            <div class="box-header with-border d-flex justify-content-between">
-                <h3 class="box-title">Transaksi Bahan Baku <i class="fa fa-shopping-cart"></i></h3>
-                <a href="{{ route('transaksibahanbaku.create') }}" class="btn btn-primary btn-sm">
+        <div class="card shadow-sm">
+            <div class="card-header d-flex justify-content-between align-items-center bg-primary text-white">
+                <h6 class="mb-0"><i class="fa fa-shopping-cart"></i> Transaksi Bahan Baku</h6>
+                <a href="{{ route('transaksibahanbaku.create') }}" class="btn btn-light btn-sm">
                     <i class="fa fa-plus"></i> Tambah
                 </a>
             </div>
-            <div class="box-body">
-                <div class="table-responsive">
-                    <table class="table table-bordered table-hover">
-                        <thead>
-                            <tr>
-                                <th>No.</th>
-                                <th>Bahan Baku</th>
-                                <th>Tanggal</th>
-                                <th>Cabang Dari</th>
-                                <th>Cabang Tujuan</th>
-                                <th>Banyak</th>
-                                <th>Satuan</th>
-                                <th>Keterangan</th>
-                                <th>Pembuat</th>
-                                <th>Aksi</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @forelse ($datas as $data)
-                            <tr>
-                                <td>#{{ $data->id }}</td>
-                                <td>{{ $data->nama_bahan }}</td>
-                                <td>{{ $data->tanggal }}</td>
-                                <td>{{ $data->cabangdari }}</td>
-                                <td>{{ $data->cabangtujuan }}</td>
-                                <td>{{ $data->banyak }}</td>
-                                <td>{{ $data->satuan }}</td>
-                                <td>{{ $data->keterangan }}</td>
-                                <td>{{ $data->username }}</td>
-                                <td class="text-center" style="width:80px;">
-                                    <div class="btn-group">
-                                        <a href="{{ route('transaksibahanbaku.edit', encrypt($data->id)) }}" class="btn btn-success btn-xs">
-                                            <i class="fa fa-edit"></i>
-                                        </a>
-                                        <form action="{{ route('transaksibahanbaku.destroy', encrypt($data->id)) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus transaksi ini?')" style="display:inline;">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button class="btn btn-danger btn-xs"><i class="fa fa-trash"></i></button>
-                                        </form>
-                                    </div>
-                                </td>
-                            </tr>
-                            @empty
-                            <tr>
-                                <td colspan="10" class="text-center text-muted">Belum ada transaksi</td>
-                            </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
+
+            <div class="card-body table-responsive">
+                <table class="table table-bordered table-hover align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>No.</th>
+                            <th>Bahan Baku</th>
+                            <th>Tanggal</th>
+                            <th>Cabang Dari</th>
+                            <th>Cabang Tujuan</th>
+                            <th>Banyak</th>
+                            <th>Satuan</th>
+                            <th>Keterangan</th>
+                            <th>Pembuat</th>
+                            <th class="text-center" style="width:80px;">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse ($datas as $data)
+                        <tr>
+                            <td>#{{ $data->id }}</td>
+                            <td>{{ $data->nama_bahan }}</td>
+                            <td>{{ $data->tanggal }}</td>
+                            <td>{{ $data->cabangdari }}</td>
+                            <td>{{ $data->cabangtujuan }}</td>
+                            <td>{{ $data->banyak }}</td>
+                            <td>{{ $data->satuan }}</td>
+                            <td>{{ $data->keterangan }}</td>
+                            <td>{{ $data->username }}</td>
+                            <td class="text-center">
+                                <div class="btn-group btn-group-sm">
+                                    <a href="{{ route('transaksibahanbaku.edit', encrypt($data->id)) }}" class="btn btn-success">
+                                        <i class="fa fa-edit"></i>
+                                    </a>
+                                    <form action="{{ route('transaksibahanbaku.destroy', encrypt($data->id)) }}"
+                                        method="POST"
+                                        onsubmit="return confirm('Yakin ingin menghapus transaksi ini?')"
+                                        style="display:inline;">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button class="btn btn-danger"><i class="fa fa-trash"></i></button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        @empty
+                        <tr>
+                            <td colspan="10" class="text-center text-muted">Belum ada transaksi</td>
+                        </tr>
+                        @endforelse
+                    </tbody>
+                </table>
             </div>
 
-            <div class="box-footer">
-                <ul class="pagination pagination-sm no-margin pull-right">
-                    {{ $datas->appends(request()->query())->links() }}
-                </ul>
+            <div class="card-footer text-end">
+                {{ $datas->appends(request()->query())->links() }}
             </div>
         </div>
     </div>
 </div>
+@endsection
 
 @push('scripts')
+{{-- ✅ CDN JS untuk plugin --}}
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.10.0/js/bootstrap-datepicker.min.js"></script>
+
 <script>
     $(function() {
         $('.select2').select2();
         $('#tanggal').datepicker({
             format: "dd-mm-yyyy",
-            autoclose: true
+            autoclose: true,
+            todayHighlight: true
         });
     });
 </script>
 @endpush
-@endsection

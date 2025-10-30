@@ -103,7 +103,7 @@ class TransaksiBahanBakusController extends Controller
         $validated = $request->validate([
             'bahanbaku_transaksibahanbaku' => 'required',
             'cabangtujuan_transaksibahanbaku' => 'required',
-            'banyak_transaksibahanbaku' => 'required|numeric',
+            'banyak_transaksibahanbaku' => 'required|numeric|min:1',
         ]);
 
         DB::beginTransaction();
@@ -114,28 +114,31 @@ class TransaksiBahanBakusController extends Controller
 
             $bahan = MBahanBakus::findOrFail($bahanbakuId);
 
-            // Cek stok di cabang asal
-            $stok = MStokBahanBakus::where('bahanbaku_id', $bahanbakuId)
-                ->where('cabang_id', $cabangDari)
-                ->first();
+            // === CABANG ASAL ===
+            $stokAsal = MStokBahanBakus::firstOrCreate(
+                ['bahanbaku_id' => $bahanbakuId, 'cabang_id' => $cabangDari],
+                ['banyak_stok' => 0, 'stok_hitung_luas' => $bahan->hitung_luas, 'satuan' => $bahan->satuan]
+            );
 
-            if (!$stok) {
-                // Jika belum ada stok, buat baru
-                $stok = MStokBahanBakus::create([
-                    'banyak_stok' => 0 - $request->banyak_transaksibahanbaku,
-                    'stok_hitung_luas' => $bahan->hitung_luas,
-                    'satuan' => $bahan->satuan,
-                    'bahanbaku_id' => $bahanbakuId,
-                    'cabang_id' => $cabangDari,
-                ]);
-            } else {
-                // Kurangi stok dari cabang asal
-                $stok->banyak_stok -= $request->banyak_transaksibahanbaku;
-                $stok->save();
+            if ($stokAsal->banyak_stok < $request->banyak_transaksibahanbaku) {
+                DB::rollBack();
+                return redirect()->back()
+                    ->withInput()
+                    ->with('error', '❌ Stok cabang asal tidak mencukupi untuk transaksi ini!');
             }
 
-            // Simpan transaksi
-            $transaksi = MTransaksiBahanBakus::create([
+            $stokAsal->decrement('banyak_stok', $request->banyak_transaksibahanbaku);
+
+            // === CABANG TUJUAN ===
+            $stokTujuan = MStokBahanBakus::firstOrCreate(
+                ['bahanbaku_id' => $bahanbakuId, 'cabang_id' => $cabangTujuan],
+                ['banyak_stok' => 0, 'stok_hitung_luas' => $bahan->hitung_luas, 'satuan' => $bahan->satuan]
+            );
+
+            $stokTujuan->increment('banyak_stok', $request->banyak_transaksibahanbaku);
+
+            // === SIMPAN TRANSAKSI ===
+            MTransaksiBahanBakus::create([
                 'bahanbaku_id' => $bahanbakuId,
                 'cabangdari_id' => $cabangDari,
                 'cabangtujuan_id' => $cabangTujuan,
@@ -147,12 +150,13 @@ class TransaksiBahanBakusController extends Controller
             ]);
 
             DB::commit();
-            return redirect()->back()->with('success', '✅ Transaksi bahan baku berhasil disimpan!');
+            return redirect()->back()->with('success', '✅ Transaksi bahan baku berhasil disimpan dan stok cabang diperbarui!');
         } catch (\Throwable $th) {
             DB::rollBack();
             return redirect()->back()->with('error', '❌ Terjadi kesalahan: ' . $th->getMessage());
         }
     }
+
 
     /**
      * ✏️ Tampilkan form edit.
