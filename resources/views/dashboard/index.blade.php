@@ -4,6 +4,7 @@
 <div class="container">
     <h3>Selamat Datang, {{ $user->name }}</h3>
     <p>Role Anda: <strong>{{ $user->getRoleNames()->implode(', ') }}</strong></p>
+    <p>Cabang Anda: <strong>{{ $cabang }}</strong></p>
 
     <div class="mt-4">
         <a href="{{ route('users.index') }}" class="btn btn-outline-primary">Manajemen User</a>
