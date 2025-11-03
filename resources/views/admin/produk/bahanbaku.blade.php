@@ -125,7 +125,7 @@ $(document).ready(function() {
     loadBahan();
 
     function loadBahan() {
-        $.get("{{ route('loadbahanbaku') }}", function(res) {
+        $.get("{{ route('bahanbaku.load') }}", function(res) {
             let rows = '';
             if (res.data.length === 0) {
                 rows = `<tr><td colspan="8" class="text-muted">Belum ada data bahan baku.</td></tr>`;

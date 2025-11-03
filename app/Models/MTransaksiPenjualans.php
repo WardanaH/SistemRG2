@@ -30,20 +30,19 @@ class MTransaksiPenjualans extends Model
     ];
 
     /**
-     * Relasi ke detail penjualan (sub transaksi)
+     * =========================
+     * 🔹 RELATIONSHIPS
+     * =========================
      */
-    public function subPenjualans()
+
+    /**
+     * Relasi ke detail penjualan (sub transaksi)
+     * Setiap transaksi penjualan memiliki banyak detail barang
+     */
+    public function subTransaksi()
     {
         return $this->hasMany(MSubTransaksiPenjualans::class, 'penjualan_id');
     }
-
-    // /**
-    //  * Relasi ke tabel angsuran
-    //  */
-    // public function angsurans()
-    // {
-    //     return $this->hasMany(Angsuran::class, 'penjualan_id');
-    // }
 
     /**
      * Relasi ke pelanggan
@@ -67,5 +66,35 @@ class MTransaksiPenjualans extends Model
     public function cabang()
     {
         return $this->belongsTo(Cabang::class, 'cabang_id');
+    }
+
+    /**
+     * =========================
+     * 🔹 ACCESSORS / HELPERS
+     * =========================
+     */
+
+    /**
+     * Format total harga menjadi Rupiah (opsional)
+     */
+    public function getTotalHargaFormatAttribute(): string
+    {
+        return 'Rp ' . number_format($this->total_harga, 0, ',', '.');
+    }
+
+    /**
+     * Format sisa tagihan jadi rupiah
+     */
+    public function getSisaTagihanFormatAttribute(): string
+    {
+        return 'Rp ' . number_format($this->sisa_tagihan, 0, ',', '.');
+    }
+
+    /**
+     * Cek apakah transaksi sudah lunas
+     */
+    public function getIsLunasAttribute(): bool
+    {
+        return $this->sisa_tagihan <= 0;
     }
 }

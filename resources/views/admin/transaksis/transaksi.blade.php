@@ -1,0 +1,420 @@
+@extends('layouts.app')
+@section('content')
+
+<div class="container-fluid">
+    <div class="row">
+
+        @if ($errors->any())
+        <div class="alert alert-danger alert-dismissible fade show mt-3" role="alert">
+            <ul>
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        @endif
+
+        {{-- ======================= FORM PELANGGAN ======================= --}}
+        <div class="col-md-3">
+            <form id="formpelanggan">
+                <div class="card shadow">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="mb-0">👤 Pelanggan</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <input type="text" id="namapelanggan" name="namapelanggan" class="form-control" placeholder="Nama Pelanggan">
+                        </div>
+                        <div class="mb-3">
+                            <input type="text" id="nomorhandphone" name="nomorhandphone" class="form-control" placeholder="Nomor Handphone">
+                        </div>
+                        <div class="mb-3">
+                            <select id="pelanggan" name="pelanggan" class="form-select select2">
+                                <option value="">-- Pilih Pelanggan --</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="card-footer text-end">
+                        <button type="button" id="submitpelanggan" class="btn btn-success btn-sm">
+                            Submit <i class="fa fa-chevron-circle-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        {{-- ======================= FORM TRANSAKSI ======================= --}}
+        <div class="col-md-9">
+            <form action="{{ route('storetransaksipenjualan') }}" method="POST">
+                @csrf
+                <div class="card shadow">
+                    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0"><i class="fa fa-shopping-cart"></i> Transaksi Penjualan</h5>
+                    </div>
+                    <div class="card-body">
+
+                        {{-- HEADER INFO --}}
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <p><strong>No. Nota:</strong> <span id="nonota">TRX-{{ now()->timestamp }}</span></p>
+                                <input type="hidden" name="nonota" value="TRX-{{ now()->timestamp }}">
+                                <p><strong>Tanggal:</strong>
+                                    <input type="text" class="form-control form-control-sm" name="inputtanggal" readonly value="{{ $date }}">
+                                </p>
+                            </div>
+                            <div class="col-md-6">
+                                <p><strong>Kepada:</strong> <span id="kepadalabel">-</span></p>
+                                <input type="hidden" name="inputnamapelanggan" id="namapelangganhidden">
+                                <p><strong>No. HP:</strong> <span id="handphonelabel">-</span></p>
+                                <input type="hidden" name="inputnomorpelanggan" id="nomorhandphonehidden">
+                                <input type="hidden" name="inputpelanggan" id="pelangganhidden">
+                            </div>
+                        </div>
+
+                        {{-- TABEL ITEM --}}
+                        <div class="table-responsive">
+                            <table class="table table-bordered text-center" id="tableItem">
+                                <thead class="table-success">
+                                    <tr>
+                                        <th>Nama Barang</th>
+                                        <th>Harga</th>
+                                        <th>P</th>
+                                        <th>L</th>
+                                        <th>Kuantitas</th>
+                                        <th>Finishing</th>
+                                        <th>Diskon %</th>
+                                        <th>Subtotal</th>
+                                        <th>Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+
+                        <button type="button" id="btnAddItem" class="btn btn-success btn-sm mt-2" disabled data-bs-toggle="modal" data-bs-target="#modal_add">
+                            <i class="fa fa-plus"></i> Tambah Item
+                        </button>
+
+                        {{-- TOTAL --}}
+                        <div class="row mt-3">
+                            <div class="col-md-6"></div>
+                            <div class="col-md-3">
+                                <label>Diskon (%)</label>
+                                <input type="number" id="diskon" name="inputdiskon" class="form-control" value="0">
+                            </div>
+                            <div class="col-md-3">
+                                <label>Total</label>
+                                <input type="text" id="total" name="inputtotal" class="form-control text-end" readonly value="Rp 0">
+                            </div>
+                        </div>
+
+                        <div class="row mt-3">
+                            <div class="col-md-6"></div>
+                            <div class="col-md-3">
+                                <label>Bayar</label>
+                                <input type="text" id="bayardp" name="inputbayardp" class="form-control" value="0">
+                            </div>
+                            <div class="col-md-3">
+                                <label>Pembayaran</label>
+                                <select id="pembayaran" name="inputpembayaran" class="form-select">
+                                    <option value="Cash">Cash</option>
+                                    <option value="Transfer">Transfer</option>
+                                </select>
+                            </div>
+                            <div class="row mt-3">
+                                <div class="col-md-12 text-end">
+                                    <label class="me-3">
+                                        <input type="radio" name="metode" id="metodelunas" value="lunas" class="form-check-input"> Lunas
+                                    </label>
+                                    <label>
+                                        <input type="radio" name="metode" id="metodedp" value="dp" class="form-check-input"> DP 50%
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row mt-3">
+                            <div class="col-md-6"></div>
+                            <div class="col-md-3">
+                                <label>Pajak (%)</label>
+                                <input type="number" id="pajak" name="inputpajak" class="form-control" value="0">
+                            </div>
+                            <div class="col-md-3">
+                                <label>Sisa</label>
+                                <input type="text" id="sisa" name="inputsisa" class="form-control text-end" readonly value="Rp 0">
+                            </div>
+                        </div>
+
+                        {{-- ITEM JSON --}}
+                        <input type="hidden" name="items" id="itemsInput">
+
+                        <hr>
+                        <div class="text-end">
+                            <button type="submit" id="submittransaksi" class="btn btn-primary btn-sm" disabled>
+                                <i class="fa fa-check-circle"></i> Simpan Transaksi
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+    </div>
+</div>
+
+{{-- ======================= MODAL TAMBAH ITEM ======================= --}}
+<div class="modal fade" id="modal_add" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title">Tambah Item</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="mb-3">
+                            <label>Produk</label>
+                            <select id="add_produk" class="form-select select2" style="width:100%;">
+                                <option value="">-- Pilih Produk --</option>
+                                @foreach ($produks as $produk)
+                                <option value="{{ $produk->id }}" data-harga="{{ $produk->harga_jual }}">
+                                    {{ $produk->nama_produk }}
+                                </option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-2">
+                                <label>Harga</label>
+                                <input id="add_harga" class="form-control" type="number" readonly>
+                            </div>
+                            <div class="col-md-3 mb-2">
+                                <label>P</label>
+                                <input id="add_panjang" class="form-control" type="number" value="0">
+                            </div>
+                            <div class="col-md-3 mb-2">
+                                <label>L</label>
+                                <input id="add_lebar" class="form-control" type="number" value="0">
+                            </div>
+                        </div>
+                        <div class="mb-2">
+                            <label>Kuantitas</label>
+                            <input id="add_kuantitas" class="form-control" type="number" value="1">
+                        </div>
+                        <div class="mb-2">
+                            <label>Finishing</label>
+                            <select id="add_finishing" class="form-select">
+                                <option value="Tanpa Finishing">Tanpa Finishing</option>
+                                <option value="Mata Ayam">Mata Ayam</option>
+                                <option value="Laminasi Glossy">Laminasi Glossy</option>
+                                <option value="Laminasi Doff">Laminasi Doff</option>
+                                <option value="Lainnya">Lainnya</option>
+                            </select>
+                        </div>
+                        <div class="mb-2">
+                            <label>Diskon (%)</label>
+                            <input id="add_diskon" class="form-control" type="number" value="0">
+                        </div>
+                        <div class="mb-2">
+                            <label>Subtotal</label>
+                            <input id="add_subtotal" class="form-control" readonly>
+                        </div>
+                        <div class="mb-2">
+                            <label>Keterangan</label>
+                            <textarea id="add_keterangan" class="form-control"></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Keluar</button>
+                <button type="button" id="additem" class="btn btn-success">Simpan</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{{-- ======================= SCRIPT ======================= --}}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script>
+    $(function() {
+        $('.select2').select2();
+
+        let total = 0;
+        const storeUrl = "{{ route('storetransaksipenjualan') }}";
+        const form = $(`form[action='${storeUrl}']`);
+        let items = [];
+
+        // ================== LOAD PELANGGAN ==================
+        $.get("{{ route('pelanggan.data') }}", function(res) {
+            res.data.forEach(p => {
+                $('#pelanggan').append(
+                    `<option value="${p.id}" data-nama="${p.nama_pemilik}" data-hp="${p.hp_pelanggan}">
+                    ${p.nama_pemilik} - ${p.hp_pelanggan}
+                </option>`
+                );
+            });
+        });
+
+        // ================== SUBMIT DATA PELANGGAN ==================
+        $('#submitpelanggan').click(function() {
+            const idPelanggan = $('#pelanggan').val();
+            let nama = $('#namapelanggan').val();
+            let hp = $('#nomorhandphone').val();
+
+            if (idPelanggan) {
+                const opt = $('#pelanggan option:selected');
+                nama = opt.data('nama');
+                hp = opt.data('hp');
+            }
+            if (!nama || !hp) return alert('Isi nama dan nomor HP pelanggan!');
+
+            $('#kepadalabel').text(nama);
+            $('#handphonelabel').text(hp);
+            $('#btnAddItem, #submittransaksi').prop('disabled', false);
+
+            $('#namapelangganhidden').val(nama);
+            $('#nomorhandphonehidden').val(hp);
+            $('#pelangganhidden').val(idPelanggan);
+        });
+
+        // ================== HITUNG SUBTOTAL ITEM ==================
+        $('#add_produk').on('change', function() {
+            const harga = $('option:selected', this).data('harga') || 0;
+            $('#add_harga').val(harga);
+            hitungSubtotal();
+        });
+
+        $('#add_panjang, #add_lebar, #add_kuantitas, #add_diskon').on('input', hitungSubtotal);
+
+        function hitungSubtotal() {
+            const harga = parseFloat($('#add_harga').val()) || 0;
+            const panjang = parseFloat($('#add_panjang').val()) || 0;
+            const lebar = parseFloat($('#add_lebar').val()) || 0;
+            const qty = parseFloat($('#add_kuantitas').val()) || 1;
+            const diskon = parseFloat($('#add_diskon').val()) || 0;
+
+            let subtotal = harga * (panjang && lebar ? panjang * lebar : 1) * qty;
+            subtotal -= subtotal * (diskon / 100);
+
+            $('#add_subtotal').val('Rp ' + subtotal.toLocaleString('id-ID'));
+        }
+
+        // ================== FIX SELECT2 DI MODAL ==================
+        $('#modal_add').on('shown.bs.modal', function() {
+            $('#add_produk, #add_finishing').select2({
+                dropdownParent: $('#modal_add')
+            });
+        });
+
+        // ================== TAMBAH ITEM KE TABEL ==================
+        $('#additem').click(function() {
+            const produkId = $('#add_produk').val();
+            const nama = $('#add_produk option:selected').text().trim();
+            const harga = parseFloat($('#add_harga').val()) || 0;
+            const panjang = parseFloat($('#add_panjang').val()) || 0;
+            const lebar = parseFloat($('#add_lebar').val()) || 0;
+            const qty = parseFloat($('#add_kuantitas').val()) || 1;
+            const finishing = $('#add_finishing').val();
+            const diskon = parseFloat($('#add_diskon').val()) || 0;
+            const subtotal = harga * (panjang && lebar ? panjang * lebar : 1) * qty * (1 - diskon / 100);
+            const keterangan = $('#add_keterangan').val() || '-';
+
+            const newItem = {
+                produk_id: produkId,
+                nama: nama,
+                harga: harga,
+                panjang: panjang,
+                lebar: lebar,
+                kuantitas: qty,
+                finishing: finishing,
+                diskon: diskon,
+                subtotal: subtotal,
+                keterangan: keterangan
+            };
+            items.push(newItem);
+
+            // update hidden input untuk array items[]
+            refreshHiddenInputs();
+
+            // Tambahkan baris ke tabel
+            $('#tableItem tbody').append(`
+            <tr>
+                <td>${nama}</td>
+                <td>Rp ${harga.toLocaleString('id-ID')}</td>
+                <td>${panjang}</td>
+                <td>${lebar}</td>
+                <td>${qty}</td>
+                <td>${finishing}</td>
+                <td>${diskon}%</td>
+                <td>Rp ${subtotal.toLocaleString('id-ID')}</td>
+                <td><button type="button" class="btn btn-danger btn-sm removeItem"><i class="fa fa-trash"></i></button></td>
+            </tr>
+        `);
+
+            total += subtotal;
+            updateTotal();
+            $('#modal_add').modal('hide');
+            $('#modal_add input, #add_keterangan').val('');
+        });
+
+        // ================== REFRESH INPUT ITEMS (Biar Laravel baca array) ==================
+        function refreshHiddenInputs() {
+            // hapus input lama
+            form.find('input[name^="items["]').remove();
+
+            // generate ulang input berdasarkan isi array items
+            items.forEach((item, i) => {
+                Object.entries(item).forEach(([key, val]) => {
+                    form.append(`<input type="hidden" name="items[${i}][${key}]" value="${val}">`);
+                });
+            });
+        }
+
+        // ================== HAPUS ITEM DARI TABEL ==================
+        $(document).on('click', '.removeItem', function() {
+            const rowIndex = $(this).closest('tr').index();
+            const val = parseFloat($(this).closest('tr').find('td').eq(7).text().replace(/[^\d]/g, ''));
+            total -= val;
+
+            // hapus dari array dan update input hidden
+            items.splice(rowIndex, 1);
+            refreshHiddenInputs();
+
+            $(this).closest('tr').remove();
+            updateTotal();
+        });
+
+        // ================== UPDATE TOTAL ==================
+        $('#diskon, #pajak, #bayardp').on('input change', updateTotal);
+        $('#metodelunas, #metodedp').on('change', updateTotal);
+
+        function updateTotal() {
+            const diskon = parseFloat($('#diskon').val()) || 0;
+            const pajak = parseFloat($('#pajak').val()) || 0;
+            let bayar = parseFloat($('#bayardp').val().replace(/[^0-9]/g, '')) || 0;
+
+            let totalDiskon = total - (total * (diskon / 100));
+            let totalFinal = totalDiskon + (totalDiskon * (pajak / 100));
+
+            if ($('#metodedp').is(':checked')) {
+                bayar = totalFinal / 2;
+                $('#bayardp').val('Rp ' + bayar.toLocaleString('id-ID'));
+            } else if ($('#metodelunas').is(':checked')) {
+                bayar = totalFinal;
+                $('#bayardp').val('Rp ' + bayar.toLocaleString('id-ID'));
+            }
+
+            const sisa = totalFinal - bayar;
+            $('#total').val('Rp ' + totalFinal.toLocaleString('id-ID'));
+            $('#sisa').val('Rp ' + sisa.toLocaleString('id-ID'));
+        }
+    });
+</script>
+
+
+
+@endsection

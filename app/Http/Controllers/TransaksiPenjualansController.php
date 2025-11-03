@@ -2,114 +2,135 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\MProduks;
 use App\Models\MBahanBakus;
 use Illuminate\Http\Request;
 use App\Models\StokBahanBaku;
 use App\Models\MStokBahanBakus;
 use App\Models\MRelasiBahanBaku;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use App\Models\MTransaksiPenjualans;
 use Illuminate\Support\Facades\Auth;
 use App\Models\MSubTransaksiPenjualans;
 
-class TransaksiPenjualanController extends Controller
+class TransaksiPenjualansController extends Controller
 {
-    public function index()
+    public function transaksi()
     {
-        return view('transaksi.index');
+        //
+        $date = date("Y-m-d");
+        $produks = MProduks::all();
+        // dd($produks);
+
+        return view('admin.transaksis.transaksi', ['date' => $date, 'produks' => $produks]);
     }
 
     public function store(Request $request)
     {
-        $validated = $request->validate([
-            'inputnomorpelanggan' => 'nullable|string|max:13',
-            'inputnamapelanggan' => 'nullable|string|max:100',
-            'inputpelanggan' => 'nullable',
-            'inputtanggal' => 'required|date',
-            'inputtotal' => 'required|numeric|min:0',
-            'inputdiskon' => 'nullable|numeric|min:0',
-            'inputpembayaran' => 'required|string',
-            'inputbayardp' => 'nullable|numeric|min:0',
-            'inputpajak' => 'nullable|numeric|min:0',
-            'jsonprodukid' => 'required|array',
-        ]);
-
+        DB::beginTransaction();
         try {
-            DB::beginTransaction();
-
-            // 🔹 Simpan transaksi utama
-            $transaksi = MTransaksiPenjualans::create([
-                'nomor_nota' => 'TRX-' . now()->format('YmdHis'),
-                'hp_pelanggan' => $request->input('inputnomorpelanggan'),
-                'nama_pelanggan' => $request->input('inputnamapelanggan'),
-                'pelanggan_id' => $request->input('inputpelanggan'),
-                'tanggal' => $request->input('inputtanggal'),
-                'total_harga' => $request->input('inputtotal'),
-                'diskon' => $request->input('inputdiskon', 0),
-                'metode_pembayaran' => $request->input('inputpembayaran'),
-                'jumlah_pembayaran' => $request->input('inputbayardp', 0),
-                'pajak' => $request->input('inputpajak', 0),
-                'user_id' => Auth::id(),
-                'cabang_id' => Auth::user()->cabang_id,
-                'sisa_tagihan' => $request->input('inputtotal') - $request->input('inputbayardp', 0),
+            // ================== VALIDASI DASAR ==================
+            $request->validate([
+                'inputtanggal' => 'required|date',
+                'inputtotal' => 'required',
+                'inputpembayaran' => 'required|string',
+                'items' => 'required|array|min:1',
+                'items.*.produk_id' => 'required|integer',
             ]);
+            // dd($request->all());
 
-            // 🔹 Simpan detail produk (sub transaksi)
-            $produks = $request->input('jsonprodukid');
+            // ================== SIMPAN DATA TRANSAKSI ==================
+            $transaksi = new MTransaksiPenjualans();
+            $transaksi->nomor_nota = $request->nonota ?? 'TRX-' . now()->timestamp;
+            $transaksi->tanggal = $request->inputtanggal;
+            $transaksi->nama_pelanggan = $request->inputnamapelanggan;
+            $transaksi->hp_pelanggan = $request->inputnomorpelanggan;
+            $transaksi->pelanggan_id = $request->inputpelanggan;
+            $transaksi->total_harga = preg_replace('/[^0-9]/', '', $request->inputtotal);
+            $transaksi->diskon = $request->inputdiskon ?? 0;
+            $transaksi->pajak = $request->inputpajak ?? 0;
+            $transaksi->metode_pembayaran = $request->inputpembayaran;
+            $transaksi->jumlah_pembayaran = preg_replace('/[^0-9]/', '', $request->inputbayardp);
+            $transaksi->sisa_tagihan = preg_replace('/[^0-9]/', '', $request->inputsisa);
+            $transaksi->user_id = Auth::id();
+            $transaksi->cabang_id = Auth::user()->cabang->id ?? null;
+            $transaksi->save();
+            // dd($transaksi);
 
-            foreach ($produks as $index => $produk) {
-                MSubTransaksiPenjualans::create([
-                    'penjualan_id' => $transaksi->id,
-                    'produk_id' => $produk['value'],
-                    'harga_satuan' => $request->json("jsonharga.$index.value"),
-                    'panjang' => $request->json("jsonpanjang.$index.value"),
-                    'lebar' => $request->json("jsonlebar.$index.value"),
-                    'banyak' => $request->json("jsonkuantitas.$index.value"),
-                    'keterangan' => $request->json("jsonketerangan.$index.value"),
-                    'subtotal' => $request->json("jsonsubtotal.$index.value"),
-                    'finishing' => $request->json("jsonfinishing.$index.value"),
-                    'satuan' => $request->json("jsonsatuan.$index.value"),
-                    'diskon' => $request->json("jsondiskon.$index.value"),
-                    'user_id' => Auth::id(),
-                ]);
+            // ================== SIMPAN DETAIL ITEM ==================
+            foreach ($request->items as $item) {
+                $sub = new MSubTransaksiPenjualans();
+                $sub->penjualan_id = $transaksi->id;
+                $sub->produk_id = $item['produk_id'];
+                $sub->harga_satuan = $item['harga'] ?? 0;
+                $sub->panjang = $item['panjang'] ?? 0;
+                $sub->lebar = $item['lebar'] ?? 0;
+                $sub->banyak = $item['kuantitas'] ?? 1;
+                $sub->finishing = $item['finishing'] ?? 'Tanpa Finishing';
+                $sub->diskon = $item['diskon'] ?? 0;
+                $sub->subtotal = $item['subtotal'] ?? 0;
+                $sub->keterangan = $item['keterangan'] ?? '-';
+                $sub->satuan = 'PCS'; // default, bisa diubah sesuai kebutuhan
+                $sub->user_id = Auth::id();
+                $sub->save();
 
-                // 🔹 Kurangi stok bahan baku sesuai relasi produk
-                $relasi = MRelasiBahanBaku::where('produk_id', $produk['value'])->get();
-                foreach ($relasi as $r) {
+                // ================== UPDATE STOK BAHAN BAKU ==================
+                $relasiBahan = MRelasiBahanBaku::where('produk_id', $item['produk_id'])->get();
+
+                foreach ($relasiBahan as $rel) {
                     $stok = MStokBahanBakus::firstOrNew([
-                        'bahanbaku_id' => $r->bahanbaku_id,
-                        'cabang_id' => Auth::user()->cabang_id,
+                        'bahanbaku_id' => $rel->bahanbaku_id,
+                        'cabang_id' => Auth::user()->cabangs->id,
                     ]);
 
-                    $bahan = MBahanBakus::find($r->bahanbaku_id);
-                    $kuantitas = $request->json("jsonkuantitas.$index.value");
-                    $panjang = $request->json("jsonpanjang.$index.value");
-                    $lebar = $request->json("jsonlebar.$index.value");
-                    $satuan = $request->json("jsonsatuan.$index.value");
+                    $bahan = MBahanBakus::find($rel->bahanbaku_id);
+                    $stok->satuan = $bahan->satuan;
+                    $stok->stokhitungluas = $bahan->hitung_luas;
 
-                    // Hitung luas bahan
-                    $luas = ($satuan === "METER")
-                        ? ($panjang * $lebar * $kuantitas)
-                        : (($panjang / 100) * ($lebar / 100) * $kuantitas);
+                    // hitung pengurangan stok
+                    $luas = $this->hitungLuas(
+                        $item['panjang'],
+                        $item['lebar'],
+                        $item['kuantitas'],
+                        $bahan->satuan ?? 'PCS',
+                        'PCS' // bisa ubah sesuai satuan item
+                    );
 
-                    $stok->banyakstok = ($stok->banyakstok ?? 0) - ($luas * $r->qtypertrx);
+                    $stok->banyakstok = ($stok->banyakstok ?? 0) - ($luas * $rel->qtypertrx);
                     $stok->save();
                 }
             }
 
-            DB::commit();
+            // ================== LOG AKTIVITAS ==================
+            // $this->createlog(
+            //     Auth::user()->username . " menambah transaksi penjualan #{$transaksi->no_nota} di cabang " . Auth::user()->cabangs->Nama_Cabang,
+            //     "add"
+            // );
 
-            return response()->json([
-                'status' => 'success',
-                'message' => 'Transaksi berhasil disimpan',
-                'id' => encrypt($transaksi->id),
-            ]);
-        } catch (\Throwable $e) {
+            Log::info('Sebelum commit', ['transaksi_id' => $transaksi->id]);
+            DB::commit();
+            return redirect()->route('transaksipenjualan')
+                ->with('success', 'Transaksi berhasil disimpan!');
+        } catch (\Exception $e) {
+            Log::error('Gagal transaksi', ['error' => $e->getMessage()]);
             DB::rollBack();
-            return response()->json([
-                'status' => 'failed',
-                'message' => $e->getMessage(),
-            ], 500);
+            return back()->with('error', 'Gagal menyimpan transaksi: ' . $e->getMessage());
         }
+    }
+
+    private function hitungLuas($panjang, $lebar, $qty, $satuanBahan, $satuanItem)
+    {
+        if (($satuanItem == "CENTIMETER") || ($satuanItem == "METER")) {
+            if ($satuanBahan == "CENTIMETER" && $satuanItem == "METER") {
+                return ($panjang * 100) * ($lebar * 100) * $qty;
+            } elseif ($satuanBahan == $satuanItem) {
+                return $panjang * $lebar * $qty;
+            } elseif ($satuanBahan == "METER" && $satuanItem == "CENTIMETER") {
+                return ($panjang / 100) * ($lebar / 100) * $qty;
+            }
+        }
+
+        return $qty; // default jika bukan hitung luas
     }
 }
