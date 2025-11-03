@@ -16,26 +16,39 @@ return new class extends Migration
             $table->timestamps();
             $table->softDeletes();
 
-            // Detail barang/jasa yang dijual
-            $table->string('nama_produk', 200);
-            $table->double('harga_satuan');
-            $table->double('panjang')->nullable();
-            $table->double('lebar')->nullable();
-            $table->double('kuantitas');
-            $table->string('satuan', 15)->nullable();
-            $table->longText('keterangan')->nullable();
-            $table->double('sub_totalpenjualan');
-            $table->text('reason_on_edit')->nullable();
-
-            // Relasi ke user, cabang, dan transaksi penjualan utama
+            // Relasi ke transaksi utama
             $table->unsignedBigInteger('penjualan_id');
-            $table->unsignedBigInteger('user_id');
-            $table->unsignedBigInteger('cabang_id');
 
-            // Foreign keys
-            $table->foreign('penjualan_id')->references('id')->on('transaksi_penjualans')->onDelete('cascade');
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
-            $table->foreign('cabang_id')->references('id')->on('cabangs')->onDelete('cascade');
+            // Detail produk yang dijual
+            $table->unsignedBigInteger('produk_id');
+            $table->double('harga_satuan');
+            $table->double('panjang')->default(0);
+            $table->double('lebar')->default(0);
+            $table->integer('banyak')->default(1);
+            $table->longText('keterangan')->nullable();
+
+            // Informasi tambahan
+            $table->unsignedBigInteger('user_id');
+            $table->double('subtotal')->default(0);
+            $table->double('diskon')->default(0);
+            $table->string('finishing', 100)->nullable();
+            $table->string('satuan', 20)->nullable();
+
+            // Foreign keys (opsional)
+            $table->foreign('penjualan_id')
+                ->references('id')
+                ->on('transaksi_penjualans')
+                ->onDelete('cascade');
+
+            $table->foreign('produk_id')
+                ->references('id')
+                ->on('produks')
+                ->onDelete('restrict');
+
+            $table->foreign('user_id')
+                ->references('id')
+                ->on('users')
+                ->onDelete('cascade');
         });
     }
 

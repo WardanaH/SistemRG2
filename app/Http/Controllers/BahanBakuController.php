@@ -18,7 +18,7 @@ class BahanBakuController extends Controller
     public function loadbahanbaku()
     {
         $data = MBahanBakus::with('kategori')->whereNull('deleted_at')->latest()->get();
-        return response()->json(['data' => $data]);
+        return response()->json(['success' => true, 'data' => $data]);
     }
 
     public function store(Request $request)

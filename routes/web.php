@@ -15,6 +15,7 @@ use App\Http\Controllers\StokBahanBakusController;
 use App\Http\Controllers\JenisPelanggansController;
 use App\Http\Controllers\RelasiBahanBakuController;
 use App\Http\Controllers\TransaksiBahanBakusController;
+use App\Http\Controllers\TransaksiPenjualansController;
 
 // Guest (belum login)
 Route::middleware('guest')->group(function () {
@@ -86,7 +87,7 @@ Route::middleware('auth')->group(function () {
 // Bahan Baku
 Route::middleware(['auth'])->group(function () {
     Route::get('/bahanbaku', [BahanBakuController::class, 'index'])->name('managebahanbakuindex');
-    Route::get('/bahanbaku/loadbahanbaku', [BahanBakuController::class, 'loadbahanbaku'])->name('loadbahanbaku');
+    Route::get('/bahanbaku/loadbahanbaku', [BahanBakuController::class, 'loadbahanbaku'])->name('bahanbaku.load');
     Route::post('/bahanbaku/postbahanbaku', [BahanBakuController::class, 'store'])->name('storebahanbaku');
     Route::post('/bahanbaku/updatebahanbaku', [BahanBakuController::class, 'update'])->name('updatebahanbaku');
     Route::post('/bahanbaku/deletebahanbaku', [BahanBakuController::class, 'destroy'])->name('deletebahanbaku');
@@ -143,4 +144,13 @@ Route::middleware(['auth'])->group(function () {
     // Mengembalikan data bahan baku
     Route::get('/ajax/load-bahanbaku', [TransaksiBahanBakusController::class, 'loadBahanBaku'])
         ->name('loadbahanbaku');
+});
+
+// Transaksi Penjualan
+Route::middleware(['auth'])->group(function () {
+    Route::get('/transaksi/penjualan', [TransaksiPenjualansController::class, 'transaksi'])->name('addtransaksiindex');
+    Route::get('/transaksi/penjualan/load', [TransaksiPenjualansController::class, 'load'])->name('loadtransaksipenjualan');
+    Route::post('/transaksi/penjualan/store', [TransaksiPenjualansController::class, 'store'])->name('storetransaksipenjualan');
+    Route::post('/transaksi/penjualan/update', [TransaksiPenjualansController::class, 'update'])->name('updatetransaksipenjualan');
+    Route::post('/transaksi/penjualan/delete', [TransaksiPenjualansController::class, 'destroy'])->name('deletetransaksipenjualan');
 });
