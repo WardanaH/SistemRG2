@@ -30,14 +30,7 @@ class MTransaksiPenjualans extends Model
     ];
 
     /**
-     * =========================
-     * 🔹 RELATIONSHIPS
-     * =========================
-     */
-
-    /**
      * Relasi ke detail penjualan (sub transaksi)
-     * Setiap transaksi penjualan memiliki banyak detail barang
      */
     public function subTransaksi()
     {
@@ -69,13 +62,7 @@ class MTransaksiPenjualans extends Model
     }
 
     /**
-     * =========================
-     * 🔹 ACCESSORS / HELPERS
-     * =========================
-     */
-
-    /**
-     * Format total harga menjadi Rupiah (opsional)
+     * Format total harga menjadi Rupiah
      */
     public function getTotalHargaFormatAttribute(): string
     {
@@ -98,3 +85,4 @@ class MTransaksiPenjualans extends Model
         return $this->sisa_tagihan <= 0;
     }
 }
+

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Cabang;
 use App\Models\MProduks;
 use App\Models\MBahanBakus;
 use Illuminate\Http\Request;
@@ -47,12 +48,12 @@ class TransaksiPenjualansController extends Controller
             $transaksi->nama_pelanggan = $request->inputnamapelanggan;
             $transaksi->hp_pelanggan = $request->inputnomorpelanggan;
             $transaksi->pelanggan_id = $request->inputpelanggan;
-            $transaksi->total_harga = preg_replace('/[^0-9]/', '', $request->inputtotal);
+            $transaksi->total_harga = $this->parseRupiah($request->inputtotal);
             $transaksi->diskon = $request->inputdiskon ?? 0;
             $transaksi->pajak = $request->inputpajak ?? 0;
             $transaksi->metode_pembayaran = $request->inputpembayaran;
-            $transaksi->jumlah_pembayaran = preg_replace('/[^0-9]/', '', $request->inputbayardp);
-            $transaksi->sisa_tagihan = preg_replace('/[^0-9]/', '', $request->inputsisa);
+            $transaksi->jumlah_pembayaran = $this->parseRupiah($request->inputbayardp);
+            $transaksi->sisa_tagihan = $this->parseRupiah($request->inputsisa);
             $transaksi->user_id = Auth::id();
             $transaksi->cabang_id = Auth::user()->cabang->id ?? null;
             $transaksi->save();
@@ -132,5 +133,64 @@ class TransaksiPenjualansController extends Controller
         }
 
         return $qty; // default jika bukan hitung luas
+    }
+
+    public function index(Request $request)
+    {
+        $query = MTransaksiPenjualans::with(['user', 'cabang'])
+            ->when($request->no, fn($q) => $q->where('nomor_nota', 'like', "%{$request->no}%"))
+            ->when($request->tanggal, fn($q) => $q->whereDate('tanggal', $request->tanggal))
+            ->when($request->cabang, fn($q) => $q->where('cabang_id', $request->cabang))
+            ->orderBy('tanggal', 'desc');
+
+        $datas = $query->paginate(10);
+        // dd($datas);
+
+        $cabangs = Cabang::all();
+
+        return view('admin.transaksis.list', compact('datas', 'cabangs'));
+    }
+
+    public function destroy($id)
+    {
+        DB::beginTransaction();
+
+        try {
+            // cari transaksi
+            $transaksi = MTransaksiPenjualans::findOrFail($id);
+
+            // soft delete semua sub transaksi-nya
+            foreach ($transaksi->subTransaksi as $sub) {
+                $sub->delete();
+            }
+
+            // soft delete transaksi utama
+            $transaksi->delete();
+
+            DB::commit();
+
+            return redirect()->route('transaksiindex')
+                ->with('success', 'Transaksi dan semua item-nya berhasil dihapus (soft delete).');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Gagal menghapus transaksi: ' . $e->getMessage());
+
+            return redirect()->route('transaksiindex')
+                ->with('error', 'Gagal menghapus transaksi: ' . $e->getMessage());
+        }
+    }
+
+    private function parseRupiah($value)
+    {
+        if (!$value) return 0;
+
+        // Hapus "Rp", spasi, dan titik ribuan
+        $value = str_replace(['Rp', ' ', '.'], '', $value);
+
+        // Ganti koma dengan titik untuk desimal
+        $value = str_replace(',', '.', $value);
+
+        // Pastikan jadi float dengan 2 desimal
+        return round((float)$value, 2);
     }
 }

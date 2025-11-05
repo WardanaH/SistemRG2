@@ -57,8 +57,8 @@
                         {{-- HEADER INFO --}}
                         <div class="row mb-3">
                             <div class="col-md-6">
-                                <p><strong>No. Nota:</strong> <span id="nonota">TRX-{{ now()->timestamp }}</span></p>
-                                <input type="hidden" name="nonota" value="TRX-{{ now()->timestamp }}">
+                                <p><strong>No. Nota:</strong> <span id="nonota">RG-{{ now()->timestamp }}</span></p>
+                                <input type="hidden" name="nonota" value="RG-{{ now()->timestamp }}">
                                 <p><strong>Tanggal:</strong>
                                     <input type="text" class="form-control form-control-sm" name="inputtanggal" readonly value="{{ $date }}">
                                 </p>

@@ -3,6 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ config('app.name', 'Sistem Restu Guru Promosindo') }}</title>
 
     {{-- Bootstrap & Font Awesome --}}
@@ -49,12 +50,13 @@
 
 <body>
     @auth
-    <div class="sidebar">
+    <div class="sidebar" style="overflow-y: scroll;">
         <h5 class="text-white">Menu</h5>
 
         <a href="{{ route('dashboard') }}">🏠 Dashboard</a>
         <a href="{{ route('users.index') }}">👤 Manajemen User</a>
         <a href="{{ route('addtransaksiindex') }}">🛒 Transaksi</a>
+        <a href="{{ route('transaksiindex') }}">🛒 Manajemen Penjualan</a>
         <a href="{{ route('cabangs.index') }}">🏢 Manajemen Cabang</a>
         <a href="{{ route('roles.index') }}">🔐 Manajemen Hak Akses</a>
         <a href="{{ route('managesupplierindex') }}">📦 Manajemen Supplier</a>
