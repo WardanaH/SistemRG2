@@ -21,7 +21,8 @@ class DatabaseSeeder extends Seeder
             UserSeeder::class,
             KategoriSeeder::class,
             ProdukSeeder::class,
-            BahanBakuSeeder::class
+            PelangganSeeder::class,
+            // BahanBakuSeeder::class
         ]);
     }
 }

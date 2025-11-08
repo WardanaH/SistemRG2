@@ -55,10 +55,10 @@
 
         <a href="{{ route('dashboard') }}">🏠 Dashboard</a>
         <a href="{{ route('users.index') }}">👤 Manajemen User</a>
+        <a href="{{ route('roles.index') }}">🔐 Manajemen Hak Akses</a>
         <a href="{{ route('addtransaksiindex') }}">🛒 Transaksi</a>
         <a href="{{ route('transaksiindex') }}">🛒 Manajemen Penjualan</a>
         <a href="{{ route('cabangs.index') }}">🏢 Manajemen Cabang</a>
-        <a href="{{ route('roles.index') }}">🔐 Manajemen Hak Akses</a>
         <a href="{{ route('designerindex') }}">👩‍🎨 Daftar Desainer</a>
         <a href="{{ route('operatorindex') }}">👩‍🎨 Daftar Operator</a>
         <a href="{{ route('pelanggan.index') }}">👥 Manajemen Pelanggan</a>

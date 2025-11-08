@@ -49,14 +49,15 @@ Route::middleware(['auth'])->group(function () {
 });
 
 // Jenis Pelanggan
-Route::controller(JenisPelanggansController::class)->group(function () {
-    Route::get('/jenispelanggan', 'index')->name('jenispelanggan.index');
-    Route::post('/jenispelanggan/store', 'store')->name('jenispelanggan.store');
-    Route::put('/jenispelanggan/update', 'update')->name('jenispelanggan.update');
-    Route::delete('/jenispelanggan/delete', 'destroy')->name('jenispelanggan.destroy');
-    Route::get('/jenispelanggan/cari', 'jenispelanggancari')->name('jenispelanggan.cari');
+Route::middleware('auth')->group(function () {
+    Route::controller(JenisPelanggansController::class)->group(function () {
+        Route::get('/jenispelanggan', 'index')->name('jenispelanggan.index');
+        Route::post('/jenispelanggan/store', 'store')->name('jenispelanggan.store');
+        Route::put('/jenispelanggan/update', 'update')->name('jenispelanggan.update');
+        Route::delete('/jenispelanggan/delete', 'destroy')->name('jenispelanggan.destroy');
+        Route::get('/jenispelanggan/cari', 'jenispelanggancari')->name('jenispelanggan.cari');
+    });
 });
-
 
 // Kategori
 Route::middleware(['auth'])->group(function () {
