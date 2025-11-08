@@ -55,19 +55,21 @@
 
         <a href="{{ route('dashboard') }}">🏠 Dashboard</a>
         <a href="{{ route('users.index') }}">👤 Manajemen User</a>
+        <a href="{{ route('roles.index') }}">🔐 Manajemen Hak Akses</a>
         <a href="{{ route('addtransaksiindex') }}">🛒 Transaksi</a>
         <a href="{{ route('transaksiindex') }}">🛒 Manajemen Penjualan</a>
         <a href="{{ route('cabangs.index') }}">🏢 Manajemen Cabang</a>
-        <a href="{{ route('roles.index') }}">🔐 Manajemen Hak Akses</a>
-        <a href="{{ route('managesupplierindex') }}">📦 Manajemen Supplier</a>
+        <a href="{{ route('designerindex') }}">👩‍🎨 Daftar Desainer</a>
+        <a href="{{ route('operatorindex') }}">👩‍🎨 Daftar Operator</a>
+        <a href="{{ route('pelanggan.index') }}">👥 Manajemen Pelanggan</a>
+        <a href="{{ route('jenispelanggan.index') }}">🧾 Manajemen Jenis Pelanggan</a>
         <a href="{{ route('managekategoriindex') }}">📂 Manajemen Kategori</a>
         <a href="{{ route('manageprodukindex') }}">🛒 Manajemen Produk</a>
         <a href="{{ route('managebahanbakuindex') }}">🧱 Manajemen Bahan Baku</a>
         <a href="{{ route('managerelasibahanbakuindex') }}">🧩 Aturan Bahan Baku</a>
-        <a href="{{ route('jenispelanggan.index') }}">🧾 Manajemen Jenis Pelanggan</a>
         <a href="{{ route('stokbahanbaku.index') }}">📦 Daftar Stock Bahan Baku</a>
         <a href="{{ route('transaksibahanbaku.index') }}">📦 Transaksi Bahan Baku</a>
-        <a href="{{ route('pelanggan.index') }}">👥 Manajemen Pelanggan</a>
+        <a href="{{ route('managesupplierindex') }}">📦 Manajemen Supplier</a>
 
         <form action="{{ route('logout') }}" method="POST" class="mt-3">
             @csrf
