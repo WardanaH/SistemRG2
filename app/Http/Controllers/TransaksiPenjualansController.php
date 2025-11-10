@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use App\Models\Cabang;
 use App\Models\MProduks;
 use App\Models\MBahanBakus;
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Models\StokBahanBaku;
 use App\Models\MStokBahanBakus;
@@ -22,9 +24,14 @@ class TransaksiPenjualansController extends Controller
         //
         $date = date("Y-m-d");
         $produks = MProduks::all();
+        $designer = User::role('designer')->get();
         // dd($produks);
 
-        return view('admin.transaksis.transaksi', ['date' => $date, 'produks' => $produks]);
+        return view('admin.transaksis.transaksi', [
+            'date' => $date,
+            'produks' => $produks,
+            'designers' => $designer
+        ]);
     }
 
     public function store(Request $request)
@@ -56,6 +63,7 @@ class TransaksiPenjualansController extends Controller
             $transaksi->sisa_tagihan = $this->parseRupiah($request->inputsisa);
             $transaksi->user_id = Auth::id();
             $transaksi->cabang_id = Auth::user()->cabang->id ?? null;
+            $transaksi->designer_id = $request->inputdesigner;
             $transaksi->save();
             // dd($transaksi);
 
@@ -141,7 +149,7 @@ class TransaksiPenjualansController extends Controller
             ->when($request->no, fn($q) => $q->where('nomor_nota', 'like', "%{$request->no}%"))
             ->when($request->tanggal, fn($q) => $q->whereDate('tanggal', $request->tanggal))
             ->when($request->cabang, fn($q) => $q->where('cabang_id', $request->cabang))
-            ->orderBy('tanggal', 'desc');
+            ->orderBy('created_at', 'desc');
 
         $datas = $query->paginate(10);
         // dd($datas);
@@ -192,5 +200,31 @@ class TransaksiPenjualansController extends Controller
 
         // Pastikan jadi float dengan 2 desimal
         return round((float)$value, 2);
+    }
+
+    public function showSubTransaksi(Request $request)
+    {
+        try {
+            // jika id terenkripsi di front-end, decrypt dulu
+            $id = $request->has('id') ? (is_string($request->id) && Str::startsWith($request->id, 'ey') ? decrypt($request->id) : $request->id) : null;
+            // atau kalau kamu selalu mengirim plain id: $id = $request->id;
+
+            $current = \App\Models\MSubTransaksiPenjualans::where('penjualan_id', $id)
+                ->with(['produk:id,nama_produk', 'user:id,username', 'cabang:id,nama'])
+                ->get();
+
+            $deleted = \App\Models\MSubTransaksiPenjualans::onlyTrashed()
+                ->where('penjualan_id', $id)
+                ->with(['produk:id,nama_produk', 'user:id,username', 'cabang:id,nama'])
+                ->get();
+
+            return response()->json([
+                'current' => $current,
+                'deleted' => $deleted,
+            ]);
+        } catch (\Exception $e) {
+            Log::error('showSubTransaksi error: ' . $e->getMessage());
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
     }
 }
