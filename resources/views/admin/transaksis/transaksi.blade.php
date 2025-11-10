@@ -2,182 +2,194 @@
 @section('content')
 
 <style>
-/* ==========================================
+    /* ==========================================
    STYLE TAMBAHAN KHUSUS HALAMAN TRANSAKSI
    (Tidak mengubah sidebar, header, dsb)
 ========================================== */
-.transaksi-page .card {
-    border: none;
-    border-radius: 8px;
-    box-shadow: 0 3px 8px rgba(0,0,0,0.05);
-}
-.transaksi-page .card-header {
-    background-color: #4B28D2 !important;
-    color: #fff !important;
-    font-weight: 600;
-    display: flex;
-    align-items: center;
-}
-.transaksi-page .card-header i {
-    color: #FFD54F !important;
-    margin-right: 6px;
-}
-.transaksi-page .form-control, 
-.transaksi-page .form-select, 
-.transaksi-page textarea {
-    border: 1px solid #ccc;
-    border-radius: 6px;
-    font-size: 0.9rem;
-    color: #333;
-    transition: border-color 0.2s ease-in-out;
-}
-.transaksi-page .form-control:focus, 
-.transaksi-page .form-select:focus {
-    border-color: #6a4ff7;
-    box-shadow: 0 0 3px rgba(106,79,247,0.3);
-}
-.transaksi-page .btn-success {
-    background-color: #28a745 !important;
-    border: none;
-    font-weight: 500;
-    border-radius: 6px;
-}
-.transaksi-page .btn-primary {
-    background-color: #4B28D2 !important;
-    border: none;
-    border-radius: 6px;
-    font-weight: 500;
-}
-.transaksi-page .btn-success:hover {
-    background-color: #218838 !important;
-}
-.transaksi-page .btn-primary:hover {
-    background-color: #3a1fb0 !important;
-}
-.transaksi-page .table th {
-    background-color: #f8f9fc !important;
-    color: #212121 !important;
-    font-weight: 600;
-    text-align: center;
-}
-.transaksi-page .table td {
-    color: #2b2b2b !important;
-    vertical-align: middle;
-}
-.transaksi-page .table tbody tr:nth-child(even) td {
-    background-color: #fafafa !important;
-}
-.transaksi-page .table tbody tr td[colspan] {
-    text-align: center;
-    color: #555 !important;
-    font-style: italic;
-}
-.transaksi-page input[type="radio"] {
-    accent-color: #4B28D2;
-    transform: scale(1.1);
-    margin-right: 4px;
-}
+    .transaksi-page .card {
+        border: none;
+        border-radius: 8px;
+        box-shadow: 0 3px 8px rgba(0, 0, 0, 0.05);
+    }
 
-/* =======================================
+    .transaksi-page .card-header {
+        background-color: #4B28D2 !important;
+        color: #fff !important;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+    }
+
+    .transaksi-page .card-header i {
+        color: #FFD54F !important;
+        margin-right: 6px;
+    }
+
+    .transaksi-page .form-control,
+    .transaksi-page .form-select,
+    .transaksi-page textarea {
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        font-size: 0.9rem;
+        color: #333;
+        transition: border-color 0.2s ease-in-out;
+    }
+
+    .transaksi-page .form-control:focus,
+    .transaksi-page .form-select:focus {
+        border-color: #6a4ff7;
+        box-shadow: 0 0 3px rgba(106, 79, 247, 0.3);
+    }
+
+    .transaksi-page .btn-success {
+        background-color: #28a745 !important;
+        border: none;
+        font-weight: 500;
+        border-radius: 6px;
+    }
+
+    .transaksi-page .btn-primary {
+        background-color: #4B28D2 !important;
+        border: none;
+        border-radius: 6px;
+        font-weight: 500;
+    }
+
+    .transaksi-page .btn-success:hover {
+        background-color: #218838 !important;
+    }
+
+    .transaksi-page .btn-primary:hover {
+        background-color: #3a1fb0 !important;
+    }
+
+    .transaksi-page .table th {
+        background-color: #f8f9fc !important;
+        color: #212121 !important;
+        font-weight: 600;
+        text-align: center;
+    }
+
+    .transaksi-page .table td {
+        color: #2b2b2b !important;
+        vertical-align: middle;
+    }
+
+    .transaksi-page .table tbody tr:nth-child(even) td {
+        background-color: #fafafa !important;
+    }
+
+    .transaksi-page .table tbody tr td[colspan] {
+        text-align: center;
+        color: #555 !important;
+        font-style: italic;
+    }
+
+    .transaksi-page input[type="radio"] {
+        accent-color: #4B28D2;
+        transform: scale(1.1);
+        margin-right: 4px;
+    }
+
+    /* =======================================
    FIX WARNA TEKS & KONTRAS BUTTON
 ======================================= */
 
-/* Pertegas semua teks di form dan tabel */
-.transaksi-page .form-control,
-.transaksi-page .form-select,
-.transaksi-page .table td,
-.transaksi-page .table th {
-    color: #1f1f1f !important;
-    opacity: 1 !important;
-}
+    /* Pertegas semua teks di form dan tabel */
+    .transaksi-page .form-control,
+    .transaksi-page .form-select,
+    .transaksi-page .table td,
+    .transaksi-page .table th {
+        color: #1f1f1f !important;
+        opacity: 1 !important;
+    }
 
-/* Label dan teks muted jangan abu transparan */
-.transaksi-page label,
-.transaksi-page p,
-.transaksi-page small,
-.transaksi-page span {
-    color: #1f1f1f !important;
-    opacity: 1 !important;
-}
+    /* Label dan teks muted jangan abu transparan */
+    .transaksi-page label,
+    .transaksi-page p,
+    .transaksi-page small,
+    .transaksi-page span {
+        color: #1f1f1f !important;
+        opacity: 1 !important;
+    }
 
-/* TOMBOL TAMBAH ITEM dan SIMPAN TRANSAKSI */
-.transaksi-page .btn-success,
-.transaksi-page .btn-primary {
-    color: #fff !important;
-    opacity: 1 !important;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-}
+    /* TOMBOL TAMBAH ITEM dan SIMPAN TRANSAKSI */
+    .transaksi-page .btn-success,
+    .transaksi-page .btn-primary {
+        color: #fff !important;
+        opacity: 1 !important;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
 
-.transaksi-page .btn-success:hover,
-.transaksi-page .btn-primary:hover {
-    opacity: 0.9 !important;
-}
+    .transaksi-page .btn-success:hover,
+    .transaksi-page .btn-primary:hover {
+        opacity: 0.9 !important;
+    }
 
-/* PERBAIKI RADIO BUTTON (Lunas / DP) */
-.transaksi-page .form-check-inline {
-    margin-right: 1rem;
-}
+    /* PERBAIKI RADIO BUTTON (Lunas / DP) */
+    .transaksi-page .form-check-inline {
+        margin-right: 1rem;
+    }
 
-.transaksi-page input[type="radio"] {
-    margin-right: 5px;
-    accent-color: #4B28D2;
-    transform: scale(1.2);
-}
+    .transaksi-page input[type="radio"] {
+        margin-right: 5px;
+        accent-color: #4B28D2;
+        transform: scale(1.2);
+    }
 
-/* =====================================
+    /* =====================================
    FIX SELECT2 AGAR SESUAI TEMPLATE FOCUS
 ===================================== */
-.transaksi-page .select2-container .select2-selection--single {
-    height: 38px !important;
-    border: 1px solid #dcdcdc !important;
-    border-radius: 6px !important;
-    background-color: #fff !important;
-    padding: 4px 10px !important;
-    display: flex !important;
-    align-items: center !important;
-    font-size: 0.9rem !important;
-    color: #333 !important;
-    transition: all 0.2s ease-in-out;
-}
+    .transaksi-page .select2-container .select2-selection--single {
+        height: 38px !important;
+        border: 1px solid #dcdcdc !important;
+        border-radius: 6px !important;
+        background-color: #fff !important;
+        padding: 4px 10px !important;
+        display: flex !important;
+        align-items: center !important;
+        font-size: 0.9rem !important;
+        color: #333 !important;
+        transition: all 0.2s ease-in-out;
+    }
 
-/* Fokus (saat diklik) */
-.transaksi-page .select2-container--default .select2-selection--single:focus,
-.transaksi-page .select2-container--default .select2-selection--single:hover {
-    border-color: #6a4ff7 !important;
-    box-shadow: 0 0 3px rgba(106,79,247,0.3);
-}
+    /* Fokus (saat diklik) */
+    .transaksi-page .select2-container--default .select2-selection--single:focus,
+    .transaksi-page .select2-container--default .select2-selection--single:hover {
+        border-color: #6a4ff7 !important;
+        box-shadow: 0 0 3px rgba(106, 79, 247, 0.3);
+    }
 
-/* Panah dropdown */
-.transaksi-page .select2-container--default .select2-selection__arrow b {
-    border-color: #4B28D2 transparent transparent transparent !important;
-}
+    /* Panah dropdown */
+    .transaksi-page .select2-container--default .select2-selection__arrow b {
+        border-color: #4B28D2 transparent transparent transparent !important;
+    }
 
-/* Teks di dalam */
-.transaksi-page .select2-selection__rendered {
-    color: #333 !important;
-    font-weight: 500 !important;
-}
+    /* Teks di dalam */
+    .transaksi-page .select2-selection__rendered {
+        color: #333 !important;
+        font-weight: 500 !important;
+    }
 
-/* Background hasil dropdown */
-.transaksi-page .select2-container--default .select2-results__option {
-    color: #222 !important;
-    font-size: 0.9rem !important;
-    padding: 6px 12px !important;
-}
+    /* Background hasil dropdown */
+    .transaksi-page .select2-container--default .select2-results__option {
+        color: #222 !important;
+        font-size: 0.9rem !important;
+        padding: 6px 12px !important;
+    }
 
-/* Hover item dropdown */
-.transaksi-page .select2-container--default .select2-results__option--highlighted {
-    background-color: #4B28D2 !important;
-    color: #fff !important;
-}
+    /* Hover item dropdown */
+    .transaksi-page .select2-container--default .select2-results__option--highlighted {
+        background-color: #4B28D2 !important;
+        color: #fff !important;
+    }
 
-/* Background dropdown list */
-.transaksi-page .select2-dropdown {
-    border: 1px solid #dcdcdc !important;
-    border-radius: 6px !important;
-    box-shadow: 0 3px 8px rgba(0,0,0,0.05);
-}
-
+    /* Background dropdown list */
+    .transaksi-page .select2-dropdown {
+        border: 1px solid #dcdcdc !important;
+        border-radius: 6px !important;
+        box-shadow: 0 3px 8px rgba(0, 0, 0, 0.05);
+    }
 </style>
 
 <div class="container-fluid transaksi-page">
@@ -187,7 +199,7 @@
         <div class="alert alert-danger alert-dismissible fade show mt-3" role="alert">
             <ul>
                 @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
+                <li>{{ $error }}</li>
                 @endforeach
             </ul>
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
@@ -248,6 +260,13 @@
                                 <p><strong>No. HP:</strong> <span id="handphonelabel">-</span></p>
                                 <input type="hidden" name="inputnomorpelanggan" id="nomorhandphonehidden">
                                 <input type="hidden" name="inputpelanggan" id="pelangganhidden">
+                                <label for="inputdesigner" class="form-label">Pilih Designer</label>
+                                <select name="inputdesigner" id="inputdesigner" class="form-select select2" required>
+                                    <option value="">-- Pilih Designer --</option>
+                                    @foreach($designers as $d)
+                                    <option value="{{ $d->id }}">{{ $d->nama }}</option>
+                                    @endforeach
+                                </select>
                             </div>
                         </div>
 
@@ -301,19 +320,18 @@
                                     <option value="Transfer">Transfer</option>
                                 </select>
                             </div>
-<div class="row mt-3">
-    <div class="col-md-12 d-flex justify-content-end align-items-center gap-4">
-        <div class="form-check form-check-inline m-2">
-            <input class="form-check-input" type="radio" name="metode" id="metodelunas" value="lunas">
-            <label class="form-check-label" for="metodelunas">Lunas</label>
-        </div>
-        <div class="form-check form-check-inline m-2">
-            <input class="form-check-input" type="radio" name="metode" id="metodedp" value="dp">
-            <label class="form-check-label" for="metodedp">DP 50%</label>
-        </div>
-    </div>
-</div>
-
+                            <div class="row md-3">
+                                <div class="col-md-12 d-flex justify-content-end align-items-center gap-4">
+                                    <div class="form-check form-check-inline m-2">
+                                        <input class="form-check-input" type="radio" name="metode" id="metodelunas" value="lunas">
+                                        <label class="form-check-label" for="metodelunas">Lunas</label>
+                                    </div>
+                                    <div class="form-check form-check-inline m-2">
+                                        <input class="form-check-input" type="radio" name="metode" id="metodedp" value="dp">
+                                        <label class="form-check-label" for="metodedp">DP 50%</label>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 
                         <div class="row mt-3">
@@ -424,10 +442,10 @@
 <script>
     $(function() {
         $('#pelanggan').select2({
-        theme: 'bootstrap-5',
-        placeholder: 'Pilih Pelanggan',
-        width: '100%'
-    });
+            theme: 'bootstrap-5',
+            placeholder: 'Pilih Pelanggan',
+            width: '100%'
+        });
 
 
         let total = 0;

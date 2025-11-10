@@ -17,9 +17,9 @@
     <link href="{{ asset('vendor/owl-carousel/css/owl.carousel.min.css') }}" rel="stylesheet">
 
     {{-- ============ ICON PACK ============ --}}
-    <link href="{{ asset('vendor/themify-icons/themify-icons.css') }}" rel="stylesheet">
+    <!-- <link href="{{ asset('vendor/themify-icons/themify-icons.css') }}" rel="stylesheet">
     <link href="{{ asset('vendor/fontawesome/css/all.min.css') }}" rel="stylesheet">
-    <link href="{{ asset('vendor/line-awesome/css/line-awesome.min.css') }}" rel="stylesheet">
+    <link href="{{ asset('vendor/line-awesome/css/line-awesome.min.css') }}" rel="stylesheet"> -->
 
     {{-- ============ MAIN STYLE ============ --}}
     <link href="{{ asset('css/style.css') }}" rel="stylesheet">
@@ -254,7 +254,7 @@
     <script src="{{ asset('vendor/chartist-plugin-tooltips/js/chartist-plugin-tooltip.min.js') }}"></script>
     <script src="{{ asset('vendor/moment/moment.min.js') }}"></script>
     <script src="{{ asset('vendor/pg-calendar/js/pignose.calendar.min.js') }}"></script>
-    <script src="{{ asset('vendor/perfect-scrollbar/perfect-scrollbar.min.js') }}"></script>
+    <!-- <script src="{{ asset('vendor/perfect-scrollbar/perfect-scrollbar.min.js') }}"></script> -->
     <script src="{{ asset('vendor/owl-carousel/js/owl.carousel.min.js') }}"></script>
 
     {{-- ============ DASHBOARD SCRIPT ============ --}}

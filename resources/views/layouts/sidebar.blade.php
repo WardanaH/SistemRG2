@@ -23,6 +23,8 @@
                 <ul aria-expanded="false">
                     <li><a href="{{ route('users.index') }}">Manajemen User</a></li>
                     <li><a href="{{ route('roles.index') }}">Hak Akses</a></li>
+                    <li><a href="{{ route('designerindex') }}">Daftar Designer</a></li>
+                    <li><a href="{{ route('operatorindex') }}">Daftar Operator</a></li>
                 </ul>
             </li>
 
