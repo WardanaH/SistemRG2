@@ -178,6 +178,62 @@
     box-shadow: 0 3px 8px rgba(0,0,0,0.05);
 }
 
+.btn-disabled {
+    opacity: 0.5 !important;
+    cursor: not-allowed !important;
+    pointer-events: none !important;
+}
+
+/* Teks label dan form di dalam modal */
+#modal_add label,
+#modal_add .form-control,
+#modal_add .form-select,
+#modal_add .select2-selection__rendered,
+#modal_add .select2-results__option,
+#modal_add .select2-selection__placeholder {
+    color: #1f1f1f !important;
+    opacity: 1 !important;
+}
+
+/* Teks placeholder agar tidak terlalu pucat */
+#modal_add ::placeholder {
+    color: #444 !important;
+    opacity: 1 !important;
+}
+
+/* Pertegas hasil dropdown Select2 */
+#modal_add .select2-dropdown,
+#modal_add .select2-results__option {
+    background-color: #fff !important;
+    color: #222 !important;
+    font-weight: 500 !important;
+}
+
+/* Input readonly (seperti harga & subtotal) */
+#modal_add input[readonly] {
+    background-color: #f9f9f9 !important;
+    color: #1f1f1f !important;
+    opacity: 1 !important;
+}
+
+/* Warna item normal di dropdown */
+#modal_add .select2-container--default .select2-results__option {
+    background-color: #fff !important;
+    color: #222 !important;
+    font-size: 0.9rem !important;
+    padding: 6px 10px !important;
+    transition: all 0.15s ease-in-out;
+}
+
+/* Warna item saat di-hover */
+#modal_add .select2-container--default .select2-results__option--highlighted {
+    background-color: #4B28D2 !important;   /* warna ungu sesuai tema */
+    color: #fff !important;
+    font-weight: 500 !important;
+    border-radius: 3px !important;
+}
+
+
 </style>
 
 <div class="container-fluid transaksi-page">
@@ -287,13 +343,28 @@
                                 <input type="text" id="total" name="inputtotal" class="form-control text-end" readonly value="Rp 0">
                             </div>
                         </div>
-
                         <div class="row mt-3">
                             <div class="col-md-6"></div>
-                            <div class="col-md-3">
+
+                            <!-- Kolom Bayar -->
+                            <div class="col-md-3 position-relative">
                                 <label>Bayar</label>
                                 <input type="text" id="bayardp" name="inputbayardp" class="form-control" value="0">
+
+                                <!-- Radio di bawah input Bayar -->
+                                <div class="d-flex justify-content-start align-items-center mt-2 ms-2">
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="metode" id="metodelunas" value="lunas">
+                                        <label class="form-check-label" for="metodelunas">Lunas</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="metode" id="metodedp" value="dp">
+                                        <label class="form-check-label" for="metodedp">DP 50%</label>
+                                    </div>
+                                </div>
                             </div>
+
+                            <!-- Kolom Pembayaran -->
                             <div class="col-md-3">
                                 <label>Pembayaran</label>
                                 <select id="pembayaran" name="inputpembayaran" class="form-select">
@@ -301,21 +372,7 @@
                                     <option value="Transfer">Transfer</option>
                                 </select>
                             </div>
-<div class="row mt-3">
-    <div class="col-md-12 d-flex justify-content-end align-items-center gap-4">
-        <div class="form-check form-check-inline m-2">
-            <input class="form-check-input" type="radio" name="metode" id="metodelunas" value="lunas">
-            <label class="form-check-label" for="metodelunas">Lunas</label>
-        </div>
-        <div class="form-check form-check-inline m-2">
-            <input class="form-check-input" type="radio" name="metode" id="metodedp" value="dp">
-            <label class="form-check-label" for="metodedp">DP 50%</label>
-        </div>
-    </div>
-</div>
-
                         </div>
-
                         <div class="row mt-3">
                             <div class="col-md-6"></div>
                             <div class="col-md-3">
@@ -599,6 +656,32 @@
             $('#total').val('Rp ' + totalFinal.toLocaleString('id-ID'));
             $('#sisa').val('Rp ' + sisa.toLocaleString('id-ID'));
         }
+
+                // ================== TOMBOL TAMBAH ITEM (disable/enable dinamis) ==================
+        const $btnAddItem = $('#btnAddItem');
+        const $submitTransaksi = $('#submittransaksi');
+
+        // fungsi update tombol
+        function updateTombolStatus() {
+            const pelangganTerisi = $('#namapelangganhidden').val() !== '' && $('#nomorhandphonehidden').val() !== '';
+            $btnAddItem.prop('disabled', !pelangganTerisi);
+            $submitTransaksi.prop('disabled', !pelangganTerisi);
+
+            if (pelangganTerisi) {
+                $btnAddItem.removeClass('btn-disabled').removeClass('btn-secondary').addClass('btn-success');
+            } else {
+                $btnAddItem.addClass('btn-disabled').removeClass('btn-success').addClass('btn-secondary');
+            }
+        }
+
+        // panggil awal (biar default tombol mati)
+        updateTombolStatus();
+
+        // setiap kali pelanggan di-submit, aktifkan tombol
+        $('#submitpelanggan').click(function() {
+            updateTombolStatus();
+        });
+
     });
 </script>
 

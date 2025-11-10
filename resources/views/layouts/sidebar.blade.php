@@ -83,7 +83,7 @@
                 </ul>
             </li>
 
-            <li class="nav-label">SYSTEM</li>
+            <!-- <li class="nav-label">SYSTEM</li>
             <li>
                 <form action="{{ route('logout') }}" method="POST" class="px-3 mt-2">
                     @csrf
@@ -91,7 +91,7 @@
                         <i class="icon icon-logout"></i> Logout
                     </button>
                 </form>
-            </li>
+            </li> -->
 
         </ul>
     </div>
