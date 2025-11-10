@@ -145,7 +145,7 @@ class TransaksiPenjualansController extends Controller
 
     public function index(Request $request)
     {
-        $query = MTransaksiPenjualans::with(['user', 'cabang'])
+        $query = MTransaksiPenjualans::with(['user', 'cabang', 'designer'])
             ->when($request->no, fn($q) => $q->where('nomor_nota', 'like', "%{$request->no}%"))
             ->when($request->tanggal, fn($q) => $q->whereDate('tanggal', $request->tanggal))
             ->when($request->cabang, fn($q) => $q->where('cabang_id', $request->cabang))
