@@ -39,6 +39,12 @@ Route::middleware('auth')->group(function () {
     });
 });
 
+//profile di header
+Route::middleware('auth')->group(function () {
+    Route::get('/profile', function () {return view('layouts.profile');})->name('profile');
+});
+
+
 //supplier
 Route::middleware(['auth'])->group(function () {
     Route::get('/supplier', [SupplierController::class, 'index'])->name('managesupplierindex');
