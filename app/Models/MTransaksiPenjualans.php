@@ -54,6 +54,14 @@ class MTransaksiPenjualans extends Model
     }
 
     /**
+     * Relasi ke user (designer)
+     */
+    public function designer()
+    {
+        return $this->belongsTo(User::class, 'designer_id')->withTrashed();
+    }
+
+    /**
      * Relasi ke cabang
      */
     public function cabang()
@@ -85,4 +93,3 @@ class MTransaksiPenjualans extends Model
         return $this->sisa_tagihan <= 0;
     }
 }
-

@@ -18,6 +18,7 @@
                     <tr>
                         <th>#</th>
                         <th>Nama</th>
+                        <th>Jumlah Transaksi</th>
                         <th>Username</th>
                         <th>Email</th>
                         <th>Telepon</th>
@@ -30,6 +31,7 @@
                     <tr>
                         <td>{{ $loop->iteration }}</td>
                         <td>{{ $user->nama }}</td>
+                        <td>{{ $user->transaksi_desain_count }}</td>
                         <td>{{ $user->username }}</td>
                         <td>{{ $user->email }}</td>
                         <td>{{ $user->telepon ?? '-' }}</td>
