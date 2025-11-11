@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
+use App\Models\Cabang;
 use App\Models\MProduks;
 use App\Models\MBahanBakus;
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Models\StokBahanBaku;
 use App\Models\MStokBahanBakus;
@@ -21,9 +24,14 @@ class TransaksiPenjualansController extends Controller
         //
         $date = date("Y-m-d");
         $produks = MProduks::all();
+        $designer = User::role('designer')->get();
         // dd($produks);
 
-        return view('admin.transaksis.transaksi', ['date' => $date, 'produks' => $produks]);
+        return view('admin.transaksis.transaksi', [
+            'date' => $date,
+            'produks' => $produks,
+            'designers' => $designer
+        ]);
     }
 
     public function store(Request $request)
@@ -47,14 +55,15 @@ class TransaksiPenjualansController extends Controller
             $transaksi->nama_pelanggan = $request->inputnamapelanggan;
             $transaksi->hp_pelanggan = $request->inputnomorpelanggan;
             $transaksi->pelanggan_id = $request->inputpelanggan;
-            $transaksi->total_harga = preg_replace('/[^0-9]/', '', $request->inputtotal);
+            $transaksi->total_harga = $this->parseRupiah($request->inputtotal);
             $transaksi->diskon = $request->inputdiskon ?? 0;
             $transaksi->pajak = $request->inputpajak ?? 0;
             $transaksi->metode_pembayaran = $request->inputpembayaran;
-            $transaksi->jumlah_pembayaran = preg_replace('/[^0-9]/', '', $request->inputbayardp);
-            $transaksi->sisa_tagihan = preg_replace('/[^0-9]/', '', $request->inputsisa);
+            $transaksi->jumlah_pembayaran = $this->parseRupiah($request->inputbayardp);
+            $transaksi->sisa_tagihan = $this->parseRupiah($request->inputsisa);
             $transaksi->user_id = Auth::id();
             $transaksi->cabang_id = Auth::user()->cabang->id ?? null;
+            $transaksi->designer_id = $request->inputdesigner;
             $transaksi->save();
             // dd($transaksi);
 
@@ -132,5 +141,90 @@ class TransaksiPenjualansController extends Controller
         }
 
         return $qty; // default jika bukan hitung luas
+    }
+
+    public function index(Request $request)
+    {
+        $query = MTransaksiPenjualans::with(['user', 'cabang'])
+            ->when($request->no, fn($q) => $q->where('nomor_nota', 'like', "%{$request->no}%"))
+            ->when($request->tanggal, fn($q) => $q->whereDate('tanggal', $request->tanggal))
+            ->when($request->cabang, fn($q) => $q->where('cabang_id', $request->cabang))
+            ->orderBy('created_at', 'desc');
+
+        $datas = $query->paginate(10);
+        // dd($datas);
+
+        $cabangs = Cabang::all();
+
+        return view('admin.transaksis.list', compact('datas', 'cabangs'));
+    }
+
+    public function destroy($id)
+    {
+        DB::beginTransaction();
+
+        try {
+            // cari transaksi
+            $transaksi = MTransaksiPenjualans::findOrFail($id);
+
+            // soft delete semua sub transaksi-nya
+            foreach ($transaksi->subTransaksi as $sub) {
+                $sub->delete();
+            }
+
+            // soft delete transaksi utama
+            $transaksi->delete();
+
+            DB::commit();
+
+            return redirect()->route('transaksiindex')
+                ->with('success', 'Transaksi dan semua item-nya berhasil dihapus (soft delete).');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Gagal menghapus transaksi: ' . $e->getMessage());
+
+            return redirect()->route('transaksiindex')
+                ->with('error', 'Gagal menghapus transaksi: ' . $e->getMessage());
+        }
+    }
+
+    private function parseRupiah($value)
+    {
+        if (!$value) return 0;
+
+        // Hapus "Rp", spasi, dan titik ribuan
+        $value = str_replace(['Rp', ' ', '.'], '', $value);
+
+        // Ganti koma dengan titik untuk desimal
+        $value = str_replace(',', '.', $value);
+
+        // Pastikan jadi float dengan 2 desimal
+        return round((float)$value, 2);
+    }
+
+    public function showSubTransaksi(Request $request)
+    {
+        try {
+            // jika id terenkripsi di front-end, decrypt dulu
+            $id = $request->has('id') ? (is_string($request->id) && Str::startsWith($request->id, 'ey') ? decrypt($request->id) : $request->id) : null;
+            // atau kalau kamu selalu mengirim plain id: $id = $request->id;
+
+            $current = \App\Models\MSubTransaksiPenjualans::where('penjualan_id', $id)
+                ->with(['produk:id,nama_produk', 'user:id,username', 'cabang:id,nama'])
+                ->get();
+
+            $deleted = \App\Models\MSubTransaksiPenjualans::onlyTrashed()
+                ->where('penjualan_id', $id)
+                ->with(['produk:id,nama_produk', 'user:id,username', 'cabang:id,nama'])
+                ->get();
+
+            return response()->json([
+                'current' => $current,
+                'deleted' => $deleted,
+            ]);
+        } catch (\Exception $e) {
+            Log::error('showSubTransaksi error: ' . $e->getMessage());
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
     }
 }

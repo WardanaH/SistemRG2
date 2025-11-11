@@ -1,14 +1,262 @@
 @extends('layouts.app')
 @section('content')
 
-<div class="container-fluid">
+<style>
+    /* ==========================================
+   STYLE TAMBAHAN KHUSUS HALAMAN TRANSAKSI
+   (Tidak mengubah sidebar, header, dsb)
+========================================== */
+    .transaksi-page .card {
+        border: none;
+        border-radius: 8px;
+        box-shadow: 0 3px 8px rgba(0, 0, 0, 0.05);
+    }
+
+    .transaksi-page .card-header {
+        background-color: #4B28D2 !important;
+        color: #fff !important;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+    }
+
+    .transaksi-page .card-header i {
+        color: #FFD54F !important;
+        margin-right: 6px;
+    }
+
+    .transaksi-page .form-control,
+    .transaksi-page .form-select,
+    .transaksi-page textarea {
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        font-size: 0.9rem;
+        color: #333;
+        transition: border-color 0.2s ease-in-out;
+    }
+
+    .transaksi-page .form-control:focus,
+    .transaksi-page .form-select:focus {
+        border-color: #6a4ff7;
+        box-shadow: 0 0 3px rgba(106, 79, 247, 0.3);
+    }
+
+    .transaksi-page .btn-success {
+        background-color: #28a745 !important;
+        border: none;
+        font-weight: 500;
+        border-radius: 6px;
+    }
+
+    .transaksi-page .btn-primary {
+        background-color: #4B28D2 !important;
+        border: none;
+        border-radius: 6px;
+        font-weight: 500;
+    }
+
+    .transaksi-page .btn-success:hover {
+        background-color: #218838 !important;
+    }
+
+    .transaksi-page .btn-primary:hover {
+        background-color: #3a1fb0 !important;
+    }
+
+    .transaksi-page .table th {
+        background-color: #f8f9fc !important;
+        color: #212121 !important;
+        font-weight: 600;
+        text-align: center;
+    }
+
+    .transaksi-page .table td {
+        color: #2b2b2b !important;
+        vertical-align: middle;
+    }
+
+    .transaksi-page .table tbody tr:nth-child(even) td {
+        background-color: #fafafa !important;
+    }
+
+    .transaksi-page .table tbody tr td[colspan] {
+        text-align: center;
+        color: #555 !important;
+        font-style: italic;
+    }
+
+    .transaksi-page input[type="radio"] {
+        accent-color: #4B28D2;
+        transform: scale(1.1);
+        margin-right: 4px;
+    }
+
+    /* =======================================
+   FIX WARNA TEKS & KONTRAS BUTTON
+======================================= */
+
+    /* Pertegas semua teks di form dan tabel */
+    .transaksi-page .form-control,
+    .transaksi-page .form-select,
+    .transaksi-page .table td,
+    .transaksi-page .table th {
+        color: #1f1f1f !important;
+        opacity: 1 !important;
+    }
+
+    /* Label dan teks muted jangan abu transparan */
+    .transaksi-page label,
+    .transaksi-page p,
+    .transaksi-page small,
+    .transaksi-page span {
+        color: #1f1f1f !important;
+        opacity: 1 !important;
+    }
+
+    /* TOMBOL TAMBAH ITEM dan SIMPAN TRANSAKSI */
+    .transaksi-page .btn-success,
+    .transaksi-page .btn-primary {
+        color: #fff !important;
+        opacity: 1 !important;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .transaksi-page .btn-success:hover,
+    .transaksi-page .btn-primary:hover {
+        opacity: 0.9 !important;
+    }
+
+    /* PERBAIKI RADIO BUTTON (Lunas / DP) */
+    .transaksi-page .form-check-inline {
+        margin-right: 1rem;
+    }
+
+    .transaksi-page input[type="radio"] {
+        margin-right: 5px;
+        accent-color: #4B28D2;
+        transform: scale(1.2);
+    }
+
+    /* =====================================
+   FIX SELECT2 AGAR SESUAI TEMPLATE FOCUS
+===================================== */
+.transaksi-page .select2-container .select2-selection--single {
+    height: 38px !important;
+    border: 1px solid #dcdcdc !important;
+    border-radius: 6px !important;
+    background-color: #fff !important;
+    padding: 4px 10px !important;
+    display: flex !important;
+    align-items: center !important;
+    font-size: 0.9rem !important;
+    color: #333 !important;
+    transition: all 0.2s ease-in-out;
+}
+
+/* Fokus (saat diklik) */
+.transaksi-page .select2-container--default .select2-selection--single:focus,
+.transaksi-page .select2-container--default .select2-selection--single:hover {
+    border-color: #6a4ff7 !important;
+    box-shadow: 0 0 3px rgba(106,79,247,0.3);
+}
+
+/* Panah dropdown */
+.transaksi-page .select2-container--default .select2-selection__arrow b {
+    border-color: #4B28D2 transparent transparent transparent !important;
+}
+
+/* Teks di dalam */
+.transaksi-page .select2-selection__rendered {
+    color: #333 !important;
+    font-weight: 500 !important;
+}
+
+/* Background hasil dropdown */
+.transaksi-page .select2-container--default .select2-results__option {
+    color: #222 !important;
+    font-size: 0.9rem !important;
+    padding: 6px 12px !important;
+}
+
+/* Hover item dropdown */
+.transaksi-page .select2-container--default .select2-results__option--highlighted {
+    background-color: #4B28D2 !important;
+    color: #fff !important;
+}
+
+/* Background dropdown list */
+.transaksi-page .select2-dropdown {
+    border: 1px solid #dcdcdc !important;
+    border-radius: 6px !important;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.05);
+}
+
+.btn-disabled {
+    opacity: 0.5 !important;
+    cursor: not-allowed !important;
+    pointer-events: none !important;
+}
+
+/* Teks label dan form di dalam modal */
+#modal_add label,
+#modal_add .form-control,
+#modal_add .form-select,
+#modal_add .select2-selection__rendered,
+#modal_add .select2-results__option,
+#modal_add .select2-selection__placeholder {
+    color: #1f1f1f !important;
+    opacity: 1 !important;
+}
+
+/* Teks placeholder agar tidak terlalu pucat */
+#modal_add ::placeholder {
+    color: #444 !important;
+    opacity: 1 !important;
+}
+
+/* Pertegas hasil dropdown Select2 */
+#modal_add .select2-dropdown,
+#modal_add .select2-results__option {
+    background-color: #fff !important;
+    color: #222 !important;
+    font-weight: 500 !important;
+}
+
+/* Input readonly (seperti harga & subtotal) */
+#modal_add input[readonly] {
+    background-color: #f9f9f9 !important;
+    color: #1f1f1f !important;
+    opacity: 1 !important;
+}
+
+/* Warna item normal di dropdown */
+#modal_add .select2-container--default .select2-results__option {
+    background-color: #fff !important;
+    color: #222 !important;
+    font-size: 0.9rem !important;
+    padding: 6px 10px !important;
+    transition: all 0.15s ease-in-out;
+}
+
+/* Warna item saat di-hover */
+#modal_add .select2-container--default .select2-results__option--highlighted {
+    background-color: #4B28D2 !important;   /* warna ungu sesuai tema */
+    color: #fff !important;
+    font-weight: 500 !important;
+    border-radius: 3px !important;
+}
+
+
+</style>
+
+<div class="container-fluid transaksi-page">
     <div class="row">
 
         @if ($errors->any())
         <div class="alert alert-danger alert-dismissible fade show mt-3" role="alert">
             <ul>
                 @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
+                <li>{{ $error }}</li>
                 @endforeach
             </ul>
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
@@ -31,7 +279,7 @@
                         </div>
                         <div class="mb-3">
                             <select id="pelanggan" name="pelanggan" class="form-select select2">
-                                <option value="">-- Pilih Pelanggan --</option>
+                                <option value="">Pilih Pelanggan</option>
                             </select>
                         </div>
                     </div>
@@ -57,8 +305,8 @@
                         {{-- HEADER INFO --}}
                         <div class="row mb-3">
                             <div class="col-md-6">
-                                <p><strong>No. Nota:</strong> <span id="nonota">TRX-{{ now()->timestamp }}</span></p>
-                                <input type="hidden" name="nonota" value="TRX-{{ now()->timestamp }}">
+                                <p><strong>No. Nota:</strong> <span id="nonota">RG-{{ now()->timestamp }}</span></p>
+                                <input type="hidden" name="nonota" value="RG-{{ now()->timestamp }}">
                                 <p><strong>Tanggal:</strong>
                                     <input type="text" class="form-control form-control-sm" name="inputtanggal" readonly value="{{ $date }}">
                                 </p>
@@ -69,6 +317,13 @@
                                 <p><strong>No. HP:</strong> <span id="handphonelabel">-</span></p>
                                 <input type="hidden" name="inputnomorpelanggan" id="nomorhandphonehidden">
                                 <input type="hidden" name="inputpelanggan" id="pelangganhidden">
+                                <label for="inputdesigner" class="form-label">Pilih Designer</label>
+                                <select name="inputdesigner" id="inputdesigner" class="form-select select2" required>
+                                    <option value="">-- Pilih Designer --</option>
+                                    @foreach($designers as $d)
+                                    <option value="{{ $d->id }}">{{ $d->nama }}</option>
+                                    @endforeach
+                                </select>
                             </div>
                         </div>
 
@@ -108,13 +363,28 @@
                                 <input type="text" id="total" name="inputtotal" class="form-control text-end" readonly value="Rp 0">
                             </div>
                         </div>
-
                         <div class="row mt-3">
                             <div class="col-md-6"></div>
-                            <div class="col-md-3">
+
+                            <!-- Kolom Bayar -->
+                            <div class="col-md-3 position-relative">
                                 <label>Bayar</label>
                                 <input type="text" id="bayardp" name="inputbayardp" class="form-control" value="0">
+
+                                <!-- Radio di bawah input Bayar -->
+                                <div class="d-flex justify-content-start align-items-center mt-2 ms-2">
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="metode" id="metodelunas" value="lunas">
+                                        <label class="form-check-label" for="metodelunas">Lunas</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="metode" id="metodedp" value="dp">
+                                        <label class="form-check-label" for="metodedp">DP 50%</label>
+                                    </div>
+                                </div>
                             </div>
+
+                            <!-- Kolom Pembayaran -->
                             <div class="col-md-3">
                                 <label>Pembayaran</label>
                                 <select id="pembayaran" name="inputpembayaran" class="form-select">
@@ -122,18 +392,7 @@
                                     <option value="Transfer">Transfer</option>
                                 </select>
                             </div>
-                            <div class="row mt-3">
-                                <div class="col-md-12 text-end">
-                                    <label class="me-3">
-                                        <input type="radio" name="metode" id="metodelunas" value="lunas" class="form-check-input"> Lunas
-                                    </label>
-                                    <label>
-                                        <input type="radio" name="metode" id="metodedp" value="dp" class="form-check-input"> DP 50%
-                                    </label>
-                                </div>
-                            </div>
                         </div>
-
                         <div class="row mt-3">
                             <div class="col-md-6"></div>
                             <div class="col-md-3">
@@ -241,7 +500,12 @@
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script>
     $(function() {
-        $('.select2').select2();
+        $('#pelanggan').select2({
+            theme: 'bootstrap-5',
+            placeholder: 'Pilih Pelanggan',
+            width: '100%'
+        });
+
 
         let total = 0;
         const storeUrl = "{{ route('storetransaksipenjualan') }}";
@@ -412,6 +676,32 @@
             $('#total').val('Rp ' + totalFinal.toLocaleString('id-ID'));
             $('#sisa').val('Rp ' + sisa.toLocaleString('id-ID'));
         }
+
+                // ================== TOMBOL TAMBAH ITEM (disable/enable dinamis) ==================
+        const $btnAddItem = $('#btnAddItem');
+        const $submitTransaksi = $('#submittransaksi');
+
+        // fungsi update tombol
+        function updateTombolStatus() {
+            const pelangganTerisi = $('#namapelangganhidden').val() !== '' && $('#nomorhandphonehidden').val() !== '';
+            $btnAddItem.prop('disabled', !pelangganTerisi);
+            $submitTransaksi.prop('disabled', !pelangganTerisi);
+
+            if (pelangganTerisi) {
+                $btnAddItem.removeClass('btn-disabled').removeClass('btn-secondary').addClass('btn-success');
+            } else {
+                $btnAddItem.addClass('btn-disabled').removeClass('btn-success').addClass('btn-secondary');
+            }
+        }
+
+        // panggil awal (biar default tombol mati)
+        updateTombolStatus();
+
+        // setiap kali pelanggan di-submit, aktifkan tombol
+        $('#submitpelanggan').click(function() {
+            updateTombolStatus();
+        });
+
     });
 </script>
 
