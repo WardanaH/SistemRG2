@@ -256,6 +256,7 @@
     <script src="{{ asset('vendor/pg-calendar/js/pignose.calendar.min.js') }}"></script>
     <!-- <script src="{{ asset('vendor/perfect-scrollbar/perfect-scrollbar.min.js') }}"></script> -->
     <script src="{{ asset('vendor/owl-carousel/js/owl.carousel.min.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     {{-- ============ DASHBOARD SCRIPT ============ --}}
     <script src="{{ asset('js/dashboard/dashboard-2.js') }}"></script>

@@ -25,6 +25,7 @@ class MTransaksiPenjualans extends Model
         'metode_pembayaran',
         'jumlah_pembayaran',
         'sisa_tagihan',
+        'status_transaksi',
         'user_id',
         'cabang_id',
     ];

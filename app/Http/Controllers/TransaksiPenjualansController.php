@@ -158,6 +158,23 @@ class TransaksiPenjualansController extends Controller
 
         return view('admin.transaksis.list', compact('datas', 'cabangs'));
     }
+    
+    public function indexdeleted(Request $request)
+    {
+        $query = MTransaksiPenjualans::withTrashed()
+            ->with(['user', 'cabang', 'designer'])
+            ->when($request->no, fn($q) => $q->where('nomor_nota', 'like', "%{$request->no}%"))
+            ->when($request->tanggal, fn($q) => $q->whereDate('tanggal', $request->tanggal))
+            ->when($request->cabang, fn($q) => $q->where('cabang_id', $request->cabang))
+            ->orderBy('deleted_at', 'desc');
+
+        $datas = $query->paginate(10);
+        // dd($datas);
+
+        $cabangs = Cabang::all();
+
+        return view('admin.transaksis.listdeleted', compact('datas', 'cabangs'));
+    }
 
     public function destroy($id)
     {

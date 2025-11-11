@@ -158,6 +158,7 @@ Route::middleware(['auth'])->group(function () {
 // Transaksi Penjualan
 Route::middleware(['auth'])->group(function () {
     Route::get('/transaksi', [TransaksiPenjualansController::class, 'index'])->name('transaksiindex');
+    Route::get('/transaksideleted', [TransaksiPenjualansController::class, 'indexdeleted'])->name('transaksiindexdeleted');
     Route::get('/transaksi/penjualan', [TransaksiPenjualansController::class, 'transaksi'])->name('addtransaksiindex');
     Route::get('/transaksi/penjualan/load', [TransaksiPenjualansController::class, 'load'])->name('loadtransaksipenjualan');
     Route::post('/transaksi/penjualan/store', [TransaksiPenjualansController::class, 'store'])->name('storetransaksipenjualan');
