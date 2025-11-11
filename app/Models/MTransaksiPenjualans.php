@@ -25,19 +25,13 @@ class MTransaksiPenjualans extends Model
         'metode_pembayaran',
         'jumlah_pembayaran',
         'sisa_tagihan',
+        'status_transaksi',
         'user_id',
         'cabang_id',
     ];
 
     /**
-     * =========================
-     * 🔹 RELATIONSHIPS
-     * =========================
-     */
-
-    /**
      * Relasi ke detail penjualan (sub transaksi)
-     * Setiap transaksi penjualan memiliki banyak detail barang
      */
     public function subTransaksi()
     {
@@ -61,6 +55,14 @@ class MTransaksiPenjualans extends Model
     }
 
     /**
+     * Relasi ke user (designer)
+     */
+    public function designer()
+    {
+        return $this->belongsTo(User::class, 'designer_id')->withTrashed();
+    }
+
+    /**
      * Relasi ke cabang
      */
     public function cabang()
@@ -69,13 +71,7 @@ class MTransaksiPenjualans extends Model
     }
 
     /**
-     * =========================
-     * 🔹 ACCESSORS / HELPERS
-     * =========================
-     */
-
-    /**
-     * Format total harga menjadi Rupiah (opsional)
+     * Format total harga menjadi Rupiah
      */
     public function getTotalHargaFormatAttribute(): string
     {
