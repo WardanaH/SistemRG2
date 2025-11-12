@@ -34,6 +34,7 @@ return new class extends Migration
             $table->decimal('sisa_tagihan', 15, 2)->default(0);
             $table->text('reason_on_delete')->nullable();
             $table->text('reason_on_edit')->nullable();
+            $table->enum('status_transaksi', ['proses', 'selesai', 'cancel'])->default('proses');
 
             // Relasi ke user dan cabang (biarkan bigInt karena id-nya juga bigInt)
             $table->foreignId('user_id')

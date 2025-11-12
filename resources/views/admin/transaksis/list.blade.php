@@ -68,6 +68,7 @@
                                     <th>Total</th>
                                     <th>Cabang</th>
                                     <th>Pembuat</th>
+                                    <th>Desainer</th>
                                     <th>Tool</th>
                                 </tr>
                             </thead>
@@ -95,6 +96,7 @@
                                     </td>
                                     <td>{{ $data->cabang->nama ?? '-' }}</td>
                                     <td>{{ $data->user->nama ?? '-' }}</td>
+                                    <td>{{ $data->designer->nama ?? '-'}}</td>
                                     <td>
                                         <div class="btn-group btn-group-sm" role="group">
                                             <button type="button" class="btn btn-primary btn-detail"
@@ -137,7 +139,7 @@
                                     <td colspan="8" class="text-center fw-bold">Total</td>
                                     <td>Rp {{ number_format($datas->sum('sisa_tagihan'), 2, ',', '.') }}</td>
                                     <td>Rp {{ number_format($datas->sum('total_harga'), 2, ',', '.') }}</td>
-                                    <td colspan="3"></td>
+                                    <td colspan="5"></td>
                                 </tr>
                             </tfoot>
                         </table>
@@ -262,6 +264,30 @@
             console.error(err);
             alert('Gagal memuat detail transaksi.');
         }
+    });
+</script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('.btn-delete').forEach(button => {
+            button.addEventListener('click', function() {
+                const id = this.dataset.id;
+
+                Swal.fire({
+                    title: 'Yakin ingin menghapus?',
+                    text: "Transaksi ini akan dihapus dengan soft delete.",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Ya, hapus!',
+                    cancelButtonText: 'Batal'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        document.getElementById('delete-form-' + id).submit();
+                    }
+                });
+            });
+        });
     });
 </script>
 

@@ -25,6 +25,7 @@ class MTransaksiPenjualans extends Model
         'metode_pembayaran',
         'jumlah_pembayaran',
         'sisa_tagihan',
+        'status_transaksi',
         'user_id',
         'cabang_id',
     ];
@@ -51,6 +52,14 @@ class MTransaksiPenjualans extends Model
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id');
+    }
+
+    /**
+     * Relasi ke user (designer)
+     */
+    public function designer()
+    {
+        return $this->belongsTo(User::class, 'designer_id')->withTrashed();
     }
 
     /**
@@ -85,4 +94,3 @@ class MTransaksiPenjualans extends Model
         return $this->sisa_tagihan <= 0;
     }
 }
-

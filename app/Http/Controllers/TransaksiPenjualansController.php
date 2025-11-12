@@ -119,8 +119,11 @@ class TransaksiPenjualansController extends Controller
 
             Log::info('Sebelum commit', ['transaksi_id' => $transaksi->id]);
             DB::commit();
-            return redirect()->route('transaksipenjualan')
-                ->with('success', 'Transaksi berhasil disimpan!');
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Transaksi berhasil disimpan!',
+                'id' => encrypt($transaksi->id),
+            ]);
         } catch (\Exception $e) {
             Log::error('Gagal transaksi', ['error' => $e->getMessage()]);
             DB::rollBack();
@@ -145,7 +148,7 @@ class TransaksiPenjualansController extends Controller
 
     public function index(Request $request)
     {
-        $query = MTransaksiPenjualans::with(['user', 'cabang'])
+        $query = MTransaksiPenjualans::with(['user', 'cabang', 'designer'])
             ->when($request->no, fn($q) => $q->where('nomor_nota', 'like', "%{$request->no}%"))
             ->when($request->tanggal, fn($q) => $q->whereDate('tanggal', $request->tanggal))
             ->when($request->cabang, fn($q) => $q->where('cabang_id', $request->cabang))
@@ -157,6 +160,23 @@ class TransaksiPenjualansController extends Controller
         $cabangs = Cabang::all();
 
         return view('admin.transaksis.list', compact('datas', 'cabangs'));
+    }
+
+    public function indexdeleted(Request $request)
+    {
+        $query = MTransaksiPenjualans::withTrashed()
+            ->with(['user', 'cabang', 'designer'])
+            ->when($request->no, fn($q) => $q->where('nomor_nota', 'like', "%{$request->no}%"))
+            ->when($request->tanggal, fn($q) => $q->whereDate('tanggal', $request->tanggal))
+            ->when($request->cabang, fn($q) => $q->where('cabang_id', $request->cabang))
+            ->orderBy('deleted_at', 'desc');
+
+        $datas = $query->paginate(10);
+        // dd($datas);
+
+        $cabangs = Cabang::all();
+
+        return view('admin.transaksis.listdeleted', compact('datas', 'cabangs'));
     }
 
     public function destroy($id)
@@ -226,5 +246,23 @@ class TransaksiPenjualansController extends Controller
             Log::error('showSubTransaksi error: ' . $e->getMessage());
             return response()->json(['error' => $e->getMessage()], 500);
         }
+    }
+
+    public function report($id)
+    {
+        $id = decrypt($id);
+
+        $transaksi = MTransaksiPenjualans::with([
+            'user',
+            'cabang',
+            'pelanggan',
+        ])->withTrashed()->findOrFail($id);
+
+        $subtransaksis = $transaksi->subTransaksi()->with('produk')->get();
+
+        return view('admin.reports.reportpenjualan', [
+            'transaksi' => $transaksi,
+            'subtransaksis' => $subtransaksis,
+        ]);
     }
 }

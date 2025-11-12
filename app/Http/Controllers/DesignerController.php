@@ -12,11 +12,16 @@ class DesignerController extends Controller
      */
     public function index()
     {
-        // Ambil semua user yang punya role 'designer'
-        $designers = User::role('designer')->with('cabang')->get();
+        // Ambil semua user dengan role 'designer' + jumlah transaksi mereka
+        $designers = User::role('designer')
+            ->withCount('transaksi_desain') // menghitung jumlah transaksi per designer
+            ->with('cabang')
+            ->get();
+        // dd($designers);
 
         return view('admin.users.designer.index', compact('designers'));
     }
+
 
     /**
      * Show the form for creating a new resource.

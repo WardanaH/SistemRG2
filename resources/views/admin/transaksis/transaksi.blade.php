@@ -140,113 +140,112 @@
     /* =====================================
    FIX SELECT2 AGAR SESUAI TEMPLATE FOCUS
 ===================================== */
-.transaksi-page .select2-container .select2-selection--single {
-    height: 38px !important;
-    border: 1px solid #dcdcdc !important;
-    border-radius: 6px !important;
-    background-color: #fff !important;
-    padding: 4px 10px !important;
-    display: flex !important;
-    align-items: center !important;
-    font-size: 0.9rem !important;
-    color: #333 !important;
-    transition: all 0.2s ease-in-out;
-}
+    .transaksi-page .select2-container .select2-selection--single {
+        height: 38px !important;
+        border: 1px solid #dcdcdc !important;
+        border-radius: 6px !important;
+        background-color: #fff !important;
+        padding: 4px 10px !important;
+        display: flex !important;
+        align-items: center !important;
+        font-size: 0.9rem !important;
+        color: #333 !important;
+        transition: all 0.2s ease-in-out;
+    }
 
-/* Fokus (saat diklik) */
-.transaksi-page .select2-container--default .select2-selection--single:focus,
-.transaksi-page .select2-container--default .select2-selection--single:hover {
-    border-color: #6a4ff7 !important;
-    box-shadow: 0 0 3px rgba(106,79,247,0.3);
-}
+    /* Fokus (saat diklik) */
+    .transaksi-page .select2-container--default .select2-selection--single:focus,
+    .transaksi-page .select2-container--default .select2-selection--single:hover {
+        border-color: #6a4ff7 !important;
+        box-shadow: 0 0 3px rgba(106, 79, 247, 0.3);
+    }
 
-/* Panah dropdown */
-.transaksi-page .select2-container--default .select2-selection__arrow b {
-    border-color: #4B28D2 transparent transparent transparent !important;
-}
+    /* Panah dropdown */
+    .transaksi-page .select2-container--default .select2-selection__arrow b {
+        border-color: #4B28D2 transparent transparent transparent !important;
+    }
 
-/* Teks di dalam */
-.transaksi-page .select2-selection__rendered {
-    color: #333 !important;
-    font-weight: 500 !important;
-}
+    /* Teks di dalam */
+    .transaksi-page .select2-selection__rendered {
+        color: #333 !important;
+        font-weight: 500 !important;
+    }
 
-/* Background hasil dropdown */
-.transaksi-page .select2-container--default .select2-results__option {
-    color: #222 !important;
-    font-size: 0.9rem !important;
-    padding: 6px 12px !important;
-}
+    /* Background hasil dropdown */
+    .transaksi-page .select2-container--default .select2-results__option {
+        color: #222 !important;
+        font-size: 0.9rem !important;
+        padding: 6px 12px !important;
+    }
 
-/* Hover item dropdown */
-.transaksi-page .select2-container--default .select2-results__option--highlighted {
-    background-color: #4B28D2 !important;
-    color: #fff !important;
-}
+    /* Hover item dropdown */
+    .transaksi-page .select2-container--default .select2-results__option--highlighted {
+        background-color: #4B28D2 !important;
+        color: #fff !important;
+    }
 
-/* Background dropdown list */
-.transaksi-page .select2-dropdown {
-    border: 1px solid #dcdcdc !important;
-    border-radius: 6px !important;
-    box-shadow: 0 3px 8px rgba(0,0,0,0.05);
-}
+    /* Background dropdown list */
+    .transaksi-page .select2-dropdown {
+        border: 1px solid #dcdcdc !important;
+        border-radius: 6px !important;
+        box-shadow: 0 3px 8px rgba(0, 0, 0, 0.05);
+    }
 
-.btn-disabled {
-    opacity: 0.5 !important;
-    cursor: not-allowed !important;
-    pointer-events: none !important;
-}
+    .btn-disabled {
+        opacity: 0.5 !important;
+        cursor: not-allowed !important;
+        pointer-events: none !important;
+    }
 
-/* Teks label dan form di dalam modal */
-#modal_add label,
-#modal_add .form-control,
-#modal_add .form-select,
-#modal_add .select2-selection__rendered,
-#modal_add .select2-results__option,
-#modal_add .select2-selection__placeholder {
-    color: #1f1f1f !important;
-    opacity: 1 !important;
-}
+    /* Teks label dan form di dalam modal */
+    #modal_add label,
+    #modal_add .form-control,
+    #modal_add .form-select,
+    #modal_add .select2-selection__rendered,
+    #modal_add .select2-results__option,
+    #modal_add .select2-selection__placeholder {
+        color: #1f1f1f !important;
+        opacity: 1 !important;
+    }
 
-/* Teks placeholder agar tidak terlalu pucat */
-#modal_add ::placeholder {
-    color: #444 !important;
-    opacity: 1 !important;
-}
+    /* Teks placeholder agar tidak terlalu pucat */
+    #modal_add ::placeholder {
+        color: #444 !important;
+        opacity: 1 !important;
+    }
 
-/* Pertegas hasil dropdown Select2 */
-#modal_add .select2-dropdown,
-#modal_add .select2-results__option {
-    background-color: #fff !important;
-    color: #222 !important;
-    font-weight: 500 !important;
-}
+    /* Pertegas hasil dropdown Select2 */
+    #modal_add .select2-dropdown,
+    #modal_add .select2-results__option {
+        background-color: #fff !important;
+        color: #222 !important;
+        font-weight: 500 !important;
+    }
 
-/* Input readonly (seperti harga & subtotal) */
-#modal_add input[readonly] {
-    background-color: #f9f9f9 !important;
-    color: #1f1f1f !important;
-    opacity: 1 !important;
-}
+    /* Input readonly (seperti harga & subtotal) */
+    #modal_add input[readonly] {
+        background-color: #f9f9f9 !important;
+        color: #1f1f1f !important;
+        opacity: 1 !important;
+    }
 
-/* Warna item normal di dropdown */
-#modal_add .select2-container--default .select2-results__option {
-    background-color: #fff !important;
-    color: #222 !important;
-    font-size: 0.9rem !important;
-    padding: 6px 10px !important;
-    transition: all 0.15s ease-in-out;
-}
+    /* Warna item normal di dropdown */
+    #modal_add .select2-container--default .select2-results__option {
+        background-color: #fff !important;
+        color: #222 !important;
+        font-size: 0.9rem !important;
+        padding: 6px 10px !important;
+        transition: all 0.15s ease-in-out;
+    }
 
-/* Warna item saat di-hover */
-#modal_add .select2-container--default .select2-results__option--highlighted {
-    background-color: #4B28D2 !important;   /* warna ungu sesuai tema */
-    color: #fff !important;
-    font-weight: 500 !important;
-    border-radius: 3px !important;
-}
-
-
+    /* Warna item saat di-hover */
+    #modal_add .select2-container--default .select2-results__option--highlighted {
+        background-color: #4B28D2 !important;
+        /* warna ungu sesuai tema */
+        color: #fff !important;
+        font-weight: 500 !important;
+        border-radius: 3px !important;
+    }
 </style>
 
 <div class="container-fluid transaksi-page">
@@ -319,7 +318,7 @@
                                 <input type="hidden" name="inputpelanggan" id="pelangganhidden">
                                 <label for="inputdesigner" class="form-label">Pilih Designer</label>
                                 <select name="inputdesigner" id="inputdesigner" class="form-select select2" required>
-                                    <option value="">-- Pilih Designer --</option>
+                                    <option value="">Pilih Designer</option>
                                     @foreach($designers as $d)
                                     <option value="{{ $d->id }}">{{ $d->nama }}</option>
                                     @endforeach
@@ -506,6 +505,11 @@
             width: '100%'
         });
 
+        $('#inputdesigner').select2({
+            theme: 'bootstrap-5',
+            placeholder: 'Pilih Designer',
+            width: '100%'
+        });
 
         let total = 0;
         const storeUrl = "{{ route('storetransaksipenjualan') }}";
@@ -677,7 +681,7 @@
             $('#sisa').val('Rp ' + sisa.toLocaleString('id-ID'));
         }
 
-                // ================== TOMBOL TAMBAH ITEM (disable/enable dinamis) ==================
+        // ================== TOMBOL TAMBAH ITEM (disable/enable dinamis) ==================
         const $btnAddItem = $('#btnAddItem');
         const $submitTransaksi = $('#submittransaksi');
 
@@ -700,6 +704,38 @@
         // setiap kali pelanggan di-submit, aktifkan tombol
         $('#submitpelanggan').click(function() {
             updateTombolStatus();
+        });
+
+        // ================== SUBMIT TRANSAKSI DAN CETAK REPORT ==================
+        form.on('submit', function(e) {
+            e.preventDefault();
+
+            const formData = form.serialize();
+
+            $.ajax({
+                type: "POST",
+                url: form.attr('action'),
+                data: formData,
+                success: function(response) {
+                    Swal.fire({
+                        title: 'Transaksi Berhasil!',
+                        text: 'Apakah Anda ingin mencetak nota transaksi?',
+                        icon: 'success',
+                        showCancelButton: true,
+                        confirmButtonText: 'Ya, Cetak!',
+                        cancelButtonText: 'Tidak'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            const reportUrl = "{{ route('transaksi.report', ':id') }}".replace(':id', response.id);
+                            window.open(reportUrl, '_blank');
+                        }
+                        window.location.href = "{{ route('addtransaksiindex') }}";
+                    });
+                },
+                error: function(xhr) {
+                    Swal.fire('Gagal!', xhr.responseJSON?.message || 'Terjadi kesalahan saat menyimpan transaksi', 'error');
+                }
+            });
         });
 
     });

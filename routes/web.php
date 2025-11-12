@@ -158,12 +158,14 @@ Route::middleware(['auth'])->group(function () {
 // Transaksi Penjualan
 Route::middleware(['auth'])->group(function () {
     Route::get('/transaksi', [TransaksiPenjualansController::class, 'index'])->name('transaksiindex');
+    Route::get('/transaksideleted', [TransaksiPenjualansController::class, 'indexdeleted'])->name('transaksiindexdeleted');
     Route::get('/transaksi/penjualan', [TransaksiPenjualansController::class, 'transaksi'])->name('addtransaksiindex');
     Route::get('/transaksi/penjualan/load', [TransaksiPenjualansController::class, 'load'])->name('loadtransaksipenjualan');
     Route::post('/transaksi/penjualan/store', [TransaksiPenjualansController::class, 'store'])->name('storetransaksipenjualan');
     Route::post('/transaksi/penjualan/update', [TransaksiPenjualansController::class, 'update'])->name('updatetransaksipenjualan');
     Route::delete('/transaksi/penjualan/delete/{id}', [TransaksiPenjualansController::class, 'destroy'])->name('destroytransaksipenjualan');
     Route::get('/transaksi-penjualan/show-sub', [TransaksiPenjualansController::class, 'showSubTransaksi'])->name('showsubtransaksi');
+    Route::get('/transaksi/report/{id}', [TransaksiPenjualansController::class, 'report'])->name('transaksi.report');
 });
 
 // Manajemen Designer

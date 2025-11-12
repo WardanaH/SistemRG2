@@ -71,6 +71,7 @@
                 <ul aria-expanded="false">
                     <li><a href="{{ route('addtransaksiindex') }}">Tambah Transaksi</a></li>
                     <li><a href="{{ route('transaksiindex') }}">Manajemen Penjualan</a></li>
+                    <li><a href="{{ route('transaksiindexdeleted') }}">Manajemen Penjualan Terhapus</a></li>
                 </ul>
             </li>
 

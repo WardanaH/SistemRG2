@@ -40,6 +40,12 @@ class User extends Authenticatable
         return $this->belongsTo(Cabang::class, 'cabang_id')->withTrashed();
     }
 
+    public function transaksi_desain()
+    {
+        return $this->hasMany(MTransaksiPenjualans::class, 'designer_id');
+    }
+
+
     // public function roles()
     // {
     //     return $this->belongsToMany(\Spatie\Permission\Models\Role::class);
