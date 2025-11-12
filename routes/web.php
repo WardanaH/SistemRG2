@@ -165,6 +165,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/transaksi/penjualan/update', [TransaksiPenjualansController::class, 'update'])->name('updatetransaksipenjualan');
     Route::delete('/transaksi/penjualan/delete/{id}', [TransaksiPenjualansController::class, 'destroy'])->name('destroytransaksipenjualan');
     Route::get('/transaksi-penjualan/show-sub', [TransaksiPenjualansController::class, 'showSubTransaksi'])->name('showsubtransaksi');
+    Route::get('/transaksi/report/{id}', [TransaksiPenjualansController::class, 'report'])->name('transaksi.report');
 });
 
 // Manajemen Designer
