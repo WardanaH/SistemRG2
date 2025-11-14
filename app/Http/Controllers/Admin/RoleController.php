@@ -12,7 +12,17 @@ class RoleController extends Controller
     public function index()
     {
         $roles = Role::with('permissions')->get();
-        $permissions = Permission::all();
+        // $permissions = Permission::all();
+        // Group permission PREFIX -> item (safe)
+        $permissions = Permission::all()->groupBy(function ($item) {
+
+            if (!is_string($item->name) || trim($item->name) === '') {
+                return 'other';
+            }
+
+            $parts = explode('-', $item->name);
+            return $parts[0] ?? 'other';
+        });
 
         return view('admin.roles.index', compact('roles', 'permissions'));
     }

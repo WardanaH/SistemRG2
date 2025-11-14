@@ -32,7 +32,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
 
     // Manajemen Sistem
-    Route::middleware(['role:admin|direktur|manajemen|supervisor'])->group(function () {
+    Route::middleware(['role:direktur|manajemen|owner'])->group(function () {
         Route::resource('users', UserController::class);
         Route::resource('cabangs', CabangController::class);
         Route::resource('roles', RoleController::class)->only(['index', 'store', 'update', 'destroy']);
@@ -123,36 +123,14 @@ Route::middleware(['auth'])->group(function () {
 
 // Transaksi Stok Bahan Baku
 Route::middleware(['auth'])->group(function () {
-    Route::get('/transaksi/bahan', [TransaksiBahanBakusController::class, 'index'])
-        ->name('transaksibahanbaku.index');
-
-    // Form tambah transaksi
-    Route::get('/transaksi/bahan/create', [TransaksiBahanBakusController::class, 'create'])
-        ->name('transaksibahanbaku.create');
-
-    // Proses simpan transaksi baru
-    Route::post('/transaksi/bahan/store', [TransaksiBahanBakusController::class, 'store'])
-        ->name('transaksibahanbaku.store');
-
-    // Form edit transaksi (menampilkan data yang sudah ada)
-    Route::get('/transaksi/bahan/edit/{id}', [TransaksiBahanBakusController::class, 'show'])
-        ->name('transaksibahanbaku.edit');
-
-    // Proses update data transaksi
-    Route::put('/transaksi/bahan/update/{id}', [TransaksiBahanBakusController::class, 'update'])
-        ->name('transaksibahanbaku.update');
-
-    // Hapus transaksi (soft delete)
-    Route::get('/transaksi/bahan/delete/{id}', [TransaksiBahanBakusController::class, 'destroy'])
-        ->name('transaksibahanbaku.destroy');
-
-    // Menampilkan data transaksi yang sudah dihapus (soft deleted)
-    Route::get('/transaksi/bahan/deleted', [TransaksiBahanBakusController::class, 'indexdeleted'])
-        ->name('transaksibahanbaku.deleted');
-
-    // Mengembalikan data bahan baku
-    Route::get('/ajax/load-bahanbaku', [TransaksiBahanBakusController::class, 'loadBahanBaku'])
-        ->name('loadbahanbaku');
+    Route::get('/transaksi/bahan', [TransaksiBahanBakusController::class, 'index'])->name('transaksibahanbaku.index');
+    Route::get('/transaksi/bahan/create', [TransaksiBahanBakusController::class, 'create'])->name('transaksibahanbaku.create');
+    Route::post('/transaksi/bahan/store', [TransaksiBahanBakusController::class, 'store'])->name('transaksibahanbaku.store');
+    Route::get('/transaksi/bahan/edit/{id}', [TransaksiBahanBakusController::class, 'show'])->name('transaksibahanbaku.edit');
+    Route::put('/transaksi/bahan/update/{id}', [TransaksiBahanBakusController::class, 'update'])->name('transaksibahanbaku.update');
+    Route::get('/transaksi/bahan/delete/{id}', [TransaksiBahanBakusController::class, 'destroy'])->name('transaksibahanbaku.destroy');
+    Route::get('/transaksi/bahan/deleted', [TransaksiBahanBakusController::class, 'indexdeleted'])->name('transaksibahanbaku.deleted');
+    Route::get('/ajax/load-bahanbaku', [TransaksiBahanBakusController::class, 'loadBahanBaku'])->name('loadbahanbaku');
 });
 
 // Transaksi Penjualan
