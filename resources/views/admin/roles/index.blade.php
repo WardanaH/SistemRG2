@@ -22,28 +22,47 @@
         </thead>
         <tbody>
             @foreach ($roles as $role)
-                <tr>
-                    <td>{{ $role->name }}</td>
-                    <td>
-                        <form method="POST" action="{{ route('roles.update', $role) }}">
-                            @csrf @method('PUT')
-                            @foreach ($permissions as $perm)
-                                <div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="checkbox" name="permissions[]" value="{{ $perm->name }}"
+            <tr>
+                <td>{{ $role->name }}</td>
+                <td>
+                    <form method="POST" action="{{ route('roles.update', $role) }}">
+                        @csrf @method('PUT')
+
+                        @foreach ($permissions as $group => $items)
+                        <h6 class="mt-3 text-primary text-uppercase">{{ $group }}</h6>
+                        <div class="row">
+
+                            @foreach ($items as $perm)
+                            <div class="col-md-3">
+                                <div class="form-check">
+                                    <input class="form-check-input"
+                                        type="checkbox"
+                                        name="permissions[]"
+                                        value="{{ $perm->name }}"
                                         {{ $role->hasPermissionTo($perm->name) ? 'checked' : '' }}>
-                                    <label class="form-check-label">{{ $perm->name }}</label>
+
+                                    <label class="form-check-label">
+                                        {{ config('permissions_label.' . $perm->name, $perm->name) }}
+                                    </label>
                                 </div>
+                            </div>
                             @endforeach
-                            <button class="btn btn-sm btn-success mt-2">Simpan</button>
-                        </form>
-                    </td>
-                    <td>
-                        <form method="POST" action="{{ route('roles.destroy', $role) }}">
-                            @csrf @method('DELETE')
-                            <button class="btn btn-danger btn-sm">Hapus</button>
-                        </form>
-                    </td>
-                </tr>
+
+                        </div>
+                        @endforeach
+
+                        <button class="btn btn-sm btn-success mt-3">Simpan</button>
+                    </form>
+
+
+                </td>
+                <td>
+                    <form method="POST" action="{{ route('roles.destroy', $role) }}">
+                        @csrf @method('DELETE')
+                        <button class="btn btn-danger btn-sm">Hapus</button>
+                    </form>
+                </td>
+            </tr>
             @endforeach
         </tbody>
     </table>
