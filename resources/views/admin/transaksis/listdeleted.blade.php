@@ -45,7 +45,7 @@
         <div class="col-md-9">
             <div class="card shadow">
                 <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0"><i class="fa fa-shopping-cart"></i> Transaksi Penjualan</h5>
+                    <h5 class="mb-0"><i class="fa fa-shopping-cart"></i> Transaksi Penjualan Terhapus</h5>
                     <a href="{{ route('addtransaksiindex') }}" class="btn btn-light btn-sm">
                         <i class="fa fa-plus"></i> Tambah
                     </a>
@@ -69,6 +69,7 @@
                                     <th>Cabang</th>
                                     <th>Pembuat</th>
                                     <th>Desainer</th>
+                                    <th>Alasan</th>
                                     <th>Tool</th>
                                 </tr>
                             </thead>
@@ -97,6 +98,7 @@
                                     <td>{{ $data->cabang->nama ?? '-' }}</td>
                                     <td>{{ $data->user->nama ?? '-' }}</td>
                                     <td>{{ $data->designer->nama ?? '-'}}</td>
+                                    <td>{{ $data->reason_on_delete ?? '-' }}</td>
                                     <td>
                                         <div class="btn-group btn-group-sm" role="group">
                                             <button type="button" class="btn btn-primary btn-detail"
@@ -104,28 +106,7 @@
                                                 data-total="Rp {{ number_format($data->total_harga, 2, ',', '.') }}">
                                                 <i class="fa fa-eye"></i>
                                             </button>
-
-                                            <button type="button" class="btn btn-warning">
-                                                <i class="fa fa-money"></i>
-                                            </button>
-
-                                            <a href="" class="btn btn-success">
-                                                <i class="fa fa-edit"></i>
-                                            </a>
-
-                                            <button type="button" class="btn btn-danger btn-delete" data-id="{{ $data->id }}">
-                                                <i class="fa fa-trash"></i>
-                                            </button>
                                         </div>
-
-                                        {{-- form delete disembunyikan --}}
-                                        <form id="delete-form-{{ $data->id }}"
-                                            action="{{ route('destroytransaksipenjualan', $data->id) }}"
-                                            method="POST"
-                                            style="display:none;">
-                                            @csrf
-                                            @method('DELETE')
-                                        </form>
                                     </td>
                                 </tr>
                                 @empty
@@ -163,77 +144,46 @@
         const id = btn.dataset.id;
         const total = btn.dataset.total;
         const row = btn.closest('tr');
-        const table = row.closest('table');
         const colCount = row.children.length;
 
-        // Hapus baris detail jika sudah terbuka
-        if (row.nextElementSibling && row.nextElementSibling.classList.contains('detail-row')) {
-            row.nextElementSibling.remove();
+        // Tutup detail sebelumnya (kalau ada)
+        document.querySelectorAll('.detail-row').forEach(r => r.remove());
+
+        // Jika klik tombol yang sama dua kali — tutup detailnya
+        if (row.classList.contains('showing-detail')) {
+            row.classList.remove('showing-detail');
             return;
         }
 
-        // Hapus detail lain yang terbuka
-        document.querySelectorAll('.detail-row').forEach(r => r.remove());
+        row.classList.add('showing-detail');
 
         try {
             const res = await fetch(`{{ route('showsubtransaksi') }}?id=${id}`);
+            if (!res.ok) throw new Error('Gagal mengambil data');
             const data = await res.json();
 
-            const current = data.current || [];
-            const deleted = data.deleted || [];
+            const deleted = Array.isArray(data.deleted) ? data.deleted : [];
 
             let html = `
-        <tr class="detail-row">
-            <td colspan="${colCount}" class="p-0">
-                <table class="table table-sm mb-0 table-bordered bg-light">
-                    <thead class="table-success text-center">
-                        <tr><th colspan="9">Produk Dibeli</th></tr>
-                        <tr>
-                            <th>Nama Barang</th>
-                            <th>Harga Satuan</th>
-                            <th>P</th>
-                            <th>L</th>
-                            <th>Kuantitas</th>
-                            <th>Finishing</th>
-                            <th>Keterangan</th>
-                            <th>Diskon (%)</th>
-                            <th>Subtotal</th>
-                        </tr>
-                    </thead>
-                    <tbody>`;
+                <tr class="detail-row">
+                    <td colspan="${colCount}" class="p-0">
+                        <table class="table table-sm mb-0 table-bordered bg-light">`;
 
-            if (current.length === 0) {
-                html += `<tr><td colspan="9" class="text-center text-muted">Tidak ada data produk</td></tr>`;
-            } else {
-                current.forEach(item => {
-                    html += `
-                <tr>
-                    <td>${item.produk?.nama_produk || '-'}</td>
-                    <td>Rp ${parseFloat(item.harga_satuan).toLocaleString('id-ID')}</td>
-                    <td>${item.panjang}</td>
-                    <td>${item.lebar}</td>
-                    <td>${item.banyak}</td>
-                    <td>${item.finishing || '-'}</td>
-                    <td>${item.keterangan || '-'}</td>
-                    <td>${item.diskon}%</td>
-                    <td>Rp ${parseFloat(item.subtotal).toLocaleString('id-ID')}</td>
-                </tr>`;
-                });
-            }
-
-            html += `
-            <tr>
-                <th colspan="8" class="text-end">Total:</th>
-                <th class="text-end">${total}</th>
-            </tr>
-        </tbody>
-        `;
-
-            // Jika ada data deleted
             if (deleted.length > 0) {
                 html += `
                 <thead class="table-danger text-center">
                     <tr><th colspan="9">Produk Sebelumnya (Terhapus)</th></tr>
+                    <tr>
+                        <th>Nama Barang</th>
+                        <th>Harga Satuan</th>
+                        <th>P</th>
+                        <th>L</th>
+                        <th>Kuantitas</th>
+                        <th>Finishing</th>
+                        <th>Keterangan</th>
+                        <th>Diskon (%)</th>
+                        <th>Subtotal</th>
+                    </tr>
                 </thead>
                 <tbody>
             `;
@@ -241,19 +191,33 @@
                 deleted.forEach(item => {
                     html += `
                 <tr>
-                    <td>${item.produk?.nama_produk || '-'}</td>
-                    <td>Rp ${parseFloat(item.harga_satuan).toLocaleString('id-ID')}</td>
-                    <td>${item.panjang}</td>
-                    <td>${item.lebar}</td>
-                    <td>${item.banyak}</td>
-                    <td>${item.finishing || '-'}</td>
-                    <td>${item.keterangan || '-'}</td>
-                    <td>${item.diskon}%</td>
-                    <td>Rp ${parseFloat(item.subtotal).toLocaleString('id-ID')}</td>
+                    <td>${item.produk?.nama_produk ?? '-'}</td>
+                    <td>Rp ${(parseFloat(item.harga_satuan) || 0).toLocaleString('id-ID')}</td>
+                    <td>${item.panjang ?? '-'}</td>
+                    <td>${item.lebar ?? '-'}</td>
+                    <td>${item.banyak ?? '-'}</td>
+                    <td>${item.finishing ?? '-'}</td>
+                    <td style="word-break: break-word;">${item.keterangan ?? '-'}</td>
+                    <td>${item.diskon ?? 0}%</td>
+                    <td>Rp ${(parseFloat(item.subtotal) || 0).toLocaleString('id-ID')}</td>
                 </tr>`;
                 });
 
-                html += `</tbody>`;
+                html += `
+                <tr class="fw-bold">
+                    <td colspan="8" class="text-end">Total:</td>
+                    <td class="text-end">${total}</td>
+                </tr>
+                </tbody>
+            `;
+            } else {
+                html += `
+                <tbody>
+                    <tr>
+                        <td colspan="9" class="text-center text-muted">Tidak ada produk terhapus.</td>
+                    </tr>
+                </tbody>
+            `;
             }
 
             html += `</table></td></tr>`;
@@ -262,10 +226,11 @@
 
         } catch (err) {
             console.error(err);
-            alert('Gagal memuat detail transaksi.');
+            Swal.fire('Gagal!', 'Tidak dapat memuat detail transaksi.', 'error');
         }
     });
 </script>
+
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         document.querySelectorAll('.btn-delete').forEach(button => {

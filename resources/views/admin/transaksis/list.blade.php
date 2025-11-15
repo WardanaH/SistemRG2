@@ -273,23 +273,50 @@
                 const id = this.dataset.id;
 
                 Swal.fire({
-                    title: 'Yakin ingin menghapus?',
-                    text: "Transaksi ini akan dihapus dengan soft delete.",
+                    title: 'Hapus Transaksi?',
+                    html: `
+                        <p>Berikan alasan penghapusan transaksi ini:</p>
+                        <textarea id="reasonInput" class="swal2-textarea" placeholder="Contoh: Data duplikat, salah input, dll"></textarea>
+                    `,
                     icon: 'warning',
                     showCancelButton: true,
                     confirmButtonColor: '#d33',
                     cancelButtonColor: '#3085d6',
-                    confirmButtonText: 'Ya, hapus!',
-                    cancelButtonText: 'Batal'
+                    confirmButtonText: 'Hapus Sekarang',
+                    cancelButtonText: 'Batal',
+                    preConfirm: () => {
+                        const reason = document.getElementById('reasonInput').value.trim();
+                        if (!reason) {
+                            Swal.showValidationMessage('Alasan wajib diisi!');
+                            return false;
+                        }
+                        return reason;
+                    }
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        document.getElementById('delete-form-' + id).submit();
+                        const reason = result.value;
+
+                        // cari form delete
+                        const form = document.getElementById('delete-form-' + id);
+
+                        // tambahkan input hidden ke form
+                        let input = form.querySelector('input[name="reason_on_delete"]');
+                        if (!input) {
+                            input = document.createElement('input');
+                            input.type = 'hidden';
+                            input.name = 'reason_on_delete';
+                            form.appendChild(input);
+                        }
+                        input.value = reason;
+
+                        form.submit();
                     }
                 });
             });
         });
     });
 </script>
+
 
 @endpush
 
