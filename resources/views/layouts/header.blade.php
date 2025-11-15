@@ -2,7 +2,7 @@
             Nav header start
         ***********************************-->
 <div class="nav-header">
-    <a href="{{ url('/') }}" class="brand-logo d-flex align-items-center">
+    <a href="{{ route('dashboard') }}" class="brand-logo d-flex align-items-center">
         <img class="logo-abbr" src="{{ asset('images/RGlogo.webp') }}" alt="Logo Restu Guru Promosindo" style="height:60px;">
         <span class="brand-title ms-2 fw-bold" style="color:#ffffff; font-size:16px;">Restu Guru</span>
     </a>
