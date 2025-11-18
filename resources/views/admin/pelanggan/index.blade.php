@@ -280,9 +280,14 @@
                         alert('❌ Gagal update pelanggan!');
                     }
                 },
-                error: err => {
-                    console.error(err);
-                    alert('❌ Terjadi kesalahan server.');
+                error: function(xhr) {
+                    if (xhr.status === 403) {
+                        alert("❌ Anda tidak memiliki izin untuk mengedit pelanggan.");
+                    } else if (xhr.status === 419) {
+                        alert("❌ Session expired, silakan refresh halaman.");
+                    } else {
+                        alert("Terjadi kesalahan: " + xhr.status);
+                    }
                 }
             });
         });
@@ -291,17 +296,31 @@
         $(document).on('click', '.deleteBtn', function() {
             const id = $(this).data('id');
             if (confirm('Yakin ingin menghapus pelanggan ini?')) {
-                $.post("{{ route('pelanggan.destroy') }}", {
-                    _token: "{{ csrf_token() }}",
-                    hapus_pelanggan_id: id
-                }, function(res) {
-                    if (res === "Success") {
-                        alert('✅ Pelanggan berhasil dihapus!');
-                        table.ajax.reload();
-                    } else {
-                        alert('❌ Gagal menghapus pelanggan!');
+                $.ajax({
+                    url: "{{ route('pelanggan.destroy') }}",
+                    method: 'POST',
+                    data: {
+                        _token: "{{ csrf_token() }}",
+                        hapus_pelanggan_id: id
+                    },
+                    success: function(res) {
+                        if (res === "Success") {
+                            alert('Pelanggan berhasil dihapus!');
+                            table.ajax.reload();
+                        } else {
+                            alert('Gagal menghapus pelanggan!');
+                        }
+                    },
+                    error: function(xhr) {
+                        if (xhr.status === 403) {
+                            alert("❌ Anda tidak memiliki izin untuk menghapus pelanggan.");
+                        } else if (xhr.status === 419) {
+                            alert("❌ Session expired, silakan refresh halaman.");
+                        } else {
+                            alert("❌ Terjadi kesalahan: " + xhr.status);
+                        }
                     }
-                }).fail(() => alert('❌ Terjadi kesalahan server.'));
+                });
             }
         });
     });

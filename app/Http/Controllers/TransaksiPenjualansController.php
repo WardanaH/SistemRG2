@@ -79,6 +79,7 @@ class TransaksiPenjualansController extends Controller
                 $sub->finishing = $item['finishing'] ?? 'Tanpa Finishing';
                 $sub->diskon = $item['diskon'] ?? 0;
                 $sub->subtotal = $item['subtotal'] ?? 0;
+                $sub->no_spk = $item['no_spk'] ?? '-';
                 $sub->keterangan = $item['keterangan'] ?? '-';
                 $sub->satuan = 'PCS'; // default, bisa diubah sesuai kebutuhan
                 $sub->user_id = Auth::id();
@@ -259,6 +260,7 @@ class TransaksiPenjualansController extends Controller
             'user',
             'cabang',
             'pelanggan',
+            'designer',
         ])->withTrashed()->findOrFail($id);
 
         $subtransaksis = $transaksi->subTransaksi()->with('produk')->get();

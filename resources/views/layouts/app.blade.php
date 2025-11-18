@@ -39,6 +39,7 @@
     <link href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" rel="stylesheet">
 
     <!-- ====================== CUSTOM STYLE ====================== -->
+     @stack('styles')
     <style>
     /* ===========================================================
        HEADER CARD DALAM CONTENT
