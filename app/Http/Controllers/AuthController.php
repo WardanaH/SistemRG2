@@ -22,6 +22,18 @@ class AuthController extends Controller
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
 
+            $user = Auth::user();
+
+            // Cek role user dan redirect sesuai peran
+            if (
+                $user->hasRole('operator indoor') ||
+                $user->hasRole('operator outdoor') ||
+                $user->hasRole('operator multi')
+            ) {
+                return redirect()->route('operator.dashboard')->with('success', 'Selamat datang kembali!');
+            }
+
+            // Redirect default untuk role lain (misal admin, owner)
             return redirect()->route('dashboard')->with('success', 'Selamat datang kembali!');
         }
 
@@ -29,6 +41,7 @@ class AuthController extends Controller
             'username' => 'Username atau password salah.',
         ])->onlyInput('username');
     }
+
 
     public function logout(Request $request)
     {
