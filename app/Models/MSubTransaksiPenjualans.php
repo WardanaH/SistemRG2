@@ -27,6 +27,7 @@ class MSubTransaksiPenjualans extends Model
         'penjualan_id',
         'user_id',
         'cabang_id',
+        'no_spk'
     ];
 
     /**

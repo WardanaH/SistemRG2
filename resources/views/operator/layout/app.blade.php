@@ -223,8 +223,8 @@
 
     <div id="main-wrapper">
         @auth
-            @include('layouts.header')
-            @include('layouts.sidebar')
+            @include('operator.layout.header')
+            @include('operator.layout.sidebar')
         @endauth
 
         <div class="content-body">
@@ -242,7 +242,7 @@
             </div>
         </div>
 
-        @include('layouts.footer')
+        @include('operator.layout.footer')
     </div>
 
     {{-- ============ CORE JS ============ --}}
@@ -251,8 +251,6 @@
     <script src="{{ asset('js/custom.min.js') }}"></script>
 
     {{-- ============ ADDITIONAL PLUGINS ============ --}}
-    <script src="{{ asset('vendor/chartist/js/chartist.min.js') }}"></script>
-    <script src="{{ asset('vendor/chartist-plugin-tooltips/js/chartist-plugin-tooltip.min.js') }}"></script>
     <script src="{{ asset('vendor/moment/moment.min.js') }}"></script>
     <script src="{{ asset('vendor/pg-calendar/js/pignose.calendar.min.js') }}"></script>
     <!-- <script src="{{ asset('vendor/perfect-scrollbar/perfect-scrollbar.min.js') }}"></script> -->

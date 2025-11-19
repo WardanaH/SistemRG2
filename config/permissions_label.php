@@ -62,9 +62,9 @@ return [
     // 🔹 Jenis Pengeluaran
     // ===============================
     'manage-jenispengeluaran' => 'Manajemen Jenis Pengeluaran',
-    'store-jenispengeluaran' => 'Tambah Jenis Pengeluaran',
+    'add-jenispengeluaran' => 'Tambah Jenis Pengeluaran',
     'edit-jenispengeluaran' => 'Edit Jenis Pengeluaran',
-    'destroy-jenispengeluaran' => 'Hapus Jenis Pengeluaran',
+    'delete-jenispengeluaran' => 'Hapus Jenis Pengeluaran',
 
     // ===============================
     // 🔹 Cabang

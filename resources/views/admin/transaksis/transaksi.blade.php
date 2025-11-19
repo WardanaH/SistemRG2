@@ -317,7 +317,7 @@
                                 <input type="hidden" name="inputnomorpelanggan" id="nomorhandphonehidden">
                                 <input type="hidden" name="inputpelanggan" id="pelangganhidden">
                                 <label for="inputdesigner" class="form-label">Pilih Designer</label>
-                                <select name="inputdesigner" id="inputdesigner" class="form-select select2" required>
+                                <select name="inputdesigner" id="inputdesigner" class="form-select select2" required disabled>
                                     <option value="">Pilih Designer</option>
                                     @foreach($designers as $d)
                                     <option value="{{ $d->id }}">{{ $d->nama }}</option>
@@ -339,6 +339,7 @@
                                         <th>Finishing</th>
                                         <th>Diskon %</th>
                                         <th>Subtotal</th>
+                                        <th>No SPK</th>
                                         <th>Aksi</th>
                                     </tr>
                                 </thead>
@@ -480,6 +481,10 @@
                             <input id="add_subtotal" class="form-control" readonly>
                         </div>
                         <div class="mb-2">
+                            <label>No SPK <span style="color: red;">*</span></label>
+                            <input id="add_nospk" class="form-control" required>
+                        </div>
+                        <div class="mb-2">
                             <label>Keterangan</label>
                             <textarea id="add_keterangan" class="form-control"></textarea>
                         </div>
@@ -543,6 +548,7 @@
             $('#kepadalabel').text(nama);
             $('#handphonelabel').text(hp);
             $('#btnAddItem, #submittransaksi').prop('disabled', false);
+            $('#inputdesigner').prop('disabled', false);
 
             $('#namapelangganhidden').val(nama);
             $('#nomorhandphonehidden').val(hp);
@@ -589,6 +595,7 @@
             const finishing = $('#add_finishing').val();
             const diskon = parseFloat($('#add_diskon').val()) || 0;
             const subtotal = harga * (panjang && lebar ? panjang * lebar : 1) * qty * (1 - diskon / 100);
+            const no_spk = $('#add_nospk').val() || '-';
             const keterangan = $('#add_keterangan').val() || '-';
 
             const newItem = {
@@ -601,6 +608,7 @@
                 finishing: finishing,
                 diskon: diskon,
                 subtotal: subtotal,
+                no_spk: no_spk,
                 keterangan: keterangan
             };
             items.push(newItem);
@@ -619,6 +627,7 @@
                 <td>${finishing}</td>
                 <td>${diskon}%</td>
                 <td>Rp ${subtotal.toLocaleString('id-ID')}</td>
+                <td>${no_spk}</td>
                 <td><button type="button" class="btn btn-danger btn-sm removeItem"><i class="fa fa-trash"></i></button></td>
             </tr>
         `);
@@ -733,7 +742,10 @@
                     });
                 },
                 error: function(xhr) {
-                    Swal.fire('Gagal!', xhr.responseJSON?.message || 'Terjadi kesalahan saat menyimpan transaksi', 'error');
+                    console.log("STATUS:", xhr.status);
+                    console.log("RESPONSE:", xhr.responseText);
+
+                    Swal.fire('Gagal!', xhr.responseJSON?.message || xhr.responseText, 'error');
                 }
             });
         });
