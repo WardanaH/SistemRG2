@@ -18,7 +18,7 @@
                     <tr>
                         <th>#</th>
                         <th>Nama</th>
-                        <th>Jumlah Transaksi</th>
+                        <th>Jumlah SPK</th>
                         <th>Username</th>
                         <th>Email</th>
                         <th>Telepon</th>

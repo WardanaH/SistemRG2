@@ -28,6 +28,7 @@ class MTransaksiPenjualans extends Model
         'status_transaksi',
         'user_id',
         'cabang_id',
+        'designer_id',
     ];
 
     /**

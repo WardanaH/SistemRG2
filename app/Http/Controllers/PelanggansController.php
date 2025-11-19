@@ -36,7 +36,8 @@ class PelanggansController extends Controller
     public function getData()
     {
         $pelanggans = MPelanggans::with('jenisPelanggan')
-            ->select('pelanggans.*');
+            ->select('pelanggans.*')
+            ->orderBy('created_at', 'desc');
 
         return DataTables::of($pelanggans)
             ->addColumn('jenis_pelanggan', fn($p) => $p->jenisPelanggan->jenis_pelanggan ?? '-')
