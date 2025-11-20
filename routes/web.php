@@ -20,6 +20,8 @@ use App\Http\Controllers\TransaksiBahanBakusController;
 use App\Http\Controllers\TransaksiPenjualansController;
 use GuzzleHttp\Middleware;
 
+require __DIR__.'/operator.php';
+
 // Guest (belum login)
 Route::middleware('guest')->group(function () {
     Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
