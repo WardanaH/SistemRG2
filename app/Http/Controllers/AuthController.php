@@ -25,16 +25,17 @@ class AuthController extends Controller
             $user = Auth::user();
 
             // Cek role user dan redirect sesuai peran
-            if (
-                $user->hasRole('operator indoor') ||
-                $user->hasRole('operator outdoor') ||
-                $user->hasRole('operator multi')
-            ) {
+            if ($user->hasRole('operator indoor') || $user->hasRole('operator outdoor') || $user->hasRole('operator multi')) {
                 return redirect()->route('operator.dashboard')->with('success', 'Selamat datang kembali!');
+            } elseif ($user->hasRole('designer')) {
+                return redirect()->route('designer.index')->with('success', 'Selamat datang kembali!');
+            } elseif ($user->hasRole('inventaris')) {
+                return redirect()->route('inventaris.dashboard')->with('success', 'Selamat datang kembali!');
+            } elseif ($user->hasRole('adversting')) {
+                return redirect()->route('adversting.index')->with('success', 'Selamat datang kembali!');
+            } else {
+                return redirect()->route('dashboard')->with('success', 'Selamat datang kembali!');
             }
-
-            // Redirect default untuk role lain (misal admin, owner)
-            return redirect()->route('dashboard')->with('success', 'Selamat datang kembali!');
         }
 
         return back()->withErrors([
