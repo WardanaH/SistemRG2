@@ -154,11 +154,11 @@ Route::middleware(['auth',])->group(function () {
     Route::get('/transaksi/bahan', [TransaksiBahanBakusController::class, 'index'])->middleware('permission:manage-transaksistokbahanbaku')->name('transaksibahanbaku.index');
     Route::get('/transaksi/bahan/create', [TransaksiBahanBakusController::class, 'create'])->middleware('permission:add-transaksistokbahanbaku')->name('transaksibahanbaku.create');
     Route::post('/transaksi/bahan/store', [TransaksiBahanBakusController::class, 'store'])->middleware('permission:add-transaksistokbahanbaku')->name('transaksibahanbaku.store');
-    Route::get('/transaksi/bahan/edit/{id}', [TransaksiBahanBakusController::class, 'show'])->name('transaksibahanbaku.edit');
-    Route::put('/transaksi/bahan/update/{id}', [TransaksiBahanBakusController::class, 'update'])->name('transaksibahanbaku.update');
-    Route::get('/transaksi/bahan/delete/{id}', [TransaksiBahanBakusController::class, 'destroy'])->name('transaksibahanbaku.destroy');
-    Route::get('/transaksi/bahan/deleted', [TransaksiBahanBakusController::class, 'indexdeleted'])->name('transaksibahanbaku.deleted');
-    Route::get('/ajax/load-bahanbaku', [TransaksiBahanBakusController::class, 'loadBahanBaku'])->name('loadbahanbaku');
+    Route::get('/transaksi/bahan/edit/{id}', [TransaksiBahanBakusController::class, 'show'])->middleware('permission:edit-transaksistokbahanbaku')->name('transaksibahanbaku.edit');
+    Route::put('/transaksi/bahan/update/{id}', [TransaksiBahanBakusController::class, 'update'])->middleware('permission:edit-transaksistokbahanbaku')->name('transaksibahanbaku.update');
+    Route::get('/transaksi/bahan/delete/{id}', [TransaksiBahanBakusController::class, 'destroy'])->middleware('permission:delete-transaksistokbahanbaku')->name('transaksibahanbaku.destroy');
+    Route::get('/transaksi/bahan/deleted', [TransaksiBahanBakusController::class, 'indexdeleted'])->middleware('permission:manage-transaksistokbahanbaku')->name('transaksibahanbaku.deleted');
+    Route::get('/ajax/load-bahanbaku', [TransaksiBahanBakusController::class, 'loadBahanBaku'])->middleware('permission:manage-transaksistokbahanbaku')->name('loadbahanbaku');
 });
 
 // Transaksi Penjualan
