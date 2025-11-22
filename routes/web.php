@@ -36,6 +36,15 @@ Route::middleware('auth')->group(function () {
 
 });
 
+// test permission, ganti aja di bagian can() nya itu kalo mau cek permission setiap role, tapi harus login dulu
+// Route::middleware('auth')->get('/cek-permission', function () {
+//     $user = auth()->user();
+//     return [
+//         'roles' => $user->getRoleNames(),
+//         'has_edit_users' => $user->can('edit-users'),
+//     ];
+// });
+
 // Manajemen Users
 Route::middleware(['auth'])->group(function () {
     Route::get('/users', [UserController::class, 'index'])->middleware('permission:manage-users')->name('users.index');
