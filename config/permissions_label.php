@@ -167,6 +167,10 @@ return [
     // 🔹 Stok & Transaksi Bahan Baku
     // ===============================
     'list-stokbahanbaku' => 'Daftar Bahan Baku',
+    'manage-stokbahanbaku' => 'Manajemen Stok Bahan Baku',
+    'add-stokbahanbaku' => 'Tambah Stok Bahan Baku',
+    'edit-stokbahanbaku' => 'Ubah Stok Bahan Baku',
+    'delete-stokbahanbaku' => 'Hapus Stok Bahan Baku',
     'manage-transaksistokbahanbaku' => 'Manajemen Transaksi Bahan Baku',
     'add-transaksistokbahanbaku' => 'Tambah Transaksi Bahan Baku',
     'edit-transaksistokbahanbaku' => 'Ubah Transaksi Bahan Baku',

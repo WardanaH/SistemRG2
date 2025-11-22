@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreCabangRequest;
 use App\Http\Requests\UpdateCabangRequest;
 use App\Models\Cabang;
+use Illuminate\Http\Request;
 
 class CabangController extends Controller
 {
@@ -20,10 +21,10 @@ class CabangController extends Controller
         return view('admin.cabangs.create');
     }
 
-    public function store(StoreCabangRequest $request)
+    public function store(Request $request)
     {
         Cabang::create($request->validated());
-        return redirect()->route('cabangs.index')->with('success','Cabang berhasil dibuat.');
+        return redirect()->route('cabangs.index')->with('success', 'Cabang berhasil dibuat.');
     }
 
     public function edit(Cabang $cabang)
@@ -31,15 +32,26 @@ class CabangController extends Controller
         return view('admin.cabangs.edit', compact('cabang'));
     }
 
-    public function update(UpdateCabangRequest $request, Cabang $cabang)
+    public function update(Request $request, Cabang $cabang)
     {
-        $cabang->update($request->validated());
-        return redirect()->route('admin.cabangs.index')->with('success','Cabang diperbarui.');
+        $validated = $request->validate([
+            'kode' => 'required|string|max:20|unique:cabangs,kode,' . $cabang->id,
+            'nama' => 'required|string|max:255',
+            'email' => 'nullable|email',
+            'telepon' => 'nullable|string|max:20',
+            'alamat' => 'nullable|string',
+        ]);
+
+        $cabang->update($validated);
+
+        return redirect()
+            ->route('cabangs.index')
+            ->with('success', 'Cabang berhasil diperbarui.');
     }
 
     public function destroy(Cabang $cabang)
     {
         $cabang->delete();
-        return redirect()->route('cabangs.index')->with('success','Cabang dihapus.');
+        return redirect()->route('cabangs.index')->with('success', 'Cabang dihapus.');
     }
 }
