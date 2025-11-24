@@ -88,6 +88,16 @@ class UserSeeder extends Seeder
         ]);
         $supervisor->assignRole('supervisor');
 
+        // --- Buar Manajemen
+        $manajemen = User::create([
+            'nama' => 'Manajemen Cabang',
+            'username' => 'manajemen',
+            'email' => 'manajemen@example.com',
+            'password' => Hash::make('password'),
+            'cabang_id' => $cabangBjm->id,
+        ]);
+        $manajemen->assignRole('manajemen');
+
         // --- Buat user admin ---
         $adminLgg = User::create([
             'nama' => 'Admin Cabang',

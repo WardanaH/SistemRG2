@@ -7,7 +7,7 @@ use Illuminate\Validation\Rule;
 
 class UpdateUserRequest extends FormRequest
 {
-    public function authorize(): bool { return $this->user()->can('manage users'); }
+    public function authorize(): bool { return $this->user()->can('manage-users'); }
 
     public function rules(): array
     {

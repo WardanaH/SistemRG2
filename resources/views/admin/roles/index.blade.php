@@ -42,7 +42,7 @@
                                         {{ $role->hasPermissionTo($perm->name) ? 'checked' : '' }}>
 
                                     <label class="form-check-label">
-                                        {{ config('permissions_label.' . $perm->name, $perm->name) }}
+                                        {{ config('permissions_labels.' . $perm->name, $perm->name) }}
                                     </label>
                                 </div>
                             </div>
