@@ -207,6 +207,96 @@
     vertical-align: middle !important;
 }
 
+/* Sembunyikan nav label saat sidebar collapse */
+.menu-toggle .quixnav .nav-label {
+    opacity: 0 !important;
+    height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+}
+
+/* Hilangkan tulisan menu saat collapse */
+.menu-toggle .quixnav .nav-text {
+    opacity: 0 !important;
+    width: 0 !important;
+    overflow: hidden !important;
+    white-space: nowrap !important;
+}
+
+/* Biar ikon tetap rapat */
+.menu-toggle .quixnav i {
+    margin-right: 0 !important;
+}
+
+</style>
+
+<style>
+/* ============================================================
+   GLOBAL MODAL STYLE — Berlaku untuk semua modal Bootstrap
+============================================================ */
+
+/* Kontainer utama modal */
+.modal-content {
+    border-radius: 13px !important;
+    border: none !important;
+    overflow: hidden !important;
+    box-shadow: 0px 8px 28px rgba(0,0,0,0.18);
+    animation: modalPop 0.25s ease-out;
+}
+
+@keyframes modalPop {
+    from { transform: scale(0.95); opacity: 0; }
+    to   { transform: scale(1); opacity: 1; }
+}
+
+.modal-header {
+    background: #4B28D2 !important;
+    color: #fff !important;
+    padding: 16px 20px !important;
+    border-bottom: none !important;
+}
+
+.modal-header .modal-title {
+    font-weight: 600 !important;
+    font-size: 1.15rem !important;
+    color: #fff !important;
+}
+
+.modal-header .btn-close {
+    filter: brightness(0) invert(1) !important;
+    opacity: 0.85;
+}
+.modal-header .btn-close:hover {
+    opacity: 1;
+}
+
+.modal-body {
+    padding: 20px !important;
+    background: #ffffff !important;
+}
+
+.modal-footer {
+    border-top: 1px solid #eaeaea !important;
+    padding: 14px 20px !important;
+    background: #fafafa !important;
+}
+
+.modal-footer .btn {
+    border-radius: 10px !important;
+    font-weight: 500 !important;
+    padding: 8px 16px !important;
+}
+
+.modal-footer .btn-primary:hover {
+    background-color: #3a1fba !important;
+}
+.modal-footer .btn-secondary:hover {
+    background-color: #e3e3e3 !important;
+}
+</style>
+
+
     </style>
 </head>
 
@@ -278,6 +368,72 @@
 
     {{-- ============ SCRIPT CHILD VIEW ============ --}}
     @stack('scripts')
+
+    <script>
+document.addEventListener("DOMContentLoaded", function () {
+    const searchInput = document.getElementById("globalSearchInput");
+
+    if (!searchInput) return;
+
+    searchInput.addEventListener("input", function () {
+        let keyword = this.value.toLowerCase().trim();
+
+        // Ambil semua table yang ada di halaman
+        const tables = document.querySelectorAll("table");
+
+        tables.forEach(table => {
+            const rows = table.querySelectorAll("tbody tr");
+
+            rows.forEach(row => {
+                const text = row.innerText.toLowerCase();
+
+                if (keyword === "" || text.includes(keyword)) {
+                    row.style.display = "";
+                } else {
+                    row.style.display = "none";
+                }
+            });
+
+            // Naikkan row yang cocok ke atas
+            if (keyword !== "") {
+                let tbody = table.querySelector("tbody");
+                let matched = [];
+                let unmatched = [];
+
+                rows.forEach(row => {
+                    if (row.style.display === "") matched.push(row);
+                    else unmatched.push(row);
+                });
+
+                tbody.innerHTML = "";
+                matched.forEach(r => tbody.appendChild(r));
+                unmatched.forEach(r => tbody.appendChild(r));
+            }
+        });
+    });
+});
+</script>
+
+<style>
+    /* Hide brand text when sidebar collapse */
+    body.menu-toggle .nav-header .brand-title {
+        display: none !important;
+    }
+
+    /* Center logo when text hidden */
+    body.menu-toggle .nav-header .brand-logo {
+        justify-content: center !important;
+    }
+</style>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const btn = document.querySelector('.nav-control');
+        btn.addEventListener('click', function () {
+            document.body.classList.toggle('menu-toggle');
+        });
+    });
+</script>
 
 </body>
 </html>
