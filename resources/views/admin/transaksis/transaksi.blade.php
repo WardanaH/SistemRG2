@@ -690,30 +690,55 @@
             $('#sisa').val('Rp ' + sisa.toLocaleString('id-ID'));
         }
 
-        // ================== TOMBOL TAMBAH ITEM (disable/enable dinamis) ==================
-        const $btnAddItem = $('#btnAddItem');
-        const $submitTransaksi = $('#submittransaksi');
+// ================== TOMBOL TAMBAH ITEM & SIMPAN TRANSAKSI ==================
+const $btnAddItem = $('#btnAddItem');
+const $submitTransaksi = $('#submittransaksi');
 
-        // fungsi update tombol
-        function updateTombolStatus() {
-            const pelangganTerisi = $('#namapelangganhidden').val() !== '' && $('#nomorhandphonehidden').val() !== '';
-            $btnAddItem.prop('disabled', !pelangganTerisi);
-            $submitTransaksi.prop('disabled', !pelangganTerisi);
+let adaItem = false; // jadi true setelah klik "Tambah Item"
 
-            if (pelangganTerisi) {
-                $btnAddItem.removeClass('btn-disabled').removeClass('btn-secondary').addClass('btn-success');
-            } else {
-                $btnAddItem.addClass('btn-disabled').removeClass('btn-success').addClass('btn-secondary');
-            }
-        }
+// fungsi update status tombol
+function updateTombolStatus() {
+    const pelangganTerisi =
+        ($('#namapelangganhidden').val() || '') !== '' &&
+        ($('#nomorhandphonehidden').val() || '') !== '';
 
-        // panggil awal (biar default tombol mati)
-        updateTombolStatus();
+    // ===== TOMBOL TAMBAH ITEM =====
+    if (pelangganTerisi) {
+        $btnAddItem.prop('disabled', false)
+            .removeClass('btn-secondary btn-disabled')
+            .addClass('btn-success');
+    } else {
+        $btnAddItem.prop('disabled', true)
+            .removeClass('btn-success')
+            .addClass('btn-secondary btn-disabled');
+    }
 
-        // setiap kali pelanggan di-submit, aktifkan tombol
-        $('#submitpelanggan').click(function() {
-            updateTombolStatus();
-        });
+    // ===== TOMBOL SIMPAN TRANSAKSI =====
+    // aturan lama: aktif setelah pelanggan terisi (WAJIB DIPERTAHANKAN UNTUK PAYLOAD)
+    // aturan baru: harus ada item (tambahan)
+    if (pelangganTerisi && adaItem) {
+        $submitTransaksi.prop('disabled', false)
+            .removeClass('btn-secondary btn-disabled')
+            .addClass('btn-primary');
+    } else {
+        $submitTransaksi.prop('disabled', true)
+            .removeClass('btn-primary')
+            .addClass('btn-secondary btn-disabled');
+    }
+}
+
+// panggil awal
+updateTombolStatus();
+
+$('#submitpelanggan').on('click', function () {
+    updateTombolStatus();
+});
+
+$('#btnAddItem').on('click', function () {
+    adaItem = true;
+    updateTombolStatus();
+});
+
 
         // ================== SUBMIT TRANSAKSI DAN CETAK REPORT ==================
         form.on('submit', function(e) {
