@@ -150,7 +150,7 @@ Route::middleware(['auth'])->group(function () {
 
 // Stok Bahan Baku
 Route::middleware(['auth'])->group(function () {
-    Route::get('/stokbahanbaku', [StokBahanBakusController::class, 'index'])->middleware('permission:manage-stokbahanbaku')->name('stokbahanbaku.index');
+    Route::get('/stokbahanbaku', [StokBahanBakusController::class, 'index'])->middleware('permission:list-stokbahanbaku')->name('stokbahanbaku.index');
     Route::get('/stokbahanbaku/create', [StokBahanBakusController::class, 'create'])->middleware('permission:add-stokbahanbaku')->name('stokbahanbaku.create');
     Route::post('/stokbahanbaku', [StokBahanBakusController::class, 'store'])->middleware('permission:add-stokbahanbaku')->name('stokbahanbaku.store');
     Route::get('/stokbahanbaku/{id}/edit', [StokBahanBakusController::class, 'edit'])->middleware('permission:edit-stokbahanbaku')->name('stokbahanbaku.edit');
