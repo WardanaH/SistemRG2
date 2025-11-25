@@ -42,10 +42,10 @@
                     <span class="nav-text">Produk & Kategori</span>
                 </a>
                 <ul aria-expanded="false">
-                    @can('manage-produk')
+                    @can('manage-kategori')
                     <li><a href="{{ route('managekategoriindex') }}">Kategori Produk</a></li>
                     @endcan
-                    @can('manage-kategori')
+                    @can('manage-produk')
                     <li><a href="{{ route('manageprodukindex') }}">Manajemen Produk</a></li>
                     @endcan
                 </ul>

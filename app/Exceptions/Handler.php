@@ -4,7 +4,6 @@ namespace App\Exceptions;
 
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Throwable;
-use Spatie\Permission\Exceptions\UnauthorizedException;
 
 class Handler extends ExceptionHandler
 {
@@ -43,11 +42,22 @@ class Handler extends ExceptionHandler
      */
     public function render($request, Throwable $exception)
     {
-        // ⛔️ Jika user tidak punya permission di Spatie Permission
-        if ($exception instanceof UnauthorizedException) {
+        // 403 - Permission Denied (Spatie)
+        if ($exception instanceof \Spatie\Permission\Exceptions\UnauthorizedException) {
             return response()->view('errors.403', [], 403);
         }
 
-        return parent::render($request, $exception);
+        // 404 - Halaman tidak ditemukan
+        if ($exception instanceof \Symfony\Component\HttpKernel\Exception\NotFoundHttpException) {
+            return response()->view('errors.404', [], 404);
+        }
+
+        // ⚠️ Jika APP_DEBUG = true → gunakan debug bawaan Laravel (Whoops)
+        if (config('app.debug')) {
+            return parent::render($request, $exception);
+        }
+
+        // 🔥 Jika APP_DEBUG = false → tampilkan custom 500 page
+        return response()->view('errors.500', ['error' => $exception->getMessage()], 500);
     }
 }
