@@ -229,6 +229,38 @@
     margin-right: 0 !important;
 }
 
+    /* STYLE GLOBAL SELECT2 */
+    .select2-container .select2-selection--single {
+        height: 38px !important;
+        border: 1px solid #dcdcdc !important;
+        border-radius: 6px !important;
+        display: flex !important;
+        align-items: center !important;
+        padding-left: 10px !important;
+        font-size: 0.9rem !important;
+        color: #333 !important;
+    }
+
+    .select2-selection__rendered {
+        color: #333 !important;
+        font-weight: 500 !important;
+    }
+
+    .select2-container--default .select2-selection--single .select2-selection__arrow b {
+        border-color: #4B28D2 transparent transparent transparent !important;
+    }
+
+    .select2-container--default .select2-results__option--highlighted {
+        background-color: #4B28D2 !important;
+        color: #fff !important;
+    }
+
+    .select2-dropdown {
+    border-radius: 10px !important;   /* sudut box dropdown */
+    overflow: hidden !important;      /* biar list di dalam ikut melengkung */
+    border: 1px solid #dcdcdc !important;
+}
+    
 </style>
 
 <style>
@@ -319,13 +351,14 @@
 
         <div class="content-body">
             <div class="container-fluid">
-                {{-- Flash Messages --}}
+                <!-- {{-- Flash Messages --}}
                 @if(session('success'))
                     <div class="alert alert-success">{{ session('success') }}</div>
                 @endif
                 @if($errors->any())
                     <div class="alert alert-danger">{{ $errors->first() }}</div>
-                @endif
+                @endif -->
+
 
                 {{-- Konten Dinamis --}}
                 @yield('content')
@@ -367,6 +400,60 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.0/dist/sweetalert2.all.min.js"></script>
 
     {{-- ============ SCRIPT CHILD VIEW ============ --}}
+
+    {{-- =====================================================
+     GLOBAL SWEETALERT FLASH MESSAGE – BERLAKU SEMUA HALAMAN
+===================================================== --}}
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    // ===== Pesan Sukses (session('success')) =====
+    @if(session('success'))
+    Swal.fire({
+        icon: 'success',
+        title: 'Berhasil!',
+        text: "{{ session('success') }}",
+        confirmButtonColor: "#3085d6",
+        toast: false,
+        position: "center",
+        showConfirmButton: true,
+    });
+    @endif
+
+    @if(session('error'))
+    Swal.fire({
+        icon: 'error',
+        title: 'Gagal!',
+        text: "{{ session('error') }}",
+        confirmButtonColor: "#d33",
+        toast: false,
+        position: "center",
+        showConfirmButton: true
+    });
+    @endif
+
+
+    // ===== Pesan Error Validasi (first error) =====
+    @if($errors->any())
+        Swal.fire({
+            icon: 'error',
+            title: 'Kesalahan Input!',
+            text: "{{ $errors->first() }}",
+            showConfirmButton: true
+        });
+    @endif
+
+});
+</script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        $('.select2').select2({
+            theme: 'bootstrap-5',
+            width: '100%'
+        });
+    });
+</script>
+
     @stack('scripts')
 
     <script>

@@ -113,6 +113,9 @@
   </div>
 </div>
 
+{{-- SWEETALERT2 --}}
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 {{-- =============== SCRIPT =============== --}}
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
@@ -143,7 +146,7 @@ $(document).ready(function() {
                       <td>${b.kategori?.Nama_Kategori ?? '-'}</td>
                       <td>${b.keterangan ?? '-'}</td>
                       <td>
-                        <button class="btn btn-success btn-sm editBtn" data-id="${b.id}">Edit</button>
+                        <button class="btn btn-warning btn-sm editBtn" data-id="${b.id}">Edit</button>
                         <button class="btn btn-danger btn-sm deleteBtn" data-id="${b.id}">Hapus</button>
                       </td>
                     </tr>`;
@@ -156,19 +159,32 @@ $(document).ready(function() {
     // Tambah
     $('#formAdd').on('submit', function(e) {
         e.preventDefault();
+
         $.post("{{ route('storebahanbaku') }}", $(this).serialize(), function(res) {
             if (res === "Success") {
-                alert('Bahan baku berhasil ditambahkan!');
+
+                Swal.fire({
+                    icon: "success",
+                    title: "Berhasil!",
+                    text: "Bahan baku berhasil ditambahkan!",
+                    timer: 1500,
+                    showConfirmButton: false
+                });
+
                 $('#formAdd')[0].reset();
                 addModal.hide();
                 loadBahan();
-            } else alert('Gagal menambahkan bahan baku!');
+
+            } else {
+                Swal.fire("Gagal!", "Gagal menambahkan bahan baku!", "error");
+            }
         });
     });
 
     // Edit
     $(document).on('click', '.editBtn', function() {
         const id = $(this).data('id');
+
         $.get("{{ route('loadbahanbaku') }}", function(res) {
             const b = res.data.find(x => x.id == id);
             if (b) {
@@ -186,31 +202,63 @@ $(document).ready(function() {
 
     $('#formEdit').on('submit', function(e) {
         e.preventDefault();
+
         $.post("{{ route('updatebahanbaku') }}", $(this).serialize(), function(res) {
             if (res === "Success") {
-                alert('Bahan baku berhasil diperbarui!');
+
+                Swal.fire({
+                    icon: "success",
+                    title: "Berhasil!",
+                    text: "Bahan baku berhasil diperbarui!",
+                    timer: 1500,
+                    showConfirmButton: false
+                });
+
                 $('#formEdit')[0].reset();
                 editModal.hide();
                 loadBahan();
-            } else alert('Gagal memperbarui bahan baku!');
+
+            } else {
+                Swal.fire("Gagal!", "Gagal memperbarui bahan baku!", "error");
+            }
         });
     });
 
     // Hapus
     $(document).on('click', '.deleteBtn', function() {
         const id = $(this).data('id');
-        if (confirm('Yakin ingin menghapus bahan baku ini?')) {
-            $.post("{{ route('deletebahanbaku') }}", {
-                _token: '{{ csrf_token() }}',
-                hapus_bahan_baku_id: id
-            }, function(res) {
-                if (res === "Success") {
-                    alert('Bahan baku berhasil dihapus!');
-                    loadBahan();
-                } else alert('Gagal menghapus bahan baku!');
-            });
-        }
+
+        Swal.fire({
+            title: "Yakin ingin menghapus?",
+            text: "Data yang dihapus tidak bisa dikembalikan!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonText: "Ya, hapus!",
+            cancelButtonText: "Batal",
+            reverseButtons: true
+        }).then((result) => {
+
+            if (result.isConfirmed) {
+
+                $.post("{{ route('deletebahanbaku') }}", {
+                    _token: '{{ csrf_token() }}',
+                    hapus_bahan_baku_id: id
+                }, function(res) {
+
+                    if (res === "Success") {
+                        Swal.fire("Berhasil!", "Bahan baku berhasil dihapus!", "success");
+                        loadBahan();
+                    } else {
+                        Swal.fire("Gagal!", "Gagal menghapus bahan baku!", "error");
+                    }
+
+                });
+
+            }
+
+        });
     });
+
 });
 </script>
 

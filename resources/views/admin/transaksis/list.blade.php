@@ -260,10 +260,15 @@
 
             row.insertAdjacentHTML('afterend', html);
 
-        } catch (err) {
-            console.error(err);
-            alert('Gagal memuat detail transaksi.');
-        }
+            catch (err) {
+                console.error(err);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Gagal!',
+                    text: 'Gagal memuat detail transaksi.'
+                });
+            }
+
     });
 </script>
 <script>

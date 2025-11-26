@@ -543,7 +543,14 @@
                 nama = opt.data('nama');
                 hp = opt.data('hp');
             }
-            if (!nama || !hp) return alert('Isi nama dan nomor HP pelanggan!');
+            if (!nama || !hp) {
+                return Swal.fire({
+                    icon: 'warning',
+                    title: 'Data belum lengkap!',
+                    text: 'Isi nama dan nomor HP pelanggan!',
+                });
+            }
+
 
             $('#kepadalabel').text(nama);
             $('#handphonelabel').text(hp);
