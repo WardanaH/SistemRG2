@@ -93,7 +93,7 @@
         <tbody>
             @foreach($users as $user)
             <tr>
-                <td>{{ $user->name }}</td>
+                <td>{{ $user->nama }}</td>
                 <td>{{ $user->username }}</td>
                 <td>{{ $user->email }}</td>
                 <td>{{ $user->getRoleNames()->implode(', ') }}</td>

@@ -83,10 +83,9 @@ class RolePermissionSeeder extends Seeder
             'manage-relasibahanbaku','add-relasibahanbaku','edit-relasibahanbaku','delete-relasibahanbaku',
 
             // Stok Bahan Baku
-            'manage-stokbahanbaku','add-stokbahanbaku','edit-stokbahanbaku','delete-stokbahanbaku',
+            'list-stokbahanbaku', 'add-stokbahanbaku', 'edit-stokbahanbaku', 'delete-stokbahanbaku',
 
-            // transaksi Stok Bahan Baku
-            'list-stokbahanbaku',
+            // Manajemen Transaksi Stok Bahan Baku
             'manage-transaksistokbahanbaku','add-transaksistokbahanbaku','edit-transaksistokbahanbaku',
             'delete-transaksistokbahanbaku','deleted-transaksistokbahanbaku',
 
