@@ -19,17 +19,20 @@
             <li>
                 <a class="has-arrow" href="javascript:void(0)" aria-expanded="false">
                     <i class="icon icon-credit-card"></i>
-                    <span class="nav-text">Transaksi</span>
+                    <span class="nav-text">Transaksi Transaksi</span>
                 </a>
                 <ul aria-expanded="false">
                     @can('add-transaksipenjualan')
-                    <li><a href="{{ route('addtransaksiindex') }}">Tambah Transaksi</a></li>
+                    <li><a href="{{ route('addtransaksiindex') }}">Tambah Transaksi Penjualan</a></li>
                     @endcan
                     @can('manage-transaksipenjualan')
-                    <li><a href="{{ route('transaksiindex') }}">Manajemen Penjualan</a></li>
+                    <li><a href="{{ route('transaksiindex') }}">Manajemen Transaksi Penjualan</a></li>
                     @endcan
                     @can('deleted-transaksipenjualan')
-                    <li><a href="{{ route('transaksiindexdeleted') }}">Manajemen Penjualan Terhapus</a></li>
+                    <li><a href="{{ route('transaksiindexdeleted') }}">Manajemen Transaksi Penjualan Terhapus</a></li>
+                    @endcan
+                    @can('manage-angsuranpenjualan')
+                    <li><a href="{{ route('angsuran.index') }}">Manajemen Angsuran Transaksi</a></li>
                     @endcan
                 </ul>
             </li>

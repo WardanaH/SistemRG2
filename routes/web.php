@@ -1,5 +1,6 @@
 <?php
 
+use GuzzleHttp\Middleware;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ProdukController;
@@ -7,6 +8,7 @@ use App\Http\Controllers\DesignerController;
 use App\Http\Controllers\KategoriController;
 use App\Http\Controllers\OperatorController;
 use App\Http\Controllers\SupplierController;
+use App\Http\Controllers\AngsuransController;
 use App\Http\Controllers\BahanBakuController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Admin\RoleController;
@@ -18,7 +20,6 @@ use App\Http\Controllers\JenisPelanggansController;
 use App\Http\Controllers\RelasiBahanBakuController;
 use App\Http\Controllers\TransaksiBahanBakusController;
 use App\Http\Controllers\TransaksiPenjualansController;
-use GuzzleHttp\Middleware;
 
 require __DIR__.'/operator.php';
 
@@ -200,3 +201,33 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/operator/update', [OperatorController::class, 'update'])->name('updateoperator');
     Route::delete('/operator/delete', [OperatorController::class, 'destroy'])->name('destroyoperator');
 });
+
+// Manajemen Angsuran Penjualan
+Route::middleware(['auth'])->group(function () {
+
+    // Halaman utama
+    Route::get('/angsuran-penjualan', [AngsuransController::class, 'index'])
+        ->middleware('permission:manage-angsuranpenjualan')
+        ->name('angsuran.index');
+
+    // Load datatable AJAX
+    Route::get('/angsuran-penjualan/data', [AngsuransController::class, 'data'])
+        ->middleware('permission:manage-angsuranpenjualan')
+        ->name('angsuran.data');
+
+    // Tambah angsuran
+    Route::post('/angsuran-penjualan/{id}/bayar', [AngsuransController::class, 'bayar'])
+        ->middleware('permission:add-angsuranpenjualan')
+        ->name('angsuran.bayar');
+
+    // Hapus angsuran
+    Route::delete('/angsuran-penjualan/{id}/hapus', [AngsuransController::class, 'hapus'])
+        ->middleware('permission:delete-angsuranpenjualan')
+        ->name('angsuran.hapus');
+
+    // Detail satu transaksi
+    Route::get('/angsuran-penjualan/detail/{id}', [AngsuransController::class, 'detail'])
+        ->middleware('permission:list-angsuranpenjualan')
+        ->name('angsuran.detail');
+});
+
