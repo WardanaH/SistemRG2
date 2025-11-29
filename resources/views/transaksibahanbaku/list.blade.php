@@ -30,20 +30,8 @@
 
 @section('content')
 
-{{-- ✅ Alerts --}}
-@if (session('success'))
-<div class="alert alert-success alert-dismissible fade show">
-    <i class="fa fa-check"></i> {{ session('success') }}
-    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-</div>
-@endif
-
-@if (session('error'))
-<div class="alert alert-danger alert-dismissible fade show">
-    <i class="fa fa-ban"></i> {{ session('error') }}
-    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-</div>
-@endif
+{{-- ❗ ALERT DEFAULT DIHAPUS (karena diganti SweetAlert)
+--}}
 
 <div class="row">
     {{-- 🔍 FILTER PANEL --}}
@@ -138,14 +126,15 @@
                                     <a href="{{ route('transaksibahanbaku.edit', encrypt($data->id)) }}" class="btn btn-success">
                                         <i class="fa fa-edit"></i>
                                     </a>
-                                    <form action="{{ route('transaksibahanbaku.destroy', encrypt($data->id)) }}"
-                                        method="POST"
-                                        onsubmit="return confirm('Yakin ingin menghapus transaksi ini?')"
-                                        style="display:inline;">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button class="btn btn-danger"><i class="fa fa-trash"></i></button>
-                                    </form>
+
+                                    {{-- ❗ BUTTON DELETE (diubah jadi SweetAlert)
+                                    --}}
+                                    <button type="button"
+                                        class="btn btn-danger btn-delete"
+                                        data-id="{{ encrypt($data->id) }}">
+                                        <i class="fa fa-trash"></i>
+                                    </button>
+
                                 </div>
                             </td>
                         </tr>
@@ -167,9 +156,10 @@
 @endsection
 
 @push('scripts')
-{{-- ✅ CDN JS untuk plugin --}}
+{{-- Plugin --}}
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.10.0/js/bootstrap-datepicker.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
     $(function() {
@@ -180,5 +170,60 @@
             todayHighlight: true
         });
     });
+
+    // ============================
+    // SWEETALERT DELETE ACTION
+    // ============================
+    $('.btn-delete').click(function(e) {
+        e.preventDefault();
+
+        let id = $(this).data('id');
+        let url = "{{ route('transaksibahanbaku.destroy', ':id') }}";
+        url = url.replace(':id', id);
+
+        Swal.fire({
+            title: 'Hapus Transaksi?',
+            text: "Data yang dihapus tidak bisa dikembalikan!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Ya, hapus!',
+            cancelButtonText: 'Batal'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $('<form>', {
+                    'method': 'POST',
+                    'action': url
+                })
+                .append('@csrf')
+                .append('@method("DELETE")')
+                .appendTo('body')
+                .submit();
+            }
+        });
+    });
+
+    // ============================
+    // SWEETALERT SESSION SUCCESS
+    // ============================
+    @if (session('success'))
+        Swal.fire({
+            icon: 'success',
+            title: 'Berhasil!',
+            text: "{{ session('success') }}"
+        });
+    @endif
+
+    // ============================
+    // SWEETALERT SESSION ERROR
+    // ============================
+    @if (session('error'))
+        Swal.fire({
+            icon: 'error',
+            title: 'Gagal!',
+            text: "{{ session('error') }}"
+        });
+    @endif
 </script>
 @endpush

@@ -116,111 +116,167 @@
 {{-- =============== SCRIPT =============== --}}
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <script>
-    $(document).ready(function() {
-        const addModal = new bootstrap.Modal(document.getElementById('addModal'));
-        const editModal = new bootstrap.Modal(document.getElementById('editModal'));
+$(document).ready(function() {
 
-        $('#openAddModal').on('click', () => addModal.show());
+    const addModal = new bootstrap.Modal(document.getElementById('addModal'));
+    const editModal = new bootstrap.Modal(document.getElementById('editModal'));
 
-        loadProduk();
+    $('#openAddModal').on('click', () => addModal.show());
 
-        function loadProduk() {
-            $.get("{{ route('loadproduk') }}", function(res) {
-                let rows = '';
-                if (res.data.length === 0) {
-                    rows = `<tr><td colspan="8" class="text-muted">Belum ada data produk.</td></tr>`;
+    loadProduk();
+
+    function loadProduk() {
+        $.get("{{ route('loadproduk') }}", function(res) {
+            let rows = '';
+            if (res.data.length === 0) {
+                rows = `<tr><td colspan="8" class="text-muted">Belum ada data produk.</td></tr>`;
+            } else {
+                res.data.forEach(p => {
+                    const warna = p.hitung_luas ? 'text-success fw-bold' : 'text-danger fw-bold';
+                    const status = p.hitung_luas ? 'Ya' : 'Tidak';
+                    rows += `
+                        <tr>
+                            <td>${p.nama_produk}</td>
+                            <td>${p.satuan}</td>
+                            <td>Rp ${parseInt(p.harga_beli).toLocaleString('id-ID')}</td>
+                            <td>Rp ${parseInt(p.harga_jual).toLocaleString('id-ID')}</td>
+                            <td>${p.kategori?.Nama_Kategori ?? '-'}</td>
+                            <td class="${warna}">${status}</td>
+                            <td>${p.keterangan ?? '-'}</td>
+                            <td>
+                                <button class="btn btn-warning btn-sm editBtn" data-id="${p.id}">Edit</button>
+                                <button class="btn btn-danger btn-sm deleteBtn" data-id="${p.id}">Hapus</button>
+                            </td>
+                        </tr>`;
+                });
+            }
+            $('#produkBody').html(rows);
+        });
+    }
+
+    // ================= TAMBAH PRODUK =================
+    $('#formAdd').on('submit', function(e) {
+        e.preventDefault();
+
+        $.post("{{ route('storeproduk') }}", $(this).serialize(), function(res) {
+            if (res === "Success") {
+
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Produk berhasil ditambahkan!',
+                    showConfirmButton: false,
+                    timer: 1500
+                });
+
+                $('#formAdd')[0].reset();
+                addModal.hide();
+                loadProduk();
+            } else {
+
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Gagal menambahkan produk!'
+                });
+
+            }
+        });
+    });
+
+    // ================= EDIT PRODUK =================
+    $(document).on('click', '.editBtn', function() {
+        const id = $(this).data('id');
+
+        $.get("{{ route('loadproduk') }}", function(res) {
+            const p = res.data.find(x => x.id == id);
+
+            if (p) {
+                $('#edit_produk_id').val(p.id);
+                $('#edit_kategori').val(p.kategori_id);
+                $('#edit_nama_produk').val(p.nama_produk);
+                $('#edit_satuan').val(p.satuan);
+                $('#edit_harga_beli').val(p.harga_beli);
+                $('#edit_harga_jual').val(p.harga_jual);
+                $('#edit_keterangan').val(p.keterangan);
+                editModal.show();
+            }
+        });
+    });
+
+    $('#formEdit').on('submit', function(e) {
+        e.preventDefault();
+
+        $.ajax({
+            url: "{{ route('updateproduk') }}",
+            method: "POST",
+            data: $(this).serialize(),
+            success: function(res) {
+
+                if (res === "Success") {
+
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Produk berhasil diperbarui!',
+                        showConfirmButton: false,
+                        timer: 1500
+                    });
+
+                    $('#formEdit')[0].reset();
+                    editModal.hide();
+                    loadProduk();
+
                 } else {
-                    res.data.forEach(p => {
-                        const warna = p.hitung_luas ? 'text-success fw-bold' : 'text-danger fw-bold';
-                        const status = p.hitung_luas ? 'Ya' : 'Tidak';
-                        rows += `
-                    <tr>
-                        <td>${p.nama_produk}</td>
-                        <td>${p.satuan}</td>
-                        <td>Rp ${parseInt(p.harga_beli).toLocaleString('id-ID')}</td>
-                        <td>Rp ${parseInt(p.harga_jual).toLocaleString('id-ID')}</td>
-                        <td>${p.kategori?.Nama_Kategori ?? '-'}</td>
-                        <td class="${warna}">${status}</td>
-                        <td>${p.keterangan ?? '-'}</td>
-                        <td>
-                            <button class="btn btn-success btn-sm editBtn" data-id="${p.id}">Edit</button>
-                            <button class="btn btn-danger btn-sm deleteBtn" data-id="${p.id}">Hapus</button>
-                        </td>
-                    </tr>`;
+
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Gagal memperbarui produk!'
+                    });
+
+                }
+            },
+            error: function(xhr) {
+
+                if (xhr.status === 403) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Anda tidak memiliki izin untuk mengedit produk.'
+                    });
+
+                } else if (xhr.status === 419) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Session expired, silakan refresh halaman.'
+                    });
+
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Terjadi kesalahan: ' + xhr.status
                     });
                 }
-                $('#produkBody').html(rows);
-            });
-        }
-
-        // Tambah
-        $('#formAdd').on('submit', function(e) {
-            e.preventDefault();
-            $.post("{{ route('storeproduk') }}", $(this).serialize(), function(res) {
-                if (res === "Success") {
-                    alert('Produk berhasil ditambahkan!');
-                    $('#formAdd')[0].reset();
-                    addModal.hide();
-                    loadProduk();
-                } else alert('Gagal menambahkan produk!');
-            });
+            }
         });
+    });
 
-        // Edit
-        $(document).on('click', '.editBtn', function() {
-            const id = $(this).data('id');
-            $.get("{{ route('loadproduk') }}", function(res) {
-                const p = res.data.find(x => x.id == id);
-                if (p) {
-                    $('#edit_produk_id').val(p.id);
-                    $('#edit_kategori').val(p.kategori_id);
-                    $('#edit_nama_produk').val(p.nama_produk);
-                    $('#edit_satuan').val(p.satuan);
-                    $('#edit_harga_beli').val(p.harga_beli);
-                    $('#edit_harga_jual').val(p.harga_jual);
-                    $('#edit_keterangan').val(p.keterangan);
-                    editModal.show();
-                }
-            });
-        });
+    // ================= HAPUS PRODUK =================
+    $(document).on('click', '.deleteBtn', function() {
 
-        $('#formEdit').on('submit', function(e) {
-            e.preventDefault();
+        const id = $(this).data('id');
 
-            $.ajax({
-                url: "{{ route('updateproduk') }}",
-                method: "POST",
-                data: $(this).serialize(),
+        Swal.fire({
+            title: 'Yakin ingin menghapus?',
+            text: "Produk akan hilang secara permanen!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Ya, Hapus',
+            cancelButtonText: 'Batal',
+            reverseButtons: true
+        }).then((result) => {
 
-                success: function(res) {
-                    if (res === "Success") {
-                        alert('Produk berhasil diperbarui!');
-                        $('#formEdit')[0].reset();
-                        editModal.hide();
-                        loadProduk();
-                    } else {
-                        alert('Gagal memperbarui produk!');
-                    }
-                },
+            if (result.isConfirmed) {
 
-                error: function(xhr) {
-                    if (xhr.status === 403) {
-                        alert("❌ Anda tidak memiliki izin untuk mengedit produk.");
-                    } else if (xhr.status === 419) {
-                        alert("❌ Session expired, silakan refresh halaman.");
-                    } else {
-                        alert("Terjadi kesalahan: " + xhr.status);
-                    }
-                }
-            });
-        });
-
-
-        // Hapus
-        $(document).on('click', '.deleteBtn', function() {
-            const id = $(this).data('id');
-            if (confirm('Yakin ingin menghapus produk ini?')) {
                 $.ajax({
                     url: "{{ route('deleteproduk') }}",
                     method: "POST",
@@ -230,23 +286,55 @@
                     },
                     success: function(res) {
                         if (res === "Success") {
-                            alert('Produk berhasil dihapus!');
+
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Produk berhasil dihapus!',
+                                showConfirmButton: false,
+                                timer: 1500
+                            });
+
                             loadProduk();
-                        } else alert('Gagal menghapus produk!');
-                    },
-                    error: function(xhr, status, error) {
-                        if (xhr.status === 403) {
-                            alert("❌ Anda tidak memiliki izin untuk mengedit produk.");
-                        } else if (xhr.status === 419) {
-                            alert("❌ Session expired, silakan refresh halaman.");
+
                         } else {
-                            alert("Terjadi kesalahan: " + error);
+
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Gagal menghapus produk!'
+                            });
+
+                        }
+                    },
+                    error: function(xhr) {
+
+                        if (xhr.status === 403) {
+                            Swal.fire({
+                                icon: 'warning',
+                                title: 'Anda tidak memiliki izin untuk menghapus produk.'
+                            });
+
+                        } else if (xhr.status === 419) {
+                            Swal.fire({
+                                icon: 'warning',
+                                title: 'Session expired, silakan refresh halaman.'
+                            });
+
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Terjadi kesalahan: ' + xhr.status
+                            });
                         }
                     }
                 });
+
             }
+
         });
+
     });
+
+});
 </script>
 
 @endsection

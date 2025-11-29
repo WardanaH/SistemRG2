@@ -118,7 +118,6 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
-                    {{-- Mirip dengan modal tambah, tapi menggunakan id edit_* --}}
                     <div class="row g-2">
                         <div class="col-md-6">
                             <label>Nama Perusahaan</label>
@@ -164,166 +163,173 @@
 
 {{-- =================== SCRIPT =================== --}}
 @push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.8/js/dataTables.bootstrap5.min.js"></script>
-<link href="https://cdn.datatables.net/1.13.8/css/dataTables.bootstrap5.min.css" rel="stylesheet">
 
 <script>
-    $(function() {
-        const addModal = new bootstrap.Modal(document.getElementById('addModal'));
-        const editModal = new bootstrap.Modal(document.getElementById('editModal'));
+$(function() {
 
-        // Inisialisasi DataTable
-        const table = $('#tabel_pelanggan').DataTable({
-            processing: true,
-            serverSide: true,
-            ajax: "{{ route('pelanggan.data') }}",
-            columns: [{
-                    data: 'nama_perusahaan',
-                    name: 'nama_perusahaan'
-                },
-                {
-                    data: 'nama_pemilik',
-                    name: 'nama_pemilik'
-                },
-                {
-                    data: 'jenis_pelanggan',
-                    name: 'jenis_pelanggan'
-                },
-                {
-                    data: 'telpon_pelanggan',
-                    name: 'telpon_pelanggan'
-                },
-                {
-                    data: 'email_pelanggan',
-                    name: 'email_pelanggan'
-                },
-                {
-                    data: 'limit_pelanggan',
-                    name: 'limit_pelanggan'
-                },
-                {
-                    data: 'status_pelanggan',
-                    name: 'status_pelanggan',
-                    orderable: false,
-                    searchable: false
-                },
-                {
-                    data: 'action',
-                    name: 'action',
-                    orderable: false,
-                    searchable: false
-                },
-            ]
-        });
+    const addModal = new bootstrap.Modal('#addModal');
+    const editModal = new bootstrap.Modal('#editModal');
 
-        // Buka modal tambah
-        $('#openAddModal').click(() => addModal.show());
+    // Datatable
+    const table = $('#tabel_pelanggan').DataTable({
+        processing: true,
+        serverSide: true,
+        ajax: "{{ route('pelanggan.data') }}",
+        columns: [
+            { data: 'nama_perusahaan' },
+            { data: 'nama_pemilik' },
+            { data: 'jenis_pelanggan' },
+            { data: 'telpon_pelanggan' },
+            { data: 'email_pelanggan' },
+            { data: 'limit_pelanggan' },
+            { data: 'status_pelanggan', orderable:false, searchable:false },
+            { data: 'action', orderable:false, searchable:false },
+        ]
+    });
 
-        // Tambah data pelanggan
-        $('#formAdd').submit(function(e) {
-            e.preventDefault();
-            $.ajax({
-                url: "{{ route('pelanggan.store') }}",
-                type: "POST",
-                data: $(this).serialize(),
-                success: res => {
-                    if (res === "Success") {
-                        addModal.hide();
-                        table.ajax.reload();
-                        alert('✅ Pelanggan berhasil ditambahkan!');
-                        this.reset();
-                    } else {
-                        alert('❌ Gagal menambah pelanggan!');
-                    }
-                },
-                error: err => {
-                    console.error(err);
-                    alert('❌ Terjadi kesalahan server.');
-                }
+    // Buka modal tambah
+    $('#openAddModal').click(() => addModal.show());
+
+    // Submit Tambah
+    $('#formAdd').submit(function(e){
+        e.preventDefault();
+        $.post("{{ route('pelanggan.store') }}", $(this).serialize(), res=>{
+            if(res==="Success"){
+                addModal.hide();
+                table.ajax.reload();
+                Swal.fire({
+                    icon:'success',
+                    title:'Berhasil!',
+                    text:'Pelanggan berhasil ditambahkan.',
+                    confirmButtonColor:'#0d6efd'
+                });
+                this.reset();
+            } else {
+                Swal.fire({
+                    icon:'error',
+                    title:'Gagal!',
+                    text:'Tidak dapat menambah pelanggan.',
+                    confirmButtonColor:'#d33'
+                });
+            }
+        }).fail(()=>{
+            Swal.fire({
+                icon:'error',
+                title:'Kesalahan Server!',
+                text:'Terjadi kesalahan pada server.',
+                confirmButtonColor:'#d33'
             });
         });
+    });
 
-        // Klik tombol edit
-        $(document).on('click', '.editBtn', function() {
-            const id = $(this).data('id');
-
-            // Ambil detail pelanggan dari route baru
-            $.get(`/pelanggan/${id}/detail`, function(p) {
-                $('#edit_pelanggan_id').val(id);
-                $('#edit_namaperusahaan').val(p.nama_perusahaan);
-                $('#edit_namapemilik').val(p.nama_pemilik);
-                $('#edit_teleponpelanggan').val(p.telpon_pelanggan);
-                $('#edit_emailpelanggan').val(p.email_pelanggan);
-                $('#edit_limittagihan').val(p.limit_pelanggan);
-                $('#edit_statuspelanggan').val(p.status_pelanggan ? 1 : 0);
-                $('#edit_keterangan').val(p.keterangan_pelanggan);
-                editModal.show();
-            }).fail(() => alert('❌ Gagal mengambil data pelanggan!'));
-        });
-
-        // Update data pelanggan
-        $('#formEdit').submit(function(e) {
-            e.preventDefault();
-            $.ajax({
-                url: "{{ route('pelanggan.update') }}",
-                type: "POST",
-                data: $(this).serialize(),
-                success: res => {
-                    if (res === "Success") {
-                        editModal.hide();
-                        table.ajax.reload();
-                        alert('✅ Data pelanggan diperbarui!');
-                    } else {
-                        alert('❌ Gagal update pelanggan!');
-                    }
-                },
-                error: function(xhr) {
-                    if (xhr.status === 403) {
-                        alert("❌ Anda tidak memiliki izin untuk mengedit pelanggan.");
-                    } else if (xhr.status === 419) {
-                        alert("❌ Session expired, silakan refresh halaman.");
-                    } else {
-                        alert("Terjadi kesalahan: " + xhr.status);
-                    }
-                }
+    // Klik Edit
+    $(document).on('click','.editBtn',function(){
+        const id=$(this).data('id');
+        $.get(`/pelanggan/${id}/detail`,p=>{
+            $('#edit_pelanggan_id').val(id);
+            $('#edit_namaperusahaan').val(p.nama_perusahaan);
+            $('#edit_namapemilik').val(p.nama_pemilik);
+            $('#edit_teleponpelanggan').val(p.telpon_pelanggan);
+            $('#edit_emailpelanggan').val(p.email_pelanggan);
+            $('#edit_limittagihan').val(p.limit_pelanggan);
+            $('#edit_statuspelanggan').val(p.status_pelanggan?1:0);
+            $('#edit_keterangan').val(p.keterangan_pelanggan);
+            editModal.show();
+        }).fail(()=>{
+            Swal.fire({
+                icon:'error',
+                title:'Gagal!',
+                text:'Tidak dapat mengambil data pelanggan.',
+                confirmButtonColor:'#d33'
             });
         });
+    });
 
-        // Hapus data pelanggan
-        $(document).on('click', '.deleteBtn', function() {
-            const id = $(this).data('id');
-            if (confirm('Yakin ingin menghapus pelanggan ini?')) {
-                $.ajax({
-                    url: "{{ route('pelanggan.destroy') }}",
-                    method: 'POST',
-                    data: {
-                        _token: "{{ csrf_token() }}",
-                        hapus_pelanggan_id: id
-                    },
-                    success: function(res) {
-                        if (res === "Success") {
-                            alert('Pelanggan berhasil dihapus!');
-                            table.ajax.reload();
-                        } else {
-                            alert('Gagal menghapus pelanggan!');
-                        }
-                    },
-                    error: function(xhr) {
-                        if (xhr.status === 403) {
-                            alert("❌ Anda tidak memiliki izin untuk menghapus pelanggan.");
-                        } else if (xhr.status === 419) {
-                            alert("❌ Session expired, silakan refresh halaman.");
-                        } else {
-                            alert("❌ Terjadi kesalahan: " + xhr.status);
-                        }
+    // Submit Edit
+    $('#formEdit').submit(function(e){
+        e.preventDefault();
+        $.post("{{ route('pelanggan.update') }}", $(this).serialize(), res=>{
+            if(res==="Success"){
+                editModal.hide();
+                table.ajax.reload();
+                Swal.fire({
+                    icon:'success',
+                    title:'Berhasil!',
+                    text:'Data pelanggan berhasil diperbarui.',
+                    confirmButtonColor:'#198754'
+                });
+            } else {
+                Swal.fire({
+                    icon:'error',
+                    title:'Gagal!',
+                    text:'Update pelanggan gagal.',
+                    confirmButtonColor:'#d33'
+                });
+            }
+        }).fail(xhr=>{
+            Swal.fire({
+                icon:'error',
+                title:'Kesalahan!',
+                text: 'Error '+xhr.status,
+                confirmButtonColor:'#d33'
+            });
+        });
+    });
+
+    // Delete SweetAlert
+    $(document).on('click','.deleteBtn',function(){
+        const id = $(this).data('id');
+
+        Swal.fire({
+            title: "Yakin hapus pelanggan ini?",
+            text: "Data yang dihapus tidak dapat dikembalikan!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#d33",
+            cancelButtonColor: "#6c757d",
+            confirmButtonText: "Ya, hapus!",
+            cancelButtonText: "Batal"
+        }).then((result)=>{
+            if(result.isConfirmed){
+                $.post("{{ route('pelanggan.destroy') }}", {
+                    _token:"{{ csrf_token() }}",
+                    hapus_pelanggan_id:id
+                },res=>{
+                    if(res==="Success"){
+                        Swal.fire({
+                            icon:'success',
+                            title:'Terhapus!',
+                            text:'Pelanggan berhasil dihapus.',
+                            confirmButtonColor:'#0d6efd'
+                        });
+                        table.ajax.reload();
+                    } else {
+                        Swal.fire({
+                            icon:'error',
+                            title:'Gagal!',
+                            text:'Tidak dapat menghapus pelanggan.',
+                            confirmButtonColor:'#d33'
+                        });
                     }
+                }).fail(xhr=>{
+                    Swal.fire({
+                        icon:'error',
+                        title:'Kesalahan!',
+                        text:'Error '+xhr.status,
+                        confirmButtonColor:'#d33'
+                    });
                 });
             }
         });
+
     });
+
+});
 </script>
 @endpush
 @endsection
