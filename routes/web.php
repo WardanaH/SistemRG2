@@ -1,5 +1,6 @@
 <?php
 
+use GuzzleHttp\Middleware;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ProdukController;
@@ -7,6 +8,7 @@ use App\Http\Controllers\DesignerController;
 use App\Http\Controllers\KategoriController;
 use App\Http\Controllers\OperatorController;
 use App\Http\Controllers\SupplierController;
+use App\Http\Controllers\AngsuransController;
 use App\Http\Controllers\BahanBakuController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Admin\RoleController;
@@ -18,9 +20,8 @@ use App\Http\Controllers\JenisPelanggansController;
 use App\Http\Controllers\RelasiBahanBakuController;
 use App\Http\Controllers\TransaksiBahanBakusController;
 use App\Http\Controllers\TransaksiPenjualansController;
-use GuzzleHttp\Middleware;
 
-require __DIR__.'/operator.php';
+require __DIR__ . '/operator.php';
 
 // Guest (belum login)
 Route::middleware('guest')->group(function () {
@@ -33,7 +34,6 @@ Route::middleware('auth')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
     Route::get('/dashboard-rg', [DashboardController::class, 'index'])->middleware('permission:index-home')->name('dashboard');
-
 });
 
 // test permission, ganti aja di bagian can() nya itu kalo mau cek permission setiap role, tapi harus login dulu
@@ -173,7 +173,7 @@ Route::middleware(['auth',])->group(function () {
 // Transaksi Penjualan
 Route::middleware(['auth'])->group(function () {
     Route::get('/transaksi', [TransaksiPenjualansController::class, 'index'])->middleware('permission:manage-transaksipenjualan')->name('transaksiindex');
-    Route::get('/transaksideleted', [TransaksiPenjualansController::class, 'indexdeleted'])->middleware('permission:manage-transaksipenjualan')->name('transaksiindexdeleted');
+    Route::get('/transaksideleted', [TransaksiPenjualansController::class, 'indexdeleted'])->middleware('permission:deleted-transaksipenjualan')->name('transaksiindexdeleted');
     Route::get('/transaksi/penjualan', [TransaksiPenjualansController::class, 'transaksi'])->middleware('permission:deleted-transaksipenjualan')->name('addtransaksiindex');
     Route::get('/transaksi/penjualan/load', [TransaksiPenjualansController::class, 'load'])->middleware('permission:manage-transaksipenjualan')->name('loadtransaksipenjualan');
     Route::post('/transaksi/penjualan/store', [TransaksiPenjualansController::class, 'store'])->middleware('permission:add-transaksipenjualan')->name('storetransaksipenjualan');
@@ -199,4 +199,37 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/operator/store', [OperatorController::class, 'store'])->name('storeoperator');
     Route::post('/operator/update', [OperatorController::class, 'update'])->name('updateoperator');
     Route::delete('/operator/delete', [OperatorController::class, 'destroy'])->name('destroyoperator');
+});
+
+// Manajemen Angsuran Penjualan
+Route::middleware(['auth'])->group(function () {
+
+    // Halaman utama
+    Route::get('/angsuran-penjualan', [AngsuransController::class, 'index'])
+        ->middleware('permission:manage-angsuranpenjualan')
+        ->name('angsuran.index');
+
+    // Load datatable AJAX
+    Route::get('/angsuran-penjualan/data', [AngsuransController::class, 'data'])
+        ->middleware('permission:manage-angsuranpenjualan')
+        ->name('angsuran.data');
+
+    // Tambah angsuran
+    Route::post('/angsuran-penjualan/bayar/{id}', [AngsuransController::class, 'bayar'])
+        ->middleware('permission:add-angsuranpenjualan')
+        ->name('angsuran.bayar');
+
+    // Hapus angsuran
+    Route::delete('/angsuran-penjualan/{id}/hapus', [AngsuransController::class, 'hapus'])
+        ->middleware('permission:delete-angsuranpenjualan')
+        ->name('angsuran.hapus');
+
+    // Detail satu transaksi
+    Route::get('/angsuran-penjualan/detail/{id}', [AngsuransController::class, 'detail'])
+        ->middleware('permission:manage-angsuranpenjualan')
+        ->name('angsuran.detail');
+
+    Route::get('/angsuran-penjualan/show-detail', [AngsuransController::class, 'showDetailAngsuran'])
+        ->middleware('permission:manage-angsuranpenjualan')
+        ->name('angsuran.showdetail');
 });
