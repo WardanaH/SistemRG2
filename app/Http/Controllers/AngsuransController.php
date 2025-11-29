@@ -2,40 +2,78 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Cabang;
 use App\Models\MAngsurans;
 use Illuminate\Http\Request;
 use Yajra\DataTables\DataTables;
+use Illuminate\Support\Facades\Log;
 use App\Models\MTransaksiPenjualans;
 use Illuminate\Support\Facades\Auth;
 
 class AngsuransController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        return view('admin.transaksis.angsuran.index');
+        $user = Auth::user();
+
+        $query = MTransaksiPenjualans::with(['pelanggan', 'cabang', 'user'])
+            ->where('sisa_tagihan', '>', 0);
+
+        // 🔹 Jika bukan owner/direktur → batasi cabang otomatis
+        if (!$user->hasRole(['owner', 'direktur'])) {
+            $query->where('cabang_id', $user->cabang_id);
+        }
+
+        // 🔹 Filter manual berdasarkan cabang (untuk owner / direktur)
+        if ($request->cabang && $request->cabang !== 'semua') {
+            $query->where('cabang_id', $request->cabang);
+        }
+
+        // 🔹 Filter No Nota
+        if ($request->no) {
+            $query->where('nomor_nota', 'like', "%{$request->no}%");
+        }
+
+        // 🔹 Filter Tanggal
+        if ($request->tanggal) {
+            $query->whereDate('tanggal', $request->tanggal);
+        }
+
+        // 🔹 Filter Pembayaran
+        if ($request->pembayaran && $request->pembayaran !== 'semua') {
+            $query->where('metode_pembayaran', $request->pembayaran);
+        }
+
+        $datas = $query->orderBy('created_at', 'desc')->paginate(10);
+        $cabangs = Cabang::all();
+
+        return view('admin.transaksis.angsuran.index', compact('datas', 'cabangs'));
     }
 
     public function data(Request $request)
     {
-        $query = MTransaksiPenjualans::with(['pelanggan', 'cabang', 'user'])
-            ->where('sisa_tagihan', '>', 0);
+        $query = MTransaksiPenjualans::with(['pelanggan', 'cabang', 'user']);
+        // ->where('sisa_tagihan', '>', 0);
 
-        // Jika user BUKAN owner / direktur → BATASI CABANG
+
+        // 🔹 Batasi cabang jika bukan owner/direktur
         if (!Auth::user()->hasRole(['owner', 'direktur'])) {
             $query->where('cabang_id', Auth::user()->cabang_id);
         }
 
-        // Filter No Nota
+        // 🔹 Filter cabang (owner/direktur)
+        if ($request->cabang && $request->cabang !== 'semua') {
+            $query->where('cabang_id', $request->cabang);
+        }
+
         if ($request->nonota) {
             $query->where('id', 'like', "%{$request->nonota}%");
         }
 
-        // Filter Nama Pelanggan
         if ($request->nama) {
             $query->where('nama_pelanggan', 'like', "%{$request->nama}%");
         }
 
-        // Filter Metode Pembayaran
         if ($request->pembayaran && $request->pembayaran !== 'semua') {
             $query->where('metode_pembayaran', $request->pembayaran);
         }
@@ -44,21 +82,33 @@ class AngsuransController extends Controller
             ->addIndexColumn()
             ->addColumn('aksi', function ($t) {
                 return '
-                <button class="btn btn-info btn-sm detailBtn" data-id="' . $t->id . '">Detail</button>
-                <button class="btn btn-success btn-sm bayarBtn" data-id="' . $t->id . '">Bayar</button>
-                <button class="btn btn-warning btn-sm deleteBtn" data-id="' . $t->id . '">Hapus</button>
-            ';
+                    <button class="btn btn-info btn-sm btn-detail"
+                        data-id="' . $t->id . '">
+                        Detail
+                    </button>
+                    <button class="btn btn-success btn-sm bayarBtn"
+                        data-id="' . $t->id . '"
+                        data-sisa="' . $t->sisa_tagihan . '">
+                        Bayar
+                    </button>
+                    <button class="btn btn-warning btn-sm deleteBtn"
+                        data-id="' . $t->id . '">
+                        Hapus
+                    </button>
+                ';
             })
             ->rawColumns(['aksi'])
             ->make(true);
     }
 
-
     public function detail($id)
     {
-        $data = MTransaksiPenjualans::with(['subTransaksi.produk'])
-            ->where('id', $id)
-            ->firstOrFail();
+        $data = MTransaksiPenjualans::with([
+            'subTransaksi.produk',
+            'user:id,username',
+            'cabang:id,nama'
+        ])->findOrFail($id);
+        // dd($data);
 
         return response()->json([
             'success' => true,
@@ -66,37 +116,111 @@ class AngsuransController extends Controller
         ]);
     }
 
+    public function showDetailAngsuran(Request $request)
+    {
+        try {
+
+            Log::info("[DETAIL] Request masuk ke showDetailAngsuran", [
+                'req_id' => $request->id
+            ]);
+
+            $id = $request->id;
+
+            if (!$id) {
+                Log::warning("[DETAIL] ID kosong dalam request!");
+                return response()->json(['error' => 'ID tidak ditemukan'], 400);
+            }
+
+            Log::info("[DETAIL] Mencari transaksi penjualan dengan ID", ['id' => $id]);
+
+            // Cari transaksi
+            $transaksi = MTransaksiPenjualans::with([
+                'subTransaksi.produk:id,nama_produk',
+                'user:id,username',
+                'cabang:id,nama'
+            ])->find($id);
+
+            if (!$transaksi) {
+                Log::warning("[DETAIL] Transaksi tidak ditemukan", [
+                    'id' => $id
+                ]);
+
+                return response()->json(['error' => 'Transaksi tidak ditemukan'], 404);
+            }
+
+            Log::info("[DETAIL] Transaksi ditemukan", [
+                'id' => $transaksi->id,
+                'nomor_nota' => $transaksi->nomor_nota ?? null,
+                'sisa_tagihan' => $transaksi->sisa_tagihan
+            ]);
+
+            // Riwayat angsuran
+            $angsuran = MAngsurans::where('transaksi_penjualan_id', $id)
+                ->orderBy('created_at')
+                ->get();
+
+            Log::info("[DETAIL] Jumlah riwayat angsuran", [
+                'count' => $angsuran->count()
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'detail' => $transaksi,
+                'angsuran' => $angsuran
+            ]);
+        } catch (\Exception $e) {
+
+            Log::error("[DETAIL] ERROR showDetailAngsuran", [
+                'message' => $e->getMessage(),
+                'line'    => $e->getLine(),
+                'file'    => $e->getFile(),
+                'trace'   => $e->getTraceAsString()
+            ]);
+
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
+
     public function bayar(Request $request, $id)
     {
         $request->validate([
             'nominal' => 'required|numeric|min:1',
-            'metode' => 'required',
+            'metode' => 'required|string'
         ]);
 
+        // Ambil transaksi by ID
         $transaksi = MTransaksiPenjualans::findOrFail($id);
 
-        if ($request->nominal > $transaksi->sisa_tagihan) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Nominal melebihi sisa tagihan!'
-            ], 422);
-        }
+        $nominal = (float)$request->nominal;
+        $date = date('Y-m-d');
 
-        // Simpan ke tabel angsuran
-        MAngsurans::create([
-            'transaksi_id' => $id,
-            'nominal' => $request->nominal,
-            'metode' => $request->metode,
+        // Hitung sisa & total pembayaran baru
+        $sisa = $transaksi->sisa_tagihan - $nominal;
+        $totalPembayaran = $transaksi->jumlah_pembayaran + $nominal;
+
+        // Buat record angsuran baru
+        $angsuran = MAngsurans::create([
+            'tanggal_angsuran' => $date,
+            'nominal_angsuran' => $nominal,
+            'sisa_angsuran' => $sisa,
+            'metode_pembayaran' => $request->metode,
             'user_id' => auth()->id(),
+            'cabang_id' => auth()->user()->cabang_id ?? auth()->user()->cabangs->id,
+            'transaksi_penjualan_id' => $transaksi->id,
         ]);
 
-        // Update sisa
-        $transaksi->sisa_tagihan -= $request->nominal;
-        $transaksi->save();
+        // Update transaksi
+        $transaksi->update([
+            'sisa_tagihan' => $sisa,
+            'jumlah_pembayaran' => $totalPembayaran,
+        ]);
 
-        return response()->json(['success' => true]);
+        // (Optional) Buat log seperti sistem lama
+        // $this->createlog(...)
+
+        return response()->json(['msg' => 'success']);
     }
-
 
     public function hapus(Request $request, $id)
     {

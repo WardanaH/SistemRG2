@@ -21,7 +21,7 @@ use App\Http\Controllers\RelasiBahanBakuController;
 use App\Http\Controllers\TransaksiBahanBakusController;
 use App\Http\Controllers\TransaksiPenjualansController;
 
-require __DIR__.'/operator.php';
+require __DIR__ . '/operator.php';
 
 // Guest (belum login)
 Route::middleware('guest')->group(function () {
@@ -34,7 +34,6 @@ Route::middleware('auth')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
     Route::get('/dashboard-rg', [DashboardController::class, 'index'])->middleware('permission:index-home')->name('dashboard');
-
 });
 
 // test permission, ganti aja di bagian can() nya itu kalo mau cek permission setiap role, tapi harus login dulu
@@ -216,7 +215,7 @@ Route::middleware(['auth'])->group(function () {
         ->name('angsuran.data');
 
     // Tambah angsuran
-    Route::post('/angsuran-penjualan/{id}/bayar', [AngsuransController::class, 'bayar'])
+    Route::post('/angsuran-penjualan/bayar/{id}', [AngsuransController::class, 'bayar'])
         ->middleware('permission:add-angsuranpenjualan')
         ->name('angsuran.bayar');
 
@@ -227,7 +226,10 @@ Route::middleware(['auth'])->group(function () {
 
     // Detail satu transaksi
     Route::get('/angsuran-penjualan/detail/{id}', [AngsuransController::class, 'detail'])
-        ->middleware('permission:list-angsuranpenjualan')
+        ->middleware('permission:manage-angsuranpenjualan')
         ->name('angsuran.detail');
-});
 
+    Route::get('/angsuran-penjualan/show-detail', [AngsuransController::class, 'showDetailAngsuran'])
+        ->middleware('permission:manage-angsuranpenjualan')
+        ->name('angsuran.showdetail');
+});
