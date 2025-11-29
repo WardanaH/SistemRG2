@@ -149,31 +149,69 @@ class TransaksiPenjualansController extends Controller
 
     public function index(Request $request)
     {
-        $query = MTransaksiPenjualans::with(['user', 'cabang', 'designer'])
-            ->when($request->no, fn($q) => $q->where('nomor_nota', 'like', "%{$request->no}%"))
-            ->when($request->tanggal, fn($q) => $q->whereDate('tanggal', $request->tanggal))
-            ->when($request->cabang, fn($q) => $q->where('cabang_id', $request->cabang))
-            ->orderBy('created_at', 'desc');
+        $user = Auth::user();
 
-        $datas = $query->paginate(10);
-        // dd($datas);
+        $query = MTransaksiPenjualans::with(['user', 'cabang', 'designer']);
+
+        // 🔹 Jika bukan owner / direktur → hanya cabangnya sendiri
+        if (!$user->hasRole(['owner', 'direktur'])) {
+            $query->where('cabang_id', $user->cabang_id);
+        }
+
+        // 🔹 Filter jika user memilih manual dari dropdown
+        if ($request->cabang && $request->cabang !== 'semua') {
+            $query->where('cabang_id', $request->cabang);
+        }
+
+        // 🔹 Filter lain
+        $query->when(
+            $request->no,
+            fn($q) =>
+            $q->where('nomor_nota', 'like', "%{$request->no}%")
+        );
+        $query->when(
+            $request->tanggal,
+            fn($q) =>
+            $q->whereDate('tanggal', $request->tanggal)
+        );
+
+        $datas = $query->orderBy('created_at', 'desc')->paginate(10);
 
         $cabangs = Cabang::all();
 
         return view('admin.transaksis.list', compact('datas', 'cabangs'));
     }
 
+
     public function indexdeleted(Request $request)
     {
-        $query = MTransaksiPenjualans::onlyTrashed()
-            ->with(['user', 'cabang', 'designer'])
-            ->when($request->no, fn($q) => $q->where('nomor_nota', 'like', "%{$request->no}%"))
-            ->when($request->tanggal, fn($q) => $q->whereDate('tanggal', $request->tanggal))
-            ->when($request->cabang, fn($q) => $q->where('cabang_id', $request->cabang))
-            ->orderBy('created_at', 'desc');
+        $user = Auth::user();
 
-        $datas = $query->paginate(10);
-        // dd($datas);
+        $query = MTransaksiPenjualans::onlyTrashed(['user', 'cabang', 'designer']);
+
+        // 🔹 Jika bukan owner / direktur → hanya cabangnya sendiri
+        if (!$user->hasRole(['owner', 'direktur'])) {
+            $query->where('cabang_id', $user->cabang_id);
+        }
+
+        // 🔹 Filter jika user memilih manual dari dropdown
+        if ($request->cabang && $request->cabang !== 'semua') {
+            $query->where('cabang_id', $request->cabang);
+        }
+
+        // 🔹 Filter lain
+        $query->when(
+            $request->no,
+            fn($q) =>
+            $q->where('nomor_nota', 'like', "%{$request->no}%")
+        );
+        $query->when(
+            $request->tanggal,
+            fn($q) =>
+            $q->whereDate('tanggal', $request->tanggal)
+        );
+
+        $datas = $query->orderBy('created_at', 'desc')->paginate(10);
 
         $cabangs = Cabang::all();
 

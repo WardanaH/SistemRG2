@@ -27,7 +27,16 @@
     {{-- ============ FONT FAMILY ============ --}}
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
-        body, h1, h2, h3, h4, h5, h6, .nav-text, .card-title, .welcome-text {
+        body,
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6,
+        .nav-text,
+        .card-title,
+        .welcome-text {
             font-family: 'Poppins', sans-serif !important;
         }
     </style>
@@ -39,88 +48,109 @@
     <link href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" rel="stylesheet">
 
     <!-- ====================== CUSTOM STYLE ====================== -->
-     @stack('styles')
+    @stack('styles')
     <style>
-    /* ===========================================================
+        /* ===========================================================
        HEADER CARD DALAM CONTENT
     =========================================================== */
-    .content-body .card-header {
-        background-color: #4B28D2 !important;
-        color: #ffffff !important;
-        font-weight: 600;
-        letter-spacing: 0.3px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        border-top-left-radius: 0.5rem;
-        border-top-right-radius: 0.5rem;
-        padding: 0.75rem 1rem;
-    }
-    .content-body .card-header * { color: #fff !important; }
-    .content-body .card-header i { color: #ffeb3b !important; margin-right: 8px; }
+        .content-body .card-header {
+            background-color: #4B28D2 !important;
+            color: #ffffff !important;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top-left-radius: 0.5rem;
+            border-top-right-radius: 0.5rem;
+            padding: 0.75rem 1rem;
+        }
 
-    /* ===========================================================
+        .content-body .card-header * {
+            color: #fff !important;
+        }
+
+        .content-body .card-header i {
+            color: #ffeb3b !important;
+            margin-right: 8px;
+        }
+
+        /* ===========================================================
        FIX TEKS TABEL PUCAT / TRANSPARAN
     =========================================================== */
-    .table, .table td, .table th {
-        color: #2b2b2b !important;
-        opacity: 1 !important;
-    }
-    .content-body .table thead th {
-        background-color: #f8f9fc !important;
-        color: #212121 !important;
-        font-weight: 600 !important;
-        border-color: #e5e7eb !important;
-    }
-    .content-body .table tbody td {
-        color: #2b2b2b !important;
-        font-weight: 500;
-        background-color: #fff !important;
-    }
-    .content-body .table tbody tr:nth-child(even) td { background-color: #fafafa !important; }
+        .table,
+        .table td,
+        .table th {
+            color: #2b2b2b !important;
+            opacity: 1 !important;
+        }
 
-    /* ===========================================================
+        .content-body .table thead th {
+            background-color: #f8f9fc !important;
+            color: #212121 !important;
+            font-weight: 600 !important;
+            border-color: #e5e7eb !important;
+        }
+
+        .content-body .table tbody td {
+            color: #2b2b2b !important;
+            font-weight: 500;
+            background-color: #fff !important;
+        }
+
+        .content-body .table tbody tr:nth-child(even) td {
+            background-color: #fafafa !important;
+        }
+
+        /* ===========================================================
        STYLE GLOBAL UNTUK SEMUA DROPDOWN / SELECT
     =========================================================== */
-    select.form-select, select {
-        border: 1.5px solid #dcdcdc;
-        border-bottom: 2px solid #5f9df7;  /* Biru muda bawah */
-        border-radius: 10px;
-        padding: 6px 10px;
-        font-size: 0.95rem;
-        transition: all 0.2s ease-in-out;
-        font-weight: 500;
-        color: #2b2b2b;
-    }
-    select.form-select:focus, select:focus {
-        border-color: #5f9df7 !important;
-        box-shadow: 0 0 0 3px rgba(119, 161, 224, 0.5);
-        outline: none;
-    }
-    select option {
-        color: #333;
-        font-weight: 500;
-    }
+        select.form-select,
+        select {
+            border: 1.5px solid #dcdcdc;
+            border-bottom: 2px solid #5f9df7;
+            /* Biru muda bawah */
+            border-radius: 10px;
+            padding: 6px 10px;
+            font-size: 0.95rem;
+            transition: all 0.2s ease-in-out;
+            font-weight: 500;
+            color: #2b2b2b;
+        }
 
-    /* === Select2 Styling === */
-    .select2-container--bootstrap-5 .select2-selection {
-        border-radius: 10px !important;
-        border: 1.5px solid #dcdcdc !important;
-        border-bottom: 2px solid #5f9df7 !important;
-        min-height: 38px !important;
-        padding: 4px 10px !important;
-        transition: all 0.2s ease-in-out;
-    }
-    .select2-container--bootstrap-5.select2-container--focus .select2-selection {
-        border-color: #5f9df7 !important;
-        box-shadow: 0 0 0 3px rgba(119, 161, 224, 0.4);
-    }
-    .select2-container--bootstrap-5 .select2-results__options {
-        max-height: 180px !important;
-        border-radius: 0 0 10px 10px !important;
-    }
+        select.form-select:focus,
+        select:focus {
+            border-color: #5f9df7 !important;
+            box-shadow: 0 0 0 3px rgba(119, 161, 224, 0.5);
+            outline: none;
+        }
 
-    /* ===========================================================
+        select option {
+            color: #333;
+            font-weight: 500;
+        }
+
+        /* === Select2 Styling === */
+        .select2-container--bootstrap-5 .select2-selection {
+            border-radius: 10px !important;
+            border: 1.5px solid #dcdcdc !important;
+            border-bottom: 2px solid #5f9df7 !important;
+            min-height: 38px !important;
+            padding: 4px 10px !important;
+            transition: all 0.2s ease-in-out;
+        }
+
+        .select2-container--bootstrap-5.select2-container--focus .select2-selection {
+            border-color: #5f9df7 !important;
+            box-shadow: 0 0 0 3px rgba(119, 161, 224, 0.4);
+        }
+
+        .select2-container--bootstrap-5 .select2-results__options {
+            max-height: 180px !important;
+            border-radius: 0 0 10px 10px !important;
+        }
+
+        /* ===========================================================
        WARNA TOMBOL PUTIH DI HEADER CARD
     =========================================================== */
     .card-header .btn-light,
@@ -268,65 +298,74 @@
    GLOBAL MODAL STYLE — Berlaku untuk semua modal Bootstrap
 ============================================================ */
 
-/* Kontainer utama modal */
-.modal-content {
-    border-radius: 13px !important;
-    border: none !important;
-    overflow: hidden !important;
-    box-shadow: 0px 8px 28px rgba(0,0,0,0.18);
-    animation: modalPop 0.25s ease-out;
-}
+        /* Kontainer utama modal */
+        .modal-content {
+            border-radius: 13px !important;
+            border: none !important;
+            overflow: hidden !important;
+            box-shadow: 0px 8px 28px rgba(0, 0, 0, 0.18);
+            animation: modalPop 0.25s ease-out;
+        }
 
-@keyframes modalPop {
-    from { transform: scale(0.95); opacity: 0; }
-    to   { transform: scale(1); opacity: 1; }
-}
+        @keyframes modalPop {
+            from {
+                transform: scale(0.95);
+                opacity: 0;
+            }
 
-.modal-header {
-    background: #4B28D2 !important;
-    color: #fff !important;
-    padding: 16px 20px !important;
-    border-bottom: none !important;
-}
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
 
-.modal-header .modal-title {
-    font-weight: 600 !important;
-    font-size: 1.15rem !important;
-    color: #fff !important;
-}
+        .modal-header {
+            background: #4B28D2 !important;
+            color: #fff !important;
+            padding: 16px 20px !important;
+            border-bottom: none !important;
+        }
 
-.modal-header .btn-close {
-    filter: brightness(0) invert(1) !important;
-    opacity: 0.85;
-}
-.modal-header .btn-close:hover {
-    opacity: 1;
-}
+        .modal-header .modal-title {
+            font-weight: 600 !important;
+            font-size: 1.15rem !important;
+            color: #fff !important;
+        }
 
-.modal-body {
-    padding: 20px !important;
-    background: #ffffff !important;
-}
+        .modal-header .btn-close {
+            filter: brightness(0) invert(1) !important;
+            opacity: 0.85;
+        }
 
-.modal-footer {
-    border-top: 1px solid #eaeaea !important;
-    padding: 14px 20px !important;
-    background: #fafafa !important;
-}
+        .modal-header .btn-close:hover {
+            opacity: 1;
+        }
 
-.modal-footer .btn {
-    border-radius: 10px !important;
-    font-weight: 500 !important;
-    padding: 8px 16px !important;
-}
+        .modal-body {
+            padding: 20px !important;
+            background: #ffffff !important;
+        }
 
-.modal-footer .btn-primary:hover {
-    background-color: #3a1fba !important;
-}
-.modal-footer .btn-secondary:hover {
-    background-color: #e3e3e3 !important;
-}
-</style>
+        .modal-footer {
+            border-top: 1px solid #eaeaea !important;
+            padding: 14px 20px !important;
+            background: #fafafa !important;
+        }
+
+        .modal-footer .btn {
+            border-radius: 10px !important;
+            font-weight: 500 !important;
+            padding: 8px 16px !important;
+        }
+
+        .modal-footer .btn-primary:hover {
+            background-color: #3a1fba !important;
+        }
+
+        .modal-footer .btn-secondary:hover {
+            background-color: #e3e3e3 !important;
+        }
+    </style>
 
 
     </style>
@@ -345,20 +384,19 @@
 
     <div id="main-wrapper">
         @auth
-            @include('layouts.header')
-            @include('layouts.sidebar')
+        @include('layouts.header')
+        @include('layouts.sidebar')
         @endauth
 
         <div class="content-body">
             <div class="container-fluid">
                 <!-- {{-- Flash Messages --}}
                 @if(session('success'))
-                    <div class="alert alert-success">{{ session('success') }}</div>
+                <div class="alert alert-success">{{ session('success') }}</div>
                 @endif
                 @if($errors->any())
-                    <div class="alert alert-danger">{{ $errors->first() }}</div>
-                @endif -->
-
+                <div class="alert alert-danger">{{ $errors->first() }}</div>
+                @endif
 
                 {{-- Konten Dinamis --}}
                 @yield('content')
@@ -394,10 +432,14 @@
     </script>
 
     {{-- ============ EXTERNAL LIBRARIES ============ --}}
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.0/dist/sweetalert2.all.min.js"></script>
+
+    {{-- DATATABLES --}}
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
 
     {{-- ============ SCRIPT CHILD VIEW ============ --}}
 
@@ -457,70 +499,71 @@ document.addEventListener("DOMContentLoaded", function () {
     @stack('scripts')
 
     <script>
-document.addEventListener("DOMContentLoaded", function () {
-    const searchInput = document.getElementById("globalSearchInput");
+        document.addEventListener("DOMContentLoaded", function() {
+            const searchInput = document.getElementById("globalSearchInput");
 
-    if (!searchInput) return;
+            if (!searchInput) return;
 
-    searchInput.addEventListener("input", function () {
-        let keyword = this.value.toLowerCase().trim();
+            searchInput.addEventListener("input", function() {
+                let keyword = this.value.toLowerCase().trim();
 
-        // Ambil semua table yang ada di halaman
-        const tables = document.querySelectorAll("table");
+                // Ambil semua table yang ada di halaman
+                const tables = document.querySelectorAll("table");
 
-        tables.forEach(table => {
-            const rows = table.querySelectorAll("tbody tr");
+                tables.forEach(table => {
+                    const rows = table.querySelectorAll("tbody tr");
 
-            rows.forEach(row => {
-                const text = row.innerText.toLowerCase();
+                    rows.forEach(row => {
+                        const text = row.innerText.toLowerCase();
 
-                if (keyword === "" || text.includes(keyword)) {
-                    row.style.display = "";
-                } else {
-                    row.style.display = "none";
-                }
-            });
+                        if (keyword === "" || text.includes(keyword)) {
+                            row.style.display = "";
+                        } else {
+                            row.style.display = "none";
+                        }
+                    });
 
-            // Naikkan row yang cocok ke atas
-            if (keyword !== "") {
-                let tbody = table.querySelector("tbody");
-                let matched = [];
-                let unmatched = [];
+                    // Naikkan row yang cocok ke atas
+                    if (keyword !== "") {
+                        let tbody = table.querySelector("tbody");
+                        let matched = [];
+                        let unmatched = [];
 
-                rows.forEach(row => {
-                    if (row.style.display === "") matched.push(row);
-                    else unmatched.push(row);
+                        rows.forEach(row => {
+                            if (row.style.display === "") matched.push(row);
+                            else unmatched.push(row);
+                        });
+
+                        tbody.innerHTML = "";
+                        matched.forEach(r => tbody.appendChild(r));
+                        unmatched.forEach(r => tbody.appendChild(r));
+                    }
                 });
-
-                tbody.innerHTML = "";
-                matched.forEach(r => tbody.appendChild(r));
-                unmatched.forEach(r => tbody.appendChild(r));
-            }
+            });
         });
-    });
-});
-</script>
+    </script>
 
-<style>
-    /* Hide brand text when sidebar collapse */
-    body.menu-toggle .nav-header .brand-title {
-        display: none !important;
-    }
+    <style>
+        /* Hide brand text when sidebar collapse */
+        body.menu-toggle .nav-header .brand-title {
+            display: none !important;
+        }
 
-    /* Center logo when text hidden */
-    body.menu-toggle .nav-header .brand-logo {
-        justify-content: center !important;
-    }
-</style>
+        /* Center logo when text hidden */
+        body.menu-toggle .nav-header .brand-logo {
+            justify-content: center !important;
+        }
+    </style>
 
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        const btn = document.querySelector('.nav-control');
-        btn.addEventListener('click', function () {
-            document.body.classList.toggle('menu-toggle');
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const btn = document.querySelector('.nav-control');
+            btn.addEventListener('click', function() {
+                document.body.classList.toggle('menu-toggle');
+            });
         });
-    });
-</script>
+    </script>
 
 </body>
+
 </html>
