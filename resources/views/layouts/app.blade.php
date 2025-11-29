@@ -153,148 +153,121 @@
         /* ===========================================================
        WARNA TOMBOL PUTIH DI HEADER CARD
     =========================================================== */
-    .card-header .btn-light,
-    .card-header .btn-white {
-        background-color: #fff !important;
-        color: #4B28D2 !important;
-        font-weight: 500;
-        border: 1px solid #eee;
-        transition: all 0.3s ease;
-    }
-    .card-header .btn-light:hover,
-    .card-header .btn-white:hover {
-        background-color: #f3f3f3 !important;
-        color: #2b0cae !important;
-    }
+        .card-header .btn-light,
+        .card-header .btn-white {
+            background-color: #fff !important;
+            color: #4B28D2 !important;
+            font-weight: 500;
+            border: 1px solid #eee;
+            transition: all 0.3s ease;
+        }
 
-    /* === Perbaiki posisi & rotasi logo di sidebar === */
-.nav-header .brand-logo .logo-abbr {
-    transform: none !important;      /* hilangkan efek miring */
-    rotate: 0deg !important;         /* pastikan tidak miring */
-    margin-top: 0 !important;
-    margin-left: 0 !important;
-    display: block;
-}
-.nav-header .brand-logo {
-    display: flex;
-    align-items: center;
-    justify-content: flex-start;
-}
-.nav-header .brand-title {
-    color: #ffffff;
-    font-weight: 600;
-    font-size: 16px;
-    line-height: 1.2;
-    margin-left: 8px;
-}
+        .card-header .btn-light:hover,
+        .card-header .btn-white:hover {
+            background-color: #f3f3f3 !important;
+            color: #2b0cae !important;
+        }
 
-/* ==== FIX LOGO NAV-HEADER AGAR TIDAK MIRING ==== */
-.nav-header .brand-logo {
-    display: flex !important;
-    align-items: center !important;
-    justify-content: flex-start !important;
-    gap: 8px;
-    transform: none !important;
-}
+        /* === Perbaiki posisi & rotasi logo di sidebar === */
+        .nav-header .brand-logo .logo-abbr {
+            transform: none !important;
+            /* hilangkan efek miring */
+            rotate: 0deg !important;
+            /* pastikan tidak miring */
+            margin-top: 0 !important;
+            margin-left: 0 !important;
+            display: block;
+        }
 
-/* Logo utama di kiri atas */
-.nav-header .brand-logo .logo-abbr {
-    transform: none !important;
-    rotate: 0deg !important;
-    margin: 0 !important;
-    height: 60px !important;
-    width: auto !important;
-    display: inline-block !important;
-}
+        .nav-header .brand-logo {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+        }
 
-/* Teks di sebelah logo */
-.nav-header .brand-logo .brand-title {
-    display: inline-block !important;
-    color: #ffffff !important;
-    font-weight: 600 !important;
-    font-size: 15px !important;
-    line-height: 1.1 !important;
-    margin-left: 6px !important;
-    text-align: left !important;
-}
+        .nav-header .brand-title {
+            color: #ffffff;
+            font-weight: 600;
+            font-size: 16px;
+            line-height: 1.2;
+            margin-left: 8px;
+        }
 
-/* Hapus rotasi global yang diset Focus di style.css */
-.logo-abbr, .brand-logo img {
-    transform: none !important;
-    rotate: 0 !important;
-}
+        /* ==== FIX LOGO NAV-HEADER AGAR TIDAK MIRING ==== */
+        .nav-header .brand-logo {
+            display: flex !important;
+            align-items: center !important;
+            justify-content: flex-start !important;
+            gap: 8px;
+            transform: none !important;
+        }
 
-/* ===== Hapus efek miring default Focus Template ===== */
-.nav-header .brand-logo .logo-abbr,
-.nav-header .brand-logo img.logo-abbr,
-.nav-header img.logo-abbr {
-    transform: none !important;
-    rotate: 0deg !important;
-    margin: 0 !important;
-    height: 38px !important;
-    width: auto !important;
-    display: inline-block !important;
-    vertical-align: middle !important;
-}
+        /* Logo utama di kiri atas */
+        .nav-header .brand-logo .logo-abbr {
+            transform: none !important;
+            rotate: 0deg !important;
+            margin: 0 !important;
+            height: 60px !important;
+            width: auto !important;
+            display: inline-block !important;
+        }
 
-/* Sembunyikan nav label saat sidebar collapse */
-.menu-toggle .quixnav .nav-label {
-    opacity: 0 !important;
-    height: 0 !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    overflow: hidden !important;
-}
+        /* Teks di sebelah logo */
+        .nav-header .brand-logo .brand-title {
+            display: inline-block !important;
+            color: #ffffff !important;
+            font-weight: 600 !important;
+            font-size: 15px !important;
+            line-height: 1.1 !important;
+            margin-left: 6px !important;
+            text-align: left !important;
+        }
 
-/* Hilangkan tulisan menu saat collapse */
-.menu-toggle .quixnav .nav-text {
-    opacity: 0 !important;
-    width: 0 !important;
-    overflow: hidden !important;
-    white-space: nowrap !important;
-}
+        /* Hapus rotasi global yang diset Focus di style.css */
+        .logo-abbr,
+        .brand-logo img {
+            transform: none !important;
+            rotate: 0 !important;
+        }
 
-/* Biar ikon tetap rapat */
-.menu-toggle .quixnav i {
-    margin-right: 0 !important;
-}
+        /* ===== Hapus efek miring default Focus Template ===== */
+        .nav-header .brand-logo .logo-abbr,
+        .nav-header .brand-logo img.logo-abbr,
+        .nav-header img.logo-abbr {
+            transform: none !important;
+            rotate: 0deg !important;
+            margin: 0 !important;
+            height: 38px !important;
+            width: auto !important;
+            display: inline-block !important;
+            vertical-align: middle !important;
+        }
 
-    /* STYLE GLOBAL SELECT2 */
-    .select2-container .select2-selection--single {
-        height: 38px !important;
-        border: 1px solid #dcdcdc !important;
-        border-radius: 6px !important;
-        display: flex !important;
-        align-items: center !important;
-        padding-left: 10px !important;
-        font-size: 0.9rem !important;
-        color: #333 !important;
-    }
+        /* Sembunyikan nav label saat sidebar collapse */
+        .menu-toggle .quixnav .nav-label {
+            opacity: 0 !important;
+            height: 0 !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            overflow: hidden !important;
+        }
 
-    .select2-selection__rendered {
-        color: #333 !important;
-        font-weight: 500 !important;
-    }
+        /* Hilangkan tulisan menu saat collapse */
+        .menu-toggle .quixnav .nav-text {
+            opacity: 0 !important;
+            width: 0 !important;
+            overflow: hidden !important;
+            white-space: nowrap !important;
+        }
 
-    .select2-container--default .select2-selection--single .select2-selection__arrow b {
-        border-color: #4B28D2 transparent transparent transparent !important;
-    }
+        /* Biar ikon tetap rapat */
+        .menu-toggle .quixnav i {
+            margin-right: 0 !important;
+        }
+    </style>
 
-    .select2-container--default .select2-results__option--highlighted {
-        background-color: #4B28D2 !important;
-        color: #fff !important;
-    }
-
-    .select2-dropdown {
-    border-radius: 10px !important;   /* sudut box dropdown */
-    overflow: hidden !important;      /* biar list di dalam ikut melengkung */
-    border: 1px solid #dcdcdc !important;
-}
-    
-</style>
-
-<style>
-/* ============================================================
+    <style>
+        /* ============================================================
    GLOBAL MODAL STYLE — Berlaku untuk semua modal Bootstrap
 ============================================================ */
 
@@ -390,7 +363,7 @@
 
         <div class="content-body">
             <div class="container-fluid">
-                <!-- {{-- Flash Messages --}}
+                {{-- Flash Messages --}}
                 @if(session('success'))
                 <div class="alert alert-success">{{ session('success') }}</div>
                 @endif
@@ -438,64 +411,12 @@
 
     {{-- DATATABLES --}}
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
+
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
 
+
     {{-- ============ SCRIPT CHILD VIEW ============ --}}
-
-    {{-- =====================================================
-     GLOBAL SWEETALERT FLASH MESSAGE – BERLAKU SEMUA HALAMAN
-===================================================== --}}
-<script>
-document.addEventListener("DOMContentLoaded", function () {
-
-    // ===== Pesan Sukses (session('success')) =====
-    @if(session('success'))
-    Swal.fire({
-        icon: 'success',
-        title: 'Berhasil!',
-        text: "{{ session('success') }}",
-        confirmButtonColor: "#3085d6",
-        toast: false,
-        position: "center",
-        showConfirmButton: true,
-    });
-    @endif
-
-    @if(session('error'))
-    Swal.fire({
-        icon: 'error',
-        title: 'Gagal!',
-        text: "{{ session('error') }}",
-        confirmButtonColor: "#d33",
-        toast: false,
-        position: "center",
-        showConfirmButton: true
-    });
-    @endif
-
-
-    // ===== Pesan Error Validasi (first error) =====
-    @if($errors->any())
-        Swal.fire({
-            icon: 'error',
-            title: 'Kesalahan Input!',
-            text: "{{ $errors->first() }}",
-            showConfirmButton: true
-        });
-    @endif
-
-});
-</script>
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        $('.select2').select2({
-            theme: 'bootstrap-5',
-            width: '100%'
-        });
-    });
-</script>
-
     @stack('scripts')
 
     <script>
