@@ -17,7 +17,7 @@
   <div class="card-body">
 
     @if($riwayat->isEmpty())
-      <p>Tidak ada data pengiriman dari Gudang Pusat.</p>
+      <p class="text-muted">Tidak ada data pengiriman dari Gudang Pusat.</p>
     @else
 
       <div class="table-responsive">
@@ -39,25 +39,36 @@
             @foreach($riwayat as $r)
             <tr>
               <td>{{ $loop->iteration }}</td>
-              <td>{{ $r->barang->nama_barang }}</td>
-              <td>{{ $r->jumlah }}</td>
-              <td>{{ \Carbon\Carbon::parse($r->tanggal_pengiriman)->format('d M Y') }}</td>
-              <td>{{ ucfirst($r->status_pengiriman) }}</td>
-              <td>{{ $r->status_penerimaan ?? '-' }}</td>
 
+              {{-- Nama barang --}}
+              <td>{{ $r->nama_bahan ?? '-' }}</td>
+
+              {{-- Jumlah --}}
+              <td>{{ $r->jumlah }}</td>
+
+              {{-- Tanggal --}}
+              <td>{{ \Carbon\Carbon::parse($r->tanggal_pengiriman)->format('d M Y') }}</td>
+
+              {{-- STATUS PENGIRIMAN (Plain text) --}}
+              <td>{{ ucfirst($r->status_pengiriman) }}</td>
+
+              {{-- STATUS PENERIMAAN (Plain text) --}}
+              <td>
+                {{ $r->status_penerimaan ? ucfirst($r->status_penerimaan) : 'Belum diterima' }}
+              </td>
+
+              {{-- Aksi terima --}}
               <td>
                 @if($r->status_pengiriman == 'Dikirim' && $r->status_penerimaan == null)
 
-                  <form action="{{ route('cabang.riwayat.terima', ['slug' => $cabang->slug, 'id' => $r->id_pengiriman]) }}"
+                  <form action="{{ route('cabang.riwayat.terima', [$cabang->slug, $r->id_pengiriman]) }}"
                         method="POST">
-
                     @csrf
                     @method('PUT')
 
                     <button type="submit" class="btn btn-success btn-sm">
-                      Telah Diterima
+                      Terima Barang
                     </button>
-
                   </form>
 
                 @else

@@ -3,9 +3,9 @@
 @section('content')
 
 <div class="page-header d-flex justify-content-between align-items-center">
-    <h3 class="page-title">Data Stok - Cabang {{ ucfirst($cabang->nama) }}</h3>
+    <h3 class="page-title">Stok Bahan Baku – Cabang {{ ucfirst($cabang->nama) }}</h3>
     <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalTambahStok">
-        <i class="bi bi-plus-circle"></i> Tambah Stok
+        <i class="bi bi-plus-circle"></i> Tambah / Update Stok
     </button>
 </div>
 
@@ -15,116 +15,117 @@
 
 <div class="card mt-3">
     <div class="card-body">
-        <h4 class="card-title">Daftar Stok Barang</h4>
+        <h4 class="card-title">Daftar Stok Bahan Baku</h4>
 
         <div class="table-responsive">
             <table class="table table-striped align-middle text-center">
                 <thead class="table-light">
                     <tr>
                         <th>No</th>
-                        <th>Nama Barang</th>
-                        <th>Masuk</th>
-                        <th>Tanggal</th>
+                        <th>Nama Bahan</th>
+                        <th>Stok</th>
+                        <th>Satuan</th>
                         <th>Aksi</th>
                     </tr>
                 </thead>
 
                 <tbody>
-                    @forelse ($stoks as $index => $stok)
-                    <tr>
-                        <td>{{ $index + 1 }}</td>
-                        <td>{{ $stok->barang->nama_barang ?? '-' }}</td>
-                        <td>{{ $stok->jumlah_masuk }}</td>
-                        <td>{{ $stok->tanggal }}</td>
-                        <td>
+                @forelse ($datas as $index => $d)
+                <tr>
+                    <td>{{ $index + 1 }}</td>
 
-                            <!-- EDIT -->
-                            <button class="btn btn-warning btn-sm"
-                                    data-bs-toggle="modal"
-                                    data-bs-target="#modalEditStok{{ $stok->id_stok }}">
-                                Edit
+                    <!-- Nama bahan -->
+                    <td>{{ $d->nama_bahan }}</td>
+
+                    <!-- Stok -->
+                    <td>{{ $d->banyak_stok }}</td>
+
+                    <!-- Satuan -->
+                    <td>{{ $d->satuan_stok ?? '-' }}</td>
+
+                    <!-- Aksi -->
+                    <td>
+
+                        <!-- EDIT hanya jika stok_id ada -->
+                        @if ($d->stok_id)
+                        <button class="btn btn-warning btn-sm"
+                                data-bs-toggle="modal"
+                                data-bs-target="#modalEditStok{{ $d->stok_id }}">
+                            Edit
+                        </button>
+                        @endif
+
+                        <!-- DELETE hanya jika stok_id ada -->
+                        @if ($d->stok_id)
+                        <form action="{{ route('cabang.stok.destroy', ['slug' => $cabang->slug, 'id' => $d->stok_id]) }}"
+                              method="POST" class="d-inline">
+
+                            @csrf
+                            @method('DELETE')
+
+                            <button class="btn btn-danger btn-sm"
+                                    onclick="return confirm('Yakin ingin menghapus stok ini?')">
+                                Hapus
                             </button>
+                        </form>
+                        @endif
 
-                            <!-- DELETE -->
-                            <form
-                                action="{{ route('cabang.stok.destroy', ['slug' => $cabangData->slug, 'id' => $stok->id_stok]) }}"
-                                method="POST"
-                                class="d-inline">
+                    </td>
+                </tr>
 
+                <!-- MODAL EDIT STOK -->
+                @if ($d->stok_id)
+                <div class="modal fade" id="modalEditStok{{ $d->stok_id }}" tabindex="-1">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+
+                            <form action="{{ route('cabang.stok.update', ['slug' => $cabang->slug, 'id' => $d->stok_id]) }}" method="POST">
                                 @csrf
-                                @method('DELETE')
+                                @method('PUT')
 
-                                <button type="submit" class="btn btn-danger btn-sm"
-                                        onclick="return confirm('Yakin ingin menghapus data ini?')">
-                                    Hapus
-                                </button>
+                                <div class="modal-header">
+                                    <h5 class="modal-title">Edit Stok</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                </div>
+
+                                <div class="modal-body">
+
+                                    <div class="mb-3">
+                                        <label class="form-label">Nama Bahan</label>
+                                        <input type="text" class="form-control" value="{{ $d->nama_bahan }}" disabled>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label class="form-label">Jumlah Stok</label>
+                                        <input type="number" name="banyak_stok" class="form-control" min="0"
+                                               value="{{ $d->banyak_stok }}" required>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label class="form-label">Satuan</label>
+                                        <input type="text" name="satuan" class="form-control"
+                                               value="{{ $d->satuan_stok }}">
+                                    </div>
+
+                                </div>
+
+                                <div class="modal-footer">
+                                    <button class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                                    <button class="btn btn-primary">Simpan Perubahan</button>
+                                </div>
+
                             </form>
 
-                        </td>
-                    </tr>
-
-                    <!-- MODAL EDIT -->
-                    <div class="modal fade" id="modalEditStok{{ $stok->id_stok }}" tabindex="-1">
-                        <div class="modal-dialog">
-                            <div class="modal-content">
-
-                                <form
-                                    action="{{ route('cabang.stok.update', ['slug' => $cabangData->slug, 'id' => $stok->id_stok]) }}"
-                                    method="POST">
-
-                                    @csrf
-                                    @method('PUT')
-
-                                    <div class="modal-header">
-                                        <h5 class="modal-title">Edit Stok</h5>
-                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                                    </div>
-
-                                    <div class="modal-body">
-
-                                        <div class="mb-3">
-                                            <label class="form-label">Nama Barang</label>
-                                            <select name="id_barang" class="form-control" required>
-                                                @foreach ($barangs as $barang)
-                                                <option value="{{ $barang->id_barang }}"
-                                                    {{ $barang->id_barang == $stok->id_barang ? 'selected' : '' }}>
-                                                    {{ $barang->nama_barang }}
-                                                </option>
-                                                @endforeach
-                                            </select>
-                                        </div>
-
-                                        <div class="mb-3">
-                                            <label class="form-label">Jumlah Masuk</label>
-                                            <input type="number" name="jumlah_masuk" class="form-control"
-                                                   value="{{ $stok->jumlah_masuk }}" min="0" required>
-                                        </div>
-
-                                        <div class="mb-3">
-                                            <label class="form-label">Tanggal</label>
-                                            <input type="date" name="tanggal" class="form-control"
-                                                   value="{{ $stok->tanggal }}" required>
-                                        </div>
-
-                                    </div>
-
-                                    <div class="modal-footer">
-                                        <button type="button" class="btn btn-secondary"
-                                                data-bs-dismiss="modal">Batal</button>
-                                        <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
-                                    </div>
-
-                                </form>
-
-                            </div>
                         </div>
                     </div>
+                </div>
+                @endif
 
-                    @empty
-                    <tr>
-                        <td colspan="6" class="text-center text-muted">Belum ada data stok</td>
-                    </tr>
-                    @endforelse
+                @empty
+                <tr>
+                    <td colspan="6" class="text-center text-muted">Belum ada data stok</td>
+                </tr>
+                @endforelse
                 </tbody>
 
             </table>
@@ -132,7 +133,9 @@
     </div>
 </div>
 
-<!-- MODAL TAMBAH -->
+
+
+<!-- MODAL TAMBAH STOK -->
 <div class="modal fade" id="modalTambahStok" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -141,38 +144,36 @@
                 @csrf
 
                 <div class="modal-header">
-                    <h5 class="modal-title">Tambah Stok</h5>
+                    <h5 class="modal-title">Tambah / Update Stok</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
 
                 <div class="modal-body">
 
                     <div class="mb-3">
-                        <label class="form-label">Nama Barang</label>
-                        <select name="id_barang" class="form-control" required>
-                            <option value="">-- Pilih Barang --</option>
-                            @foreach ($barangs as $barang)
-                            <option value="{{ $barang->id_barang }}">{{ $barang->nama_barang }}</option>
+                        <label class="form-label">Nama Bahan</label>
+                        <select name="bahanbaku_id" class="form-control" required>
+                            <option value="">-- Pilih Bahan --</option>
+                            @foreach ($datas as $d)
+                            <option value="{{ $d->id }}">{{ $d->nama_bahan }}</option>
                             @endforeach
                         </select>
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label">Jumlah Masuk</label>
-                        <input type="number" name="jumlah_masuk" class="form-control"
-                               value="0" min="0" required>
+                        <label class="form-label">Jumlah Stok</label>
+                        <input type="number" name="banyak_stok" class="form-control" min="0" required>
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label">Tanggal</label>
-                        <input type="date" name="tanggal" class="form-control" required>
+                        <label class="form-label">Satuan</label>
+                        <input type="text" name="satuan" class="form-control" placeholder="kg, pcs, liter, dll">
                     </div>
 
                 </div>
 
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary"
-                            data-bs-dismiss="modal">Batal</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
                     <button type="submit" class="btn btn-primary">Simpan</button>
                 </div>
 

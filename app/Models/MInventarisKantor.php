@@ -13,16 +13,20 @@ class MInventarisKantor extends Model
     // Table sesuai dengan database
     protected $table = 'inventaris_kantors';
 
+
+    public $incrementing = true;
+    protected $keyType = 'int';
+
     // Kolom yang bisa diisi
     protected $fillable = [
-        'id_cabang',
+        'cabang_id',
         'kode_barang',
         'nama_barang',
         'kategori',
         'jumlah',
         'kondisi',
         'keterangan',
-        'qrcode_path',
+        'qr_code',
         'tanggal_input'
     ];
 
@@ -31,6 +35,6 @@ class MInventarisKantor extends Model
     // Relasi ke tabel cabang (foreign key = id_cabang)
     public function cabang()
     {
-        return $this->belongsTo(Cabang::class, 'id_cabang', 'id');
+        return $this->belongsTo(Cabang::class, 'cabang_id', 'id');
     }
 }

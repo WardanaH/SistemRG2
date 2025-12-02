@@ -194,6 +194,19 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/inventaris/store', [InventarisKantorController::class, 'store'])
         ->name('inventaris.global.store');
 
+    // ====================== MANAJEMEN CABANG INVENTARIS ======================
+    Route::get('/inventaris/cabang', [CabangDinamisController::class, 'manageCabang'])
+        ->name('inventaris.cabang.index');
+
+    Route::post('/inventaris/cabang/store', [CabangDinamisController::class, 'manageCabangStore'])
+        ->name('inventaris.cabang.store');
+
+    Route::put('/inventaris/cabang/update/{id}', [CabangDinamisController::class, 'manageCabangUpdate'])
+        ->name('inventaris.cabang.update');
+
+    Route::delete('/inventaris/cabang/delete/{id}', [CabangDinamisController::class, 'manageCabangDelete'])
+        ->name('inventaris.cabang.delete');
+
     // ================== CABANG {slug} ==================
     Route::prefix('cabang/{slug}')->name('cabang.')->group(function () {
 
@@ -222,12 +235,32 @@ Route::middleware(['auth'])->group(function () {
     });
 
 
-    // ===================== GUDANG PUSAT =====================
+// ===================== GUDANG PUSAT =====================
+    //barang
     Route::get('/gudangpusat/barang', [PengirimanGudangController::class, 'barang'])
         ->name('gudangpusat.barang');
 
+    Route::post('/gudangpusat/barang/store', [PengirimanGudangController::class, 'storeBarang'])
+        ->name('gudangpusat.barang.store');
+
+    Route::put('/gudangpusat/barang/update/{id}', [PengirimanGudangController::class, 'updateBarang'])
+        ->name('gudangpusat.barang.update');
+
+    Route::delete('/gudangpusat/barang/delete/{id}', [PengirimanGudangController::class, 'destroyBarang'])
+        ->name('gudangpusat.barang.destroy');
+
+    // stok
     Route::get('/gudangpusat/stok', [PengirimanGudangController::class, 'stok'])
         ->name('gudangpusat.stok');
+
+    Route::post('/gudangpusat/stok/tambah', [PengirimanGudangController::class, 'tambahStok'])
+        ->name('gudangpusat.stok.tambah');
+
+    Route::put('/gudangpusat/stok/update/{id}', [PengirimanGudangController::class, 'updateStok'])
+        ->name('gudangpusat.stok.update');
+
+    Route::delete('/gudangpusat/stok/delete/{id}', [PengirimanGudangController::class, 'deleteStok'])
+        ->name('gudangpusat.stok.delete');
 
     // Pengiriman
     Route::get('/gudangpusat/pengiriman', [PengirimanGudangController::class, 'index'])

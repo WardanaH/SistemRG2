@@ -1,32 +1,5 @@
 <?php
 
-// namespace App\Models;
-
-// use Illuminate\Database\Eloquent\Factories\HasFactory;
-// use Illuminate\Database\Eloquent\Model;
-// use Illuminate\Database\Eloquent\SoftDeletes;
-
-// class Cabang extends Model
-// {
-//     use HasFactory, SoftDeletes;
-
-//     protected $fillable = [
-//         'kode',
-//         'nama',
-//         'slug',
-//         'email',
-//         'telepon',
-//         'alamat',
-//         'jenis'
-//     ];
-
-//     public function users()
-//     {
-//         return $this->hasMany(User::class, 'cabang_id');
-//     }
-// }
-
-
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -37,8 +10,6 @@ class Cabang extends Model
 {
     use HasFactory, SoftDeletes;
 
-    protected $table = 'cabangs';      
-    protected $primaryKey = 'id';      
     protected $fillable = [
         'kode',
         'nama',
@@ -49,12 +20,26 @@ class Cabang extends Model
         'jenis'
     ];
 
-    /**
-     * Relasi ke model User
-     * Satu cabang punya banyak user.
-     */
     public function users()
     {
-        return $this->hasMany(User::class, 'id_cabang', 'id');
+        return $this->hasMany(User::class, 'cabang_id');
     }
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($cabang) {
+            if (empty($cabang->slug)) {
+                $cabang->slug = \Str::slug($cabang->nama);
+            }
+        });
+    }
+
+        public static function findBySlug($slug)
+    {
+        return static::where('slug', $slug)->firstOrFail();
+    }
+
 }
+

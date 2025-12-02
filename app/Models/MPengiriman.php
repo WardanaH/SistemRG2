@@ -19,8 +19,12 @@ class MPengiriman extends Model
         'status_penerimaan'
     ];
 
-    public function barang()
+        public function barang()
     {
-        return $this->belongsTo(MCabangBarang::class, 'id_barang', 'id_barang');
+        return $this->belongsTo(\App\Models\MBahanBakus::class, 'id_barang', 'id');
+    }
+    public function stok()
+    {
+        return $this->belongsTo(\App\Models\MStokBahanBakus::class, 'id_stok', 'id');
     }
 }

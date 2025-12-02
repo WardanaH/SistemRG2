@@ -91,6 +91,13 @@
             {{-- ===================== CABANG & INVENTARIS ===================== --}}
             <li class="nav-label mt-3">CABANG & INVENTARIS</li>
 
+            <li>
+                <a href="{{ route('inventaris.cabang.index') }}">
+                    <i class="icon icon-settings"></i>
+                    <span class="nav-text">Manajemen Cabang</span>
+                </a>
+            </li>
+
             @php
                 // CABANG BENERAN (bukan gudang)
                 $cabangs = App\Models\Cabang::where('jenis', 'cabang')->get();
@@ -104,7 +111,7 @@
                     </a>
                     <ul>
                         <li><a href="{{ url('cabang/'.$c->slug.'/barang') }}">Daftar Barang</a></li>
-                        <li><a href="{{ url('cabang/'.$c->slug.'/stok') }}">Stok Barang</a></li>
+                        <li><a href="{{ url('cabang/'.$c->slug.'/stok') }}">Stok Tersedia</a></li>
                         <li><a href="{{ url('cabang/'.$c->slug.'/riwayat') }}">Riwayat Pengiriman</a></li>
                         <li><a href="{{ url('cabang/'.$c->slug.'/inventaris') }}">Inventaris Kantor</a></li>
                     </ul>
@@ -121,7 +128,7 @@
                 </a>
                 <ul>
                     <li><a href="{{ route('gudangpusat.barang') }}">Daftar Barang</a></li>
-                    <li><a href="{{ route('gudangpusat.stok') }}">Stok Barang</a></li>
+                    <li><a href="{{ route('gudangpusat.stok') }}">Stok Tersedia</a></li>
                     <li><a href="{{ route('gudangpusat.pengiriman.index') }}">Pengiriman Barang</a></li>
                 </ul>
             </li>
