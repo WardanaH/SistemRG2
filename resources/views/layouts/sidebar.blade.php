@@ -5,7 +5,9 @@
     <div class="quixnav-scroll">
         <ul class="metismenu" id="menu">
 
+            {{-- ====================== MAIN MENU ====================== --}}
             <li class="nav-label first">MAIN MENU</li>
+
             <li>
                 <a href="{{ route('dashboard') }}">
                     <i class="icon icon-single-04"></i>
@@ -13,6 +15,7 @@
                 </a>
             </li>
 
+            {{-- ====================== MANAJEMEN UTAMA ====================== --}}
             <li class="nav-label">MANAJEMEN UTAMA</li>
 
             @can('manage-transaksipenjualan')
@@ -130,6 +133,51 @@
                 </ul>
             </li>
             @endcan
+
+            {{-- ===================== CABANG & INVENTARIS ===================== --}}
+            <li class="nav-label mt-3">CABANG & INVENTARIS</li>
+
+            <li>
+                <a href="{{ route('inventaris.cabang.index') }}">
+                    <i class="icon icon-settings"></i>
+                    <span class="nav-text">Manajemen Cabang</span>
+                </a>
+            </li>
+
+            @php
+            // CABANG BENERAN (bukan gudang)
+            $cabangs = App\Models\Cabang::where('jenis', 'cabang')->get();
+            @endphp
+
+            @foreach($cabangs as $c)
+            <li>
+                <a class="has-arrow" href="javascript:void(0)">
+                    <i class="icon icon-home"></i>
+                    <span class="nav-text">{{ $c->nama }}</span>
+                </a>
+                <ul>
+                    <li><a href="{{ url('cabang/'.$c->slug.'/barang') }}">Daftar Barang</a></li>
+                    <li><a href="{{ url('cabang/'.$c->slug.'/stok') }}">Stok Tersedia</a></li>
+                    <li><a href="{{ url('cabang/'.$c->slug.'/riwayat') }}">Riwayat Pengiriman</a></li>
+                    <li><a href="{{ url('cabang/'.$c->slug.'/inventaris') }}">Inventaris Kantor</a></li>
+                </ul>
+            </li>
+            @endforeach
+
+            {{-- ===================== GUDANG PUSAT ===================== --}}
+            <li class="nav-label mt-4">GUDANG PUSAT</li>
+
+            <li>
+                <a class="has-arrow" href="javascript:void(0)">
+                    <i class="icon icon-folder"></i>
+                    <span class="nav-text">Gudang Pusat</span>
+                </a>
+                <ul>
+                    <li><a href="{{ route('gudangpusat.barang') }}">Daftar Barang</a></li>
+                    <li><a href="{{ route('gudangpusat.stok') }}">Stok Tersedia</a></li>
+                    <li><a href="{{ route('gudangpusat.pengiriman.index') }}">Pengiriman Barang</a></li>
+                </ul>
+            </li>
         </ul>
     </div>
 </div>
