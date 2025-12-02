@@ -248,11 +248,10 @@ Route::middleware(['auth'])->group(function () {
         // Riwayat pengiriman
         Route::get('/riwayat', [CabangDinamisController::class, 'riwayat'])->name('riwayat');
         Route::put('/riwayat/terima/{id}', [CabangDinamisController::class, 'riwayatTerima'])->name('riwayat.terima');
-
     });
 
 
-// ===================== GUDANG PUSAT =====================
+    // ===================== GUDANG PUSAT =====================
     //barang
     Route::get('/gudangpusat/barang', [PengirimanGudangController::class, 'barang'])
         ->name('gudangpusat.barang');
@@ -291,6 +290,7 @@ Route::middleware(['auth'])->group(function () {
 
     Route::delete('/gudangpusat/pengiriman/delete/{id}', [PengirimanGudangController::class, 'destroy'])
         ->name('gudangpusat.pengiriman.destroy');
+});
 
 // Manajemen Angsuran Penjualan
 Route::middleware(['auth'])->group(function () {
