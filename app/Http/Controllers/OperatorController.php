@@ -19,6 +19,15 @@ class OperatorController extends Controller
         return view('admin.users.operator.index', compact('operators'));
     }
 
+    public function dashboard()
+    {
+        return view('operator.dashboard');
+    }
+    public function profile()
+    {
+        return view('operator.dashboard');
+    }
+
     /**
      * Show the form for creating a new resource.
      */

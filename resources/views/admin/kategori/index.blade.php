@@ -70,10 +70,13 @@
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
 <script>
 $(function(){
+
     const addModal = new bootstrap.Modal(document.getElementById('addModal'));
     const editModal = new bootstrap.Modal(document.getElementById('editModal'));
+
     loadKategories();
 
     function loadKategories(){
@@ -85,7 +88,7 @@ $(function(){
                     <td>${k.Nama_Kategori}</td>
                     <td>${k.Keterangan ?? '-'}</td>
                     <td>
-                        <button class="btn btn-success btn-sm editBtn" data-id="${k.id}">Edit</button>
+                        <button class="btn btn-warning btn-sm editBtn" data-id="${k.id}">Edit</button>
                         <button class="btn btn-danger btn-sm deleteBtn" data-id="${k.id}">Hapus</button>
                     </td>
                 </tr>`;
@@ -96,6 +99,7 @@ $(function(){
 
     $('#openAddModal').click(()=>addModal.show());
 
+    // Tambah Kategori
     $('#formAdd').on('submit', function(e){
         e.preventDefault();
         $.ajax({
@@ -104,16 +108,26 @@ $(function(){
             data: $(this).serialize(),
             success: function(res){
                 if(res === "Success"){
-                    alert('Kategori berhasil ditambahkan!');
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Berhasil',
+                        text: 'Kategori berhasil ditambahkan!'
+                    });
                     $('#formAdd')[0].reset();
                     addModal.hide();
                     loadKategories();
-                } else { alert('Gagal menambahkan kategori!'); }
-            },
-            error: function(){ alert('Terjadi kesalahan pada server!'); }
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Gagal',
+                        text: 'Gagal menambahkan kategori!'
+                    });
+                }
+            }
         });
     });
 
+    // Edit Kategori
     $(document).on('click', '.editBtn', function(){
         const id = $(this).data('id');
         $.get("{{ route('loadkategori') }}", function(res){
@@ -135,24 +149,62 @@ $(function(){
             data: $(this).serialize(),
             success: function(res){
                 if(res === "Success"){
-                    alert('Kategori berhasil diupdate!');
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Berhasil',
+                        text: 'Kategori berhasil diupdate!'
+                    });
                     editModal.hide();
                     loadKategories();
-                } else { alert('Gagal update kategori!'); }
-            },
-            error: function(){ alert('Terjadi kesalahan pada server!'); }
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Gagal',
+                        text: 'Gagal update kategori!'
+                    });
+                }
+            }
         });
     });
 
+    // Delete Kategori
     $(document).on('click', '.deleteBtn', function(){
         const id = $(this).data('id');
-        if(confirm('Yakin ingin menghapus kategori ini?')){
-            $.post("{{ route('deletekategori') }}", {_token:'{{ csrf_token() }}', hapus_kategori_id:id}, function(res){
-                if(res === "Success"){ alert('Kategori dihapus!'); loadKategories(); }
-                else { alert('Gagal menghapus kategori!'); }
-            });
-        }
+
+        Swal.fire({
+            title: 'Hapus Kategori?',
+            text: 'Data akan hilang permanen.',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Hapus',
+            cancelButtonText: 'Batal'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.post("{{ route('deletekategori') }}", {
+                    _token:'{{ csrf_token() }}',
+                    hapus_kategori_id:id
+                }, function(res){
+                    if(res === "Success"){
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Berhasil',
+                            text: 'Kategori dihapus!'
+                        });
+                        loadKategories();
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Gagal',
+                            text: 'Gagal menghapus kategori!'
+                        });
+                    }
+                });
+            }
+        });
+
     });
+
 });
 </script>
+
 @endsection

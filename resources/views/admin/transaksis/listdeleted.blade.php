@@ -45,7 +45,7 @@
         <div class="col-md-9">
             <div class="card shadow">
                 <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0"><i class="fa fa-shopping-cart"></i> Transaksi Penjualan</h5>
+                    <h5 class="mb-0"><i class="fa fa-shopping-cart"></i> Transaksi Penjualan Terhapus</h5>
                     <a href="{{ route('addtransaksiindex') }}" class="btn btn-light btn-sm">
                         <i class="fa fa-plus"></i> Tambah
                     </a>
@@ -66,53 +66,48 @@
                                     <th>Pajak</th>
                                     <th>Sisa Tagihan</th>
                                     <th>Total</th>
-                                    <th>Tool</th>
                                     <th>Cabang</th>
                                     <th>Pembuat</th>
+                                    <th>Desainer</th>
+                                    <th>Alasan</th>
+                                    <th>Tool</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @forelse ($datas as $data)
                                 <tr>
                                     <td>
-                                        #{{ $data->id }}
+                                        {{ $data->nomor_nota }}
                                         @if ($data->subTransaksi()->onlyTrashed()->count() > 0)
                                         <span class="badge bg-success ms-2">edited</span>
                                         @endif
                                     </td>
                                     <td>{{ $data->nama_pelanggan }}</td>
                                     <td>{{ $data->hp_pelanggan }}</td>
-                                    <td>{{ \Carbon\Carbon::parse($data->tanggal)->format('d-m-Y H:i:s') }}</td>
+                                    <td>{{ \Carbon\Carbon::parse($data->created_at)->format('d-m-Y H:m:i') }}</td>
                                     <td>Rp {{ number_format($data->jumlah_pembayaran, 2, ',', '.') }}</td>
                                     <td>{{ $data->metode_pembayaran }}</td>
                                     <td>{{ $data->diskon }}%</td>
                                     <td>{{ $data->pajak }}%</td>
-
                                     <td class="{{ $data->sisa_tagihan != 0 ? 'bg-warning' : 'bg-light' }}">
                                         Rp {{ number_format($data->sisa_tagihan, 2, ',', '.') }}
                                     </td>
-
                                     <td class="bg-light">
                                         Rp {{ number_format($data->total_harga, 2, ',', '.') }}
                                     </td>
-
+                                    <td>{{ $data->cabang->nama ?? '-' }}</td>
+                                    <td>{{ $data->user->nama ?? '-' }}</td>
+                                    <td>{{ $data->designer->nama ?? '-'}}</td>
+                                    <td>{{ $data->reason_on_delete ?? '-' }}</td>
                                     <td>
                                         <div class="btn-group btn-group-sm" role="group">
-                                            <a href="#" class="btn btn-primary"><i class="fa fa-eye"></i></a>
-                                            <button type="button" class="btn btn-warning"><i class="fa fa-money"></i></button>
-                                            <a href="#" class="btn btn-success"><i class="fa fa-edit"></i></a>
-                                            <form action="#" method="POST" class="d-inline">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button class="btn btn-danger" onclick="return confirm('Hapus transaksi ini?')">
-                                                    <i class="fa fa-trash"></i>
-                                                </button>
-                                            </form>
+                                            <button type="button" class="btn btn-primary btn-detail"
+                                                data-id="{{ encrypt($data->id) }}"
+                                                data-total="Rp {{ number_format($data->total_harga, 2, ',', '.') }}">
+                                                <i class="fa fa-eye"></i>
+                                            </button>
                                         </div>
                                     </td>
-
-                                    <td>{{ $data->cabang->nama ?? '-' }}</td>
-                                    <td>{{ $data->user->name ?? '-' }}</td>
                                 </tr>
                                 @empty
                                 <tr>
@@ -125,7 +120,7 @@
                                     <td colspan="8" class="text-center fw-bold">Total</td>
                                     <td>Rp {{ number_format($datas->sum('sisa_tagihan'), 2, ',', '.') }}</td>
                                     <td>Rp {{ number_format($datas->sum('total_harga'), 2, ',', '.') }}</td>
-                                    <td colspan="3"></td>
+                                    <td colspan="5"></td>
                                 </tr>
                             </tfoot>
                         </table>
@@ -139,5 +134,128 @@
         </div>
     </div>
 </div>
+
+@push('scripts')
+<script>
+    document.addEventListener('click', async function(e) {
+        const btn = e.target.closest('.btn-detail');
+        if (!btn) return;
+
+        const id = btn.dataset.id;
+        const total = btn.dataset.total;
+        const row = btn.closest('tr');
+        const colCount = row.children.length;
+
+        // Tutup detail sebelumnya (kalau ada)
+        document.querySelectorAll('.detail-row').forEach(r => r.remove());
+
+        // Jika klik tombol yang sama dua kali — tutup detailnya
+        if (row.classList.contains('showing-detail')) {
+            row.classList.remove('showing-detail');
+            return;
+        }
+
+        row.classList.add('showing-detail');
+
+        try {
+            const res = await fetch(`{{ route('showsubtransaksi') }}?id=${id}`);
+            if (!res.ok) throw new Error('Gagal mengambil data');
+            const data = await res.json();
+
+            const deleted = Array.isArray(data.deleted) ? data.deleted : [];
+
+            let html = `
+                <tr class="detail-row">
+                    <td colspan="${colCount}" class="p-0">
+                        <table class="table table-sm mb-0 table-bordered bg-light">`;
+
+            if (deleted.length > 0) {
+                html += `
+                <thead class="table-danger text-center">
+                    <tr><th colspan="9">Produk Sebelumnya (Terhapus)</th></tr>
+                    <tr>
+                        <th>Nama Barang</th>
+                        <th>Harga Satuan</th>
+                        <th>P</th>
+                        <th>L</th>
+                        <th>Kuantitas</th>
+                        <th>Finishing</th>
+                        <th>Keterangan</th>
+                        <th>Diskon (%)</th>
+                        <th>Subtotal</th>
+                    </tr>
+                </thead>
+                <tbody>
+            `;
+
+                deleted.forEach(item => {
+                    html += `
+                <tr>
+                    <td>${item.produk?.nama_produk ?? '-'}</td>
+                    <td>Rp ${(parseFloat(item.harga_satuan) || 0).toLocaleString('id-ID')}</td>
+                    <td>${item.panjang ?? '-'}</td>
+                    <td>${item.lebar ?? '-'}</td>
+                    <td>${item.banyak ?? '-'}</td>
+                    <td>${item.finishing ?? '-'}</td>
+                    <td style="word-break: break-word;">${item.keterangan ?? '-'}</td>
+                    <td>${item.diskon ?? 0}%</td>
+                    <td>Rp ${(parseFloat(item.subtotal) || 0).toLocaleString('id-ID')}</td>
+                </tr>`;
+                });
+
+                html += `
+                <tr class="fw-bold">
+                    <td colspan="8" class="text-end">Total:</td>
+                    <td class="text-end">${total}</td>
+                </tr>
+                </tbody>
+            `;
+            } else {
+                html += `
+                <tbody>
+                    <tr>
+                        <td colspan="9" class="text-center text-muted">Tidak ada produk terhapus.</td>
+                    </tr>
+                </tbody>
+            `;
+            }
+
+            html += `</table></td></tr>`;
+
+            row.insertAdjacentHTML('afterend', html);
+
+        } catch (err) {
+            console.error(err);
+            Swal.fire('Gagal!', 'Tidak dapat memuat detail transaksi.', 'error');
+        }
+    });
+</script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('.btn-delete').forEach(button => {
+            button.addEventListener('click', function() {
+                const id = this.dataset.id;
+
+                Swal.fire({
+                    title: 'Yakin ingin menghapus?',
+                    text: "Transaksi ini akan dihapus dengan soft delete.",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Ya, hapus!',
+                    cancelButtonText: 'Batal'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        document.getElementById('delete-form-' + id).submit();
+                    }
+                });
+            });
+        });
+    });
+</script>
+
+@endpush
 
 @endsection
