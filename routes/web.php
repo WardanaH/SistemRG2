@@ -20,6 +20,9 @@ use App\Http\Controllers\JenisPelanggansController;
 use App\Http\Controllers\RelasiBahanBakuController;
 use App\Http\Controllers\TransaksiBahanBakusController;
 use App\Http\Controllers\TransaksiPenjualansController;
+use App\Http\Controllers\InventarisKantorController;
+use App\Http\Controllers\CabangDinamisController;
+use App\Http\Controllers\PengirimanGudangController;
 
 require __DIR__ . '/operator.php';
 
@@ -200,6 +203,94 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/operator/update', [OperatorController::class, 'update'])->name('updateoperator');
     Route::delete('/operator/delete', [OperatorController::class, 'destroy'])->name('destroyoperator');
 });
+
+// ===================== CABANG & INVENTARIS (DINAMIS) =====================
+Route::middleware(['auth'])->group(function () {
+
+    // Store inventaris global
+    Route::post('/inventaris/store', [InventarisKantorController::class, 'store'])
+        ->name('inventaris.global.store');
+
+    // ====================== MANAJEMEN CABANG INVENTARIS ======================
+    Route::get('/inventaris/cabang', [CabangDinamisController::class, 'manageCabang'])
+        ->name('inventaris.cabang.index');
+
+    Route::post('/inventaris/cabang/store', [CabangDinamisController::class, 'manageCabangStore'])
+        ->name('inventaris.cabang.store');
+
+    Route::put('/inventaris/cabang/update/{id}', [CabangDinamisController::class, 'manageCabangUpdate'])
+        ->name('inventaris.cabang.update');
+
+    Route::delete('/inventaris/cabang/delete/{id}', [CabangDinamisController::class, 'manageCabangDelete'])
+        ->name('inventaris.cabang.delete');
+
+    // ================== CABANG {slug} ==================
+    Route::prefix('cabang/{slug}')->name('cabang.')->group(function () {
+
+        // Barang
+        Route::get('/barang', [CabangDinamisController::class, 'barang'])->name('barang');
+        Route::post('/barang/store', [CabangDinamisController::class, 'barangStore'])->name('barang.store');
+        Route::put('/barang/update/{id}', [CabangDinamisController::class, 'barangUpdate'])->name('barang.update');
+        Route::delete('/barang/delete/{id}', [CabangDinamisController::class, 'barangDestroy'])->name('barang.destroy');
+
+        // Stok
+        Route::get('/stok', [CabangDinamisController::class, 'stok'])->name('stok');
+        Route::post('/stok/store', [CabangDinamisController::class, 'stokStore'])->name('stok.store');
+        Route::put('/stok/update/{id}', [CabangDinamisController::class, 'stokUpdate'])->name('stok.update');
+        Route::delete('/stok/delete/{id}', [CabangDinamisController::class, 'stokDestroy'])->name('stok.destroy');
+
+        // Inventaris
+        Route::get('/inventaris', [CabangDinamisController::class, 'inventaris'])->name('inventaris');
+        Route::post('/inventaris/store', [CabangDinamisController::class, 'inventarisStore'])->name('inventaris.store');
+        Route::put('/inventaris/update/{id}', [CabangDinamisController::class, 'inventarisUpdate'])->name('inventaris.update');
+        Route::delete('/inventaris/delete/{id}', [CabangDinamisController::class, 'inventarisDestroy'])->name('inventaris.destroy');
+
+        // Riwayat pengiriman
+        Route::get('/riwayat', [CabangDinamisController::class, 'riwayat'])->name('riwayat');
+        Route::put('/riwayat/terima/{id}', [CabangDinamisController::class, 'riwayatTerima'])->name('riwayat.terima');
+
+    });
+
+
+// ===================== GUDANG PUSAT =====================
+    //barang
+    Route::get('/gudangpusat/barang', [PengirimanGudangController::class, 'barang'])
+        ->name('gudangpusat.barang');
+
+    Route::post('/gudangpusat/barang/store', [PengirimanGudangController::class, 'storeBarang'])
+        ->name('gudangpusat.barang.store');
+
+    Route::put('/gudangpusat/barang/update/{id}', [PengirimanGudangController::class, 'updateBarang'])
+        ->name('gudangpusat.barang.update');
+
+    Route::delete('/gudangpusat/barang/delete/{id}', [PengirimanGudangController::class, 'destroyBarang'])
+        ->name('gudangpusat.barang.destroy');
+
+    // stok
+    Route::get('/gudangpusat/stok', [PengirimanGudangController::class, 'stok'])
+        ->name('gudangpusat.stok');
+
+    Route::post('/gudangpusat/stok/tambah', [PengirimanGudangController::class, 'tambahStok'])
+        ->name('gudangpusat.stok.tambah');
+
+    Route::put('/gudangpusat/stok/update/{id}', [PengirimanGudangController::class, 'updateStok'])
+        ->name('gudangpusat.stok.update');
+
+    Route::delete('/gudangpusat/stok/delete/{id}', [PengirimanGudangController::class, 'deleteStok'])
+        ->name('gudangpusat.stok.delete');
+
+    // Pengiriman
+    Route::get('/gudangpusat/pengiriman', [PengirimanGudangController::class, 'index'])
+        ->name('gudangpusat.pengiriman.index');
+
+    Route::post('/gudangpusat/pengiriman/store', [PengirimanGudangController::class, 'store'])
+        ->name('gudangpusat.pengiriman.store');
+
+    Route::put('/gudangpusat/pengiriman/update-status/{id}', [PengirimanGudangController::class, 'updateStatus'])
+        ->name('gudangpusat.pengiriman.updateStatus');
+
+    Route::delete('/gudangpusat/pengiriman/delete/{id}', [PengirimanGudangController::class, 'destroy'])
+        ->name('gudangpusat.pengiriman.destroy');
 
 // Manajemen Angsuran Penjualan
 Route::middleware(['auth'])->group(function () {

@@ -5,7 +5,9 @@
     <div class="quixnav-scroll">
         <ul class="metismenu" id="menu">
 
+            {{-- ====================== MAIN MENU ====================== --}}
             <li class="nav-label first">MAIN MENU</li>
+
             <li>
                 <a href="{{ route('dashboard') }}">
                     <i class="icon icon-single-04"></i>
@@ -13,6 +15,7 @@
                 </a>
             </li>
 
+            {{-- ====================== MANAJEMEN UTAMA ====================== --}}
             <li class="nav-label">MANAJEMEN UTAMA</li>
 
             @can('manage-transaksipenjualan')
