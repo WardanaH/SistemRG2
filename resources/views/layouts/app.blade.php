@@ -50,9 +50,7 @@
     <!-- ====================== CUSTOM STYLE ====================== -->
     @stack('styles')
     <style>
-        /* ===========================================================
-       HEADER CARD DALAM CONTENT
-    =========================================================== */
+        /* =========================================================== HEADER CARD DALAM CONTENT =========================================================== */
         .content-body .card-header {
             background-color: #4B28D2 !important;
             color: #ffffff !important;
@@ -76,8 +74,7 @@
         }
 
         /* ===========================================================
-       FIX TEKS TABEL PUCAT / TRANSPARAN
-    =========================================================== */
+       FIX TEKS TABEL PUCAT / TRANSPARAN=========================================================== */
         .table,
         .table td,
         .table th {
@@ -103,8 +100,7 @@
         }
 
         /* ===========================================================
-       STYLE GLOBAL UNTUK SEMUA DROPDOWN / SELECT
-    =========================================================== */
+       STYLE GLOBAL UNTUK SEMUA DROPDOWN / SELECT=========================================================== */
         select.form-select,
         select {
             border: 1.5px solid #dcdcdc;
@@ -151,8 +147,7 @@
         }
 
         /* ===========================================================
-       WARNA TOMBOL PUTIH DI HEADER CARD
-    =========================================================== */
+       WARNA TOMBOL PUTIH DI HEADER CARD=========================================================== */
         .card-header .btn-light,
         .card-header .btn-white {
             background-color: #fff !important;
@@ -267,9 +262,7 @@
     </style>
 
     <style>
-        /* ============================================================
-   GLOBAL MODAL STYLE — Berlaku untuk semua modal Bootstrap
-============================================================ */
+        /* ============================================================ GLOBAL MODAL STYLE — Berlaku untuk semua modal Bootstrap ============================================================ */
 
         /* Kontainer utama modal */
         .modal-content {
@@ -339,7 +332,6 @@
             background-color: #e3e3e3 !important;
         }
     </style>
-
 
     </style>
 </head>
