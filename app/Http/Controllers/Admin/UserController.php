@@ -177,6 +177,7 @@ class UserController extends Controller
 
     public function edit(User $user)
     {
+        // dd(auth()->user()->getRoleNames()->first());
         $roles = Role::pluck('name', 'name');
         $cabangs = Cabang::pluck('nama', 'id');
         return view('admin.users.edit', compact('user', 'roles', 'cabangs'));
@@ -191,6 +192,7 @@ class UserController extends Controller
         } else {
             unset($data['password']);
         }
+        // dd($data);
 
         // 🔹 Sinkronisasi cabang jika diubah
         if (!empty($data['nama_cabang'])) {

@@ -45,4 +45,32 @@
         </div>
     </div>
 </div>
+
+{{-- SWEETALERT NOTIFIKASI --}}
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    @if(session('success'))
+        Swal.fire({
+            icon: "success",
+            title: "{{ session('success') }}",
+            showConfirmButton: false,
+            timer: 1500,
+            position: "center"
+        });
+    @endif
+
+    @if(session('error'))
+        Swal.fire({
+            icon: "error",
+            title: "{{ session('error') }}",
+            showConfirmButton: false,
+            timer: 1500,
+            position: "center"
+        });
+    @endif
+
+});
+</script>
+
 @endsection

@@ -18,121 +18,121 @@
             {{-- ====================== MANAJEMEN UTAMA ====================== --}}
             <li class="nav-label">MANAJEMEN UTAMA</li>
 
+            @can('manage-transaksipenjualan')
             <li>
-                <a class="has-arrow" href="javascript:void(0)">
-                    <i class="icon icon-people"></i>
+                <a class="has-arrow" href="javascript:void(0)" aria-expanded="false">
+                    <i class="icon icon-credit-card"></i>
+                    <span class="nav-text">Transaksi Transaksi</span>
+                </a>
+                <ul aria-expanded="false">
+                    @can('add-transaksipenjualan')
+                    <li><a href="{{ route('addtransaksiindex') }}">Tambah Transaksi Penjualan</a></li>
+                    @endcan
+                    @can('manage-transaksipenjualan')
+                    <li><a href="{{ route('transaksiindex') }}">Manajemen Transaksi Penjualan</a></li>
+                    @endcan
+                    @can('deleted-transaksipenjualan')
+                    <li><a href="{{ route('transaksiindexdeleted') }}">Manajemen Transaksi Penjualan Terhapus</a></li>
+                    @endcan
+                    @can('manage-angsuranpenjualan')
+                    <li><a href="{{ route('angsuran.index') }}">Manajemen Angsuran Transaksi</a></li>
+                    @endcan
+                </ul>
+            </li>
+            @endcan
+
+            @can('manage-produk')
+            <li>
+                <a class="has-arrow" href="javascript:void(0)" aria-expanded="false">
+                    <i class="la la-archive"></i>
+                    <span class="nav-text">Produk & Kategori</span>
+                </a>
+                <ul aria-expanded="false">
+                    @can('manage-kategori')
+                    <li><a href="{{ route('managekategoriindex') }}">Kategori Produk</a></li>
+                    @endcan
+                    @can('manage-produk')
+                    <li><a href="{{ route('manageprodukindex') }}">Manajemen Produk</a></li>
+                    @endcan
+                </ul>
+            </li>
+            @endcan
+
+            @can('manage-bahanbaku')
+            <li>
+                <a class="has-arrow" href="javascript:void(0)" aria-expanded="false">
+                    <i class="la la-cubes"></i>
+                    <span class="nav-text">Bahan Baku</span>
+                </a>
+                <ul aria-expanded="false">
+                    @can('manage-bahanbaku')
+                    <li><a href="{{ route('managebahanbakuindex') }}">Daftar Bahan Baku</a></li>
+                    @endcan
+                    @can('manage-relasibahanbaku')
+                    <li><a href="{{ route('managerelasibahanbakuindex') }}">Relasi Bahan Baku</a></li>
+                    @endcan
+                    @can('list-stokbahanbaku')
+                    <li><a href="{{ route('stokbahanbaku.index') }}">Stok Bahan Baku</a></li>
+                    @endcan
+                    @can('manage-transaksistokbahanbaku')
+                    <li><a href="{{ route('transaksibahanbaku.index') }}">Transaksi Bahan Baku</a></li>
+                    @endcan
+                </ul>
+            </li>
+            @endcan
+
+            @can('manage-pelanggan')
+            <li>
+                <a class="has-arrow" href="javascript:void(0)" aria-expanded="false">
+                    <i class="icon icon-users-mm"></i>
+                    <span class="nav-text">Pelanggan</span>
+                </a>
+                <ul aria-expanded="false">
+                    @can('manage-jenispelanggan')
+                    <li><a href="{{ route('jenispelanggan.index') }}">Jenis Pelanggan</a></li>
+                    @endcan
+                    @can('manage-pelanggan')
+                    <li><a href="{{ route('pelanggan.index') }}">Daftar Pelanggan</a></li>
+                    @endcan
+                </ul>
+            </li>
+            @endcan
+
+            @can('manage-cabang')
+            <li>
+                <a class="has-arrow" href="javascript:void(0)" aria-expanded="false">
+                    <i class="icon icon-home"></i>
+                    <span class="nav-text">Cabang & Supplier</span>
+                </a>
+                <ul aria-expanded="false">
+                    @can('manage-cabang')
+                    <li><a href="{{ route('cabangs.index') }}">Manajemen Cabang</a></li>
+                    @endcan
+                    @can('manage-supplier')
+                    <li><a href="{{ route('managesupplierindex') }}">Manajemen Supplier</a></li>
+                    @endcan
+                </ul>
+            </li>
+            @endcan
+
+            @can('manage-users')
+            <li>
+                <a class="has-arrow" href="javascript:void(0)" aria-expanded="false">
+                    <i class="la la-key"></i>
                     <span class="nav-text">User & Akses</span>
                 </a>
-                <ul>
+                <ul aria-expanded="false">
+                    @can('manage-users')
                     <li><a href="{{ route('users.index') }}">Manajemen User</a></li>
+                    @endcan
+                    @can('manage-roles')
                     <li><a href="{{ route('roles.index') }}">Hak Akses</a></li>
+                    @endcan
                     <li><a href="{{ route('designerindex') }}">Daftar Designer</a></li>
                     <li><a href="{{ route('operatorindex') }}">Daftar Operator</a></li>
                 </ul>
             </li>
-
-            <li>
-                <a class="has-arrow" href="javascript:void(0)">
-                    <i class="icon icon-home"></i>
-                    <span class="nav-text">Cabang & Supplier</span>
-                </a>
-                <ul>
-                    <li><a href="{{ route('cabangs.index') }}">Manajemen Cabang</a></li>
-                    <li><a href="{{ route('managesupplierindex') }}">Manajemen Supplier</a></li>
-                </ul>
-            </li>
-
-            <li>
-                <a class="has-arrow" href="javascript:void(0)">
-                    <i class="icon icon-bag"></i>
-                    <span class="nav-text">Produk & Kategori</span>
-                </a>
-                <ul>
-                    <li><a href="{{ route('managekategoriindex') }}">Kategori Produk</a></li>
-                    <li><a href="{{ route('manageprodukindex') }}">Manajemen Produk</a></li>
-                </ul>
-            </li>
-
-            <li>
-                <a class="has-arrow" href="javascript:void(0)">
-                    <i class="icon icon-layers"></i>
-                    <span class="nav-text">Bahan Baku</span>
-                </a>
-                <ul>
-                    <li><a href="{{ route('managebahanbakuindex') }}">Daftar Bahan Baku</a></li>
-                    <li><a href="{{ route('managerelasibahanbakuindex') }}">Relasi Bahan Baku</a></li>
-                    <li><a href="{{ route('stokbahanbaku.index') }}">Stok Bahan Baku</a></li>
-                    <li><a href="{{ route('transaksibahanbaku.index') }}">Transaksi Bahan Baku</a></li>
-                </ul>
-            </li>
-
-            <li>
-                <a class="has-arrow" href="javascript:void(0)">
-                    <i class="icon icon-credit-card"></i>
-                    <span class="nav-text">Transaksi</span>
-                </a>
-                <ul>
-                    <li><a href="{{ route('addtransaksiindex') }}">Tambah Transaksi</a></li>
-                    <li><a href="{{ route('transaksiindex') }}">Manajemen Penjualan</a></li>
-                </ul>
-            </li>
-
-            <li>
-                <a class="has-arrow" href="javascript:void(0)">
-                    <i class="icon icon-users-mm"></i>
-                    <span class="nav-text">Pelanggan</span>
-                </a>
-                <ul>
-                    <li><a href="{{ route('jenispelanggan.index') }}">Jenis Pelanggan</a></li>
-                    <li><a href="{{ route('pelanggan.index') }}">Daftar Pelanggan</a></li>
-                </ul>
-            </li>
-
-            {{-- ===================== CABANG & INVENTARIS ===================== --}}
-            <li class="nav-label mt-3">CABANG & INVENTARIS</li>
-
-            <li>
-                <a href="{{ route('inventaris.cabang.index') }}">
-                    <i class="icon icon-settings"></i>
-                    <span class="nav-text">Manajemen Cabang</span>
-                </a>
-            </li>
-
-            @php
-                // CABANG BENERAN (bukan gudang)
-                $cabangs = App\Models\Cabang::where('jenis', 'cabang')->get();
-            @endphp
-
-            @foreach($cabangs as $c)
-                <li>
-                    <a class="has-arrow" href="javascript:void(0)">
-                        <i class="icon icon-home"></i>
-                        <span class="nav-text">{{ $c->nama }}</span>
-                    </a>
-                    <ul>
-                        <li><a href="{{ url('cabang/'.$c->slug.'/barang') }}">Daftar Barang</a></li>
-                        <li><a href="{{ url('cabang/'.$c->slug.'/stok') }}">Stok Tersedia</a></li>
-                        <li><a href="{{ url('cabang/'.$c->slug.'/riwayat') }}">Riwayat Pengiriman</a></li>
-                        <li><a href="{{ url('cabang/'.$c->slug.'/inventaris') }}">Inventaris Kantor</a></li>
-                    </ul>
-                </li>
-            @endforeach
-
-            {{-- ===================== GUDANG PUSAT ===================== --}}
-            <li class="nav-label mt-4">GUDANG PUSAT</li>
-
-            <li>
-                <a class="has-arrow" href="javascript:void(0)">
-                    <i class="icon icon-folder"></i>
-                    <span class="nav-text">Gudang Pusat</span>
-                </a>
-                <ul>
-                    <li><a href="{{ route('gudangpusat.barang') }}">Daftar Barang</a></li>
-                    <li><a href="{{ route('gudangpusat.stok') }}">Stok Tersedia</a></li>
-                    <li><a href="{{ route('gudangpusat.pengiriman.index') }}">Pengiriman Barang</a></li>
-                </ul>
-            </li>
-
+            @endcan
         </ul>
     </div>
 </div>

@@ -23,7 +23,7 @@
                         </div>
                     </div>
                     <div class="profile-info text-center mt-3">
-                        <h4 class="text-primary">{{ Auth::user()->name ?? 'Nama Pengguna' }}</h4>
+                        <h4 class="text-primary">{{ Auth::user()->nama ?? 'Nama Pengguna' }}</h4>
                         <p class="text-muted">{{ Auth::user()->email ?? 'Email pengguna' }}</p>
                     </div>
                 </div>
@@ -44,14 +44,14 @@
                             </ul>
                             <div class="tab-content pt-3">
                                 <div id="about" class="tab-pane fade active show">
-                                    <h5>Nama: {{ Auth::user()->name ?? '-' }}</h5>
+                                    <h5>Nama: {{ Auth::user()->nama ?? '-' }}</h5>
                                     <h6>Email: {{ Auth::user()->email ?? '-' }}</h6>
                                 </div>
                                 <div id="settings" class="tab-pane fade">
                                     <form>
                                         <div class="form-group">
                                             <label>Nama</label>
-                                            <input type="text" class="form-control" value="{{ Auth::user()->name ?? '' }}">
+                                            <input type="text" class="form-control" value="{{ Auth::user()->nama ?? '' }}">
                                         </div>
                                         <div class="form-group">
                                             <label>Email</label>

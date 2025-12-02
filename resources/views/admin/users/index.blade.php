@@ -1,6 +1,31 @@
 @extends('layouts.app')
 
 @section('content')
+
+{{-- CSS BIAR TOMBOL EDIT-HAPUS TIDAK NUMPUK --}}
+<style>
+    /* Paksa kolom Aksi lebih lebar */
+    table th:last-child,
+    table td:last-child {
+        min-width: 130px;
+        white-space: nowrap;
+    }
+
+    /* Group tombol agar sejajar */
+    .aksi-group {
+        display: flex;
+        gap: 6px;
+        align-items: center;
+    }
+
+    /* Form delete jangan memanjang */
+    .aksi-group form {
+        margin: 0;
+        padding: 0;
+    }
+</style>
+
+
 <div class="container">
     <h3>Manajemen User</h3>
     <hr>
@@ -28,6 +53,7 @@
                 </select>
             </div>
         </div>
+
         <div class="row">
             <div class="col-md-3 mb-2">
                 <input type="text" name="telepon" class="form-control" placeholder="Telepon">
@@ -46,10 +72,11 @@
                 </select>
             </div>
         </div>
+
         <button class="btn btn-primary mt-2">Tambah User</button>
     </form>
 
-    <table class="table table-striped">
+    <table class="table table-bordered table-striped">
         <thead>
             <tr>
                 <th>Nama</th>
@@ -66,7 +93,7 @@
         <tbody>
             @foreach($users as $user)
             <tr>
-                <td>{{ $user->name }}</td>
+                <td>{{ $user->nama }}</td>
                 <td>{{ $user->username }}</td>
                 <td>{{ $user->email }}</td>
                 <td>{{ $user->getRoleNames()->implode(', ') }}</td>
@@ -74,16 +101,55 @@
                 <td>{{ $user->telepon ?? '-' }}</td>
                 <td>{{ $user->gaji ?? '-' }}</td>
                 <td>{{ $user->alamat ?? '-' }}</td>
+
+                {{-- A K S I --}}
                 <td>
-                    <a href="{{ route('users.edit', $user) }}" class="btn btn-warning btn-sm">Edit</a>
-                    <form method="POST" action="{{ route('users.destroy', $user) }}" class="d-inline">
-                        @csrf @method('DELETE')
-                        <button class="btn btn-danger btn-sm" onclick="return confirm('Yakin hapus user ini?')">Hapus</button>
-                    </form>
+                    <div class="aksi-group">
+                        <a href="{{ route('users.edit', $user) }}" class="btn btn-warning btn-sm">Edit</a>
+
+                        <form method="POST" action="{{ route('users.destroy', $user) }}" class="delete-form">
+                            @csrf @method('DELETE')
+                            <button type="button" class="btn btn-danger btn-sm btn-delete">Hapus</button>
+                        </form>
+                    </div>
                 </td>
             </tr>
             @endforeach
         </tbody>
     </table>
 </div>
+
+
+
+{{-- SWEETALERT DELETE --}}
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    const deleteButtons = document.querySelectorAll(".btn-delete");
+
+    deleteButtons.forEach(btn => {
+        btn.addEventListener("click", function () {
+            let form = this.closest("form");
+
+            Swal.fire({
+                title: "Yakin hapus user ini?",
+                text: "Data yang dihapus tidak dapat dikembalikan!",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#d33",
+                cancelButtonColor: "#6c757d",
+                confirmButtonText: "Ya, hapus!",
+                cancelButtonText: "Batal",
+                position: "center"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    form.submit();
+                }
+            });
+        });
+    });
+
+});
+</script>
+
 @endsection

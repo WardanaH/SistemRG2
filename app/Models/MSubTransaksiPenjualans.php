@@ -22,10 +22,12 @@ class MSubTransaksiPenjualans extends Model
         'satuan',
         'keterangan',
         'sub_totalpenjualan',
+        'status_sub_transaksi',
         'produk_id',
         'penjualan_id',
         'user_id',
         'cabang_id',
+        'no_spk'
     ];
 
     /**

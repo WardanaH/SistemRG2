@@ -8,6 +8,11 @@ use Spatie\Permission\Traits\HasRoles;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
+/**
+ * @method bool hasRole(string|array $roles)
+ * @method bool hasPermissionTo(string $permission)
+ * @method \Spatie\Permission\Models\Role[] getRoleNames()
+ */
 class User extends Authenticatable
 {
     use HasFactory, Notifiable, HasRoles, SoftDeletes;
@@ -39,6 +44,12 @@ class User extends Authenticatable
     {
         return $this->belongsTo(Cabang::class, 'cabang_id')->withTrashed();
     }
+
+    public function transaksi_desain()
+    {
+        return $this->hasMany(MTransaksiPenjualans::class, 'designer_id');
+    }
+
 
     // public function roles()
     // {
