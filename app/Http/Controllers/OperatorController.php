@@ -23,15 +23,32 @@ class OperatorController extends Controller
 
     public function dashboard()
     {
-        $selesai = MSubTransaksiPenjualans::where('status_sub_transaksi', 'selesai')->count();
-        $belum_selesai = MSubTransaksiPenjualans::where('status_sub_transaksi', '<>', 'selesai')->count();
+        $user = auth()->user();
+        $cabangId = $user->cabang->id;
+        $role = $user->roles->first()->name ?? null;
+        // dd($role);
 
+        $kategoriFilter = $this->getKategoriFilter($role);
 
-        return view(
-            'operator.dashboard',
-            compact('selesai', 'belum_selesai')
-        );
+        // Query dasar
+        $query = MSubTransaksiPenjualans::with('produk.kategori')
+            ->whereHas('penjualan', fn($q) => $q->where('cabang_id', $cabangId));
+
+        // Filter kategori jika bukan operator multi
+        if ($kategoriFilter) {
+            $query->whereHas(
+                'produk.kategori',
+                fn($q) =>
+                $q->where('nama_kategori', $kategoriFilter)
+            );
+        }
+
+        $selesai = (clone $query)->where('status_sub_transaksi', 'selesai')->count();
+        $belum_selesai = (clone $query)->where('status_sub_transaksi', '!=', 'selesai')->count();
+
+        return view('operator.dashboard', compact('selesai', 'belum_selesai'));
     }
+
     public function profile()
     {
         return view('operator.dashboard');
@@ -39,21 +56,25 @@ class OperatorController extends Controller
 
     public function pesanan()
     {
-        $cabangId = auth()->user()->cabang->id;
+        $user = auth()->user();
+        $cabangId = $user->cabang->id;
+        $role = $user->roles->first()->name ?? null;
 
-        $subTransaksiData = MSubTransaksiPenjualans::with('produk')
-            ->whereHas('penjualan', function ($query) use ($cabangId) {
-                $query->where('cabang_id', $cabangId);
+        $kategoriFilter = $this->getKategoriFilter($role);
+
+        $subTransaksiData = MSubTransaksiPenjualans::with('produk.kategori')
+            ->whereHas('penjualan', fn($q) => $q->where('cabang_id', $cabangId))
+            ->when($kategoriFilter, function ($query) use ($kategoriFilter) {
+                $query->whereHas(
+                    'produk.kategori',
+                    fn($q) =>
+                    $q->where('nama_kategori', $kategoriFilter)
+                );
             })
             ->where('status_sub_transaksi', '!=', 'selesai')
             ->get();
 
-        // dd($subTransaksiData);
-
-        return view(
-            'operator.status_pesanan',
-            compact('subTransaksiData')
-        );
+        return view('operator.status_pesanan', compact('subTransaksiData'));
     }
 
     public function updateStatus(Request $request, $id)
@@ -70,20 +91,37 @@ class OperatorController extends Controller
 
     public function riwayat()
     {
-        $cabangId = auth()->user()->cabang->id;
+        $user = auth()->user();
+        $cabangId = $user->cabang->id;
+        $role = $user->roles->first()->name ?? null;
 
-        $subTransaksiData = MSubTransaksiPenjualans::with('produk')
-            ->whereHas('penjualan', function ($query) use ($cabangId) {
-                $query->where('cabang_id', $cabangId);
+        $kategoriFilter = $this->getKategoriFilter($role);
+
+        $subTransaksiData = MSubTransaksiPenjualans::with('produk.kategori')
+            ->whereHas('penjualan', fn($q) => $q->where('cabang_id', $cabangId))
+            ->when($kategoriFilter, function ($query) use ($kategoriFilter) {
+                $query->whereHas(
+                    'produk.kategori',
+                    fn($q) =>
+                    $q->where('nama_kategori', $kategoriFilter)
+                );
             })
             ->where('status_sub_transaksi', 'selesai')
             ->get();
 
-        return view(
-            'operator.riwayat_pesanan',
-            compact('subTransaksiData')
-        );
+        return view('operator.riwayat_pesanan', compact('subTransaksiData'));
     }
+
+    private function getKategoriFilter($role)
+    {
+        return match ($role) {
+            'operator indoor' => 'Indoor',
+            'operator outdoor' => 'Outdoor',
+            'operator multi' => null,
+            default => null,
+        };
+    }
+
 
     /**
      * Show the form for creating a new resource.

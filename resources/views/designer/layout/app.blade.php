@@ -223,8 +223,8 @@
 
     <div id="main-wrapper">
         @auth
-            @include('operator.layout.header')
-            @include('operator.layout.sidebar')
+            @include('designer.layout.header')
+            @include('designer.layout.sidebar')
         @endauth
 
         <div class="content-body">
