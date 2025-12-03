@@ -1,6 +1,7 @@
 <?php
 
 use GuzzleHttp\Middleware;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ProdukController;
@@ -15,16 +16,29 @@ use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\PelanggansController;
 use App\Http\Controllers\Admin\CabangController;
+use App\Http\Controllers\CabangDinamisController;
 use App\Http\Controllers\StokBahanBakusController;
 use App\Http\Controllers\JenisPelanggansController;
 use App\Http\Controllers\RelasiBahanBakuController;
+use App\Http\Controllers\InventarisKantorController;
+use App\Http\Controllers\PengirimanGudangController;
 use App\Http\Controllers\TransaksiBahanBakusController;
 use App\Http\Controllers\TransaksiPenjualansController;
-use App\Http\Controllers\InventarisKantorController;
-use App\Http\Controllers\CabangDinamisController;
-use App\Http\Controllers\PengirimanGudangController;
 
 require __DIR__ . '/operator.php';
+require __DIR__ . '/designer.php';
+
+Route::get('/', function () {
+    $user = auth()->user();
+
+    if ($user->hasRole('designer')) {
+        return redirect()->route('designer.dashboard');
+    } elseif ($user->hasAnyRole(['operator indoor', 'operator outdoor', 'operator multi'])) {
+        return redirect()->route('operator.dashboard');
+    } else {
+        return redirect()->route('dashboard');
+    }
+})->middleware('auth');
 
 // Guest (belum login)
 Route::middleware('guest')->group(function () {
