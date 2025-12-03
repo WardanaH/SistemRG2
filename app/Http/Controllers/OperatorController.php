@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\MSubTransaksiPenjualans;
+use App\Models\MTransaksiPenjualans;
 use App\Models\User;
 use Illuminate\Http\Request;
 
@@ -26,6 +28,54 @@ class OperatorController extends Controller
     public function profile()
     {
         return view('operator.dashboard');
+    }
+
+    public function pesanan()
+    {
+        $cabangId = auth()->user()->cabang->id;
+
+        $subTransaksiData = MSubTransaksiPenjualans::with('produk')
+            ->whereHas('penjualan', function ($query) use ($cabangId) {
+                $query->where('cabang_id', $cabangId);
+            })
+            ->where('status_sub_transaksi', '!=', 'selesai')
+            ->get();
+
+        // dd($subTransaksiData);
+
+        return view(
+            'operator.status_pesanan',
+            compact('subTransaksiData')
+        );
+    }
+
+    public function updateStatus(Request $request, $id)
+    {
+        $sub = MSubTransaksiPenjualans::findOrFail($id);
+        // dd($sub);
+
+        $sub->update([
+            'status_sub_transaksi' => $request->status_sub_transaksi
+        ]);
+
+        return redirect()->route('operator.pesanan')->with('success', 'Status berhasil diperbarui');
+    }
+
+    public function riwayat()
+    {
+        $cabangId = auth()->user()->cabang->id;
+
+        $subTransaksiData = MSubTransaksiPenjualans::with('produk')
+            ->whereHas('penjualan', function ($query) use ($cabangId) {
+                $query->where('cabang_id', $cabangId);
+            })
+            ->where('status_sub_transaksi', 'selesai')
+            ->get();
+
+        return view(
+            'operator.riwayat_pesanan',
+            compact('subTransaksiData')
+        );
     }
 
     /**

@@ -15,12 +15,8 @@
 
             <li class="nav-label">PANEL OPERATOR</li>
 
-            <ul>
-                <a href="{{ route('operator.pesanan') }}">Status Item Pesanan</a>
-            </ul>
-            <ul>
-                <a href="{{ route('operator.riwayat') }}">Riwayat Pesanan</a>
-            </ul>
+            <li>
+                <a href="#">Status Item Pesanan</a>
             </li>
             <!-- <li class="nav-label">SYSTEM</li>
             <li>
