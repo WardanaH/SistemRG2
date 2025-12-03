@@ -10,19 +10,16 @@
         <div class="card-body">
 
             {{-- FILTER --}}
-            <div class="row mb-3">
+            <div class="row mb-3 g-2 align-items-end">
 
-                {{-- No Nota --}}
                 <div class="col-md-2">
                     <input id="filter_nota" class="form-control" placeholder="No Nota">
                 </div>
 
-                {{-- Nama --}}
                 <div class="col-md-2">
                     <input id="filter_nama" class="form-control" placeholder="Nama Pelanggan">
                 </div>
 
-                {{-- Pembayaran --}}
                 <div class="col-md-2">
                     <select id="filter_bayar" class="form-select">
                         <option value="semua">Semua Pembayaran</option>
@@ -31,7 +28,6 @@
                     </select>
                 </div>
 
-                {{-- Cabang (Tampil hanya untuk owner / direktur) --}}
                 @if(Auth::user()->hasRole(['owner','direktur']))
                 <div class="col-md-2">
                     <select id="filter_cabang" class="form-select">
@@ -43,11 +39,13 @@
                 </div>
                 @endif
 
+                {{-- tombol filter --}}
                 <div class="col-md-2">
                     <button id="btnFilter" class="btn btn-success w-100">Filter</button>
                 </div>
 
             </div>
+
 
             {{-- DATATABLE --}}
             <div style="overflow-x:auto;">
@@ -155,6 +153,7 @@
                 processing: true,
                 serverSide: true,
                 destroy: true,
+                searching: false,
                 ajax: {
                     url: "{{ route('angsuran.data') }}",
                     data: {
@@ -405,4 +404,10 @@
     //     return "Rp " + angka.toLocaleString('id-ID');
     // }
 </script>
+<style>
+    #filter_cabang {
+        max-width: 100%;
+    }
+</style>
+
 @endpush
