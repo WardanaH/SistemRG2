@@ -11,6 +11,7 @@ return new class extends Migration {
             $table->id();
             $table->string('kode')->unique();
             $table->string('nama');
+            $table->string('slug')->unique();
             $table->string('email')->nullable();
             $table->string('telepon')->nullable();
             $table->text('alamat')->nullable();

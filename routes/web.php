@@ -1,5 +1,7 @@
 <?php
 
+use GuzzleHttp\Middleware;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ProdukController;
@@ -7,20 +9,36 @@ use App\Http\Controllers\DesignerController;
 use App\Http\Controllers\KategoriController;
 use App\Http\Controllers\OperatorController;
 use App\Http\Controllers\SupplierController;
+use App\Http\Controllers\AngsuransController;
 use App\Http\Controllers\BahanBakuController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\PelanggansController;
 use App\Http\Controllers\Admin\CabangController;
+use App\Http\Controllers\CabangDinamisController;
 use App\Http\Controllers\StokBahanBakusController;
 use App\Http\Controllers\JenisPelanggansController;
 use App\Http\Controllers\RelasiBahanBakuController;
+use App\Http\Controllers\InventarisKantorController;
+use App\Http\Controllers\PengirimanGudangController;
 use App\Http\Controllers\TransaksiBahanBakusController;
 use App\Http\Controllers\TransaksiPenjualansController;
-use GuzzleHttp\Middleware;
 
-require __DIR__.'/operator.php';
+require __DIR__ . '/operator.php';
+require __DIR__ . '/designer.php';
+
+Route::get('/', function () {
+    $user = auth()->user();
+
+    if ($user->hasRole('designer')) {
+        return redirect()->route('designer.dashboard');
+    } elseif ($user->hasAnyRole(['operator indoor', 'operator outdoor', 'operator multi'])) {
+        return redirect()->route('operator.dashboard');
+    } else {
+        return redirect()->route('dashboard');
+    }
+})->middleware('auth');
 
 // Guest (belum login)
 Route::middleware('guest')->group(function () {
@@ -33,8 +51,16 @@ Route::middleware('auth')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
     Route::get('/dashboard-rg', [DashboardController::class, 'index'])->middleware('permission:index-home')->name('dashboard');
-
 });
+
+// test permission, ganti aja di bagian can() nya itu kalo mau cek permission setiap role, tapi harus login dulu
+// Route::middleware('auth')->get('/cek-permission', function () {
+//     $user = auth()->user();
+//     return [
+//         'roles' => $user->getRoleNames(),
+//         'has_edit_users' => $user->can('edit-users'),
+//     ];
+// });
 
 // Manajemen Users
 Route::middleware(['auth'])->group(function () {
@@ -141,7 +167,7 @@ Route::middleware(['auth'])->group(function () {
 
 // Stok Bahan Baku
 Route::middleware(['auth'])->group(function () {
-    Route::get('/stokbahanbaku', [StokBahanBakusController::class, 'index'])->middleware('permission:manage-stokbahanbaku')->name('stokbahanbaku.index');
+    Route::get('/stokbahanbaku', [StokBahanBakusController::class, 'index'])->middleware('permission:list-stokbahanbaku')->name('stokbahanbaku.index');
     Route::get('/stokbahanbaku/create', [StokBahanBakusController::class, 'create'])->middleware('permission:add-stokbahanbaku')->name('stokbahanbaku.create');
     Route::post('/stokbahanbaku', [StokBahanBakusController::class, 'store'])->middleware('permission:add-stokbahanbaku')->name('stokbahanbaku.store');
     Route::get('/stokbahanbaku/{id}/edit', [StokBahanBakusController::class, 'edit'])->middleware('permission:edit-stokbahanbaku')->name('stokbahanbaku.edit');
@@ -164,7 +190,7 @@ Route::middleware(['auth',])->group(function () {
 // Transaksi Penjualan
 Route::middleware(['auth'])->group(function () {
     Route::get('/transaksi', [TransaksiPenjualansController::class, 'index'])->middleware('permission:manage-transaksipenjualan')->name('transaksiindex');
-    Route::get('/transaksideleted', [TransaksiPenjualansController::class, 'indexdeleted'])->middleware('permission:manage-transaksipenjualan')->name('transaksiindexdeleted');
+    Route::get('/transaksideleted', [TransaksiPenjualansController::class, 'indexdeleted'])->middleware('permission:deleted-transaksipenjualan')->name('transaksiindexdeleted');
     Route::get('/transaksi/penjualan', [TransaksiPenjualansController::class, 'transaksi'])->middleware('permission:deleted-transaksipenjualan')->name('addtransaksiindex');
     Route::get('/transaksi/penjualan/load', [TransaksiPenjualansController::class, 'load'])->middleware('permission:manage-transaksipenjualan')->name('loadtransaksipenjualan');
     Route::post('/transaksi/penjualan/store', [TransaksiPenjualansController::class, 'store'])->middleware('permission:add-transaksipenjualan')->name('storetransaksipenjualan');
@@ -190,4 +216,125 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/operator/store', [OperatorController::class, 'store'])->name('storeoperator');
     Route::post('/operator/update', [OperatorController::class, 'update'])->name('updateoperator');
     Route::delete('/operator/delete', [OperatorController::class, 'destroy'])->name('destroyoperator');
+});
+
+// ===================== CABANG & INVENTARIS (DINAMIS) =====================
+Route::middleware(['auth'])->group(function () {
+
+    // Store inventaris global
+    Route::post('/inventaris/store', [InventarisKantorController::class, 'store'])
+        ->name('inventaris.global.store');
+
+    // ====================== MANAJEMEN CABANG INVENTARIS ======================
+    Route::get('/inventaris/cabang', [CabangDinamisController::class, 'manageCabang'])
+        ->name('inventaris.cabang.index');
+
+    Route::post('/inventaris/cabang/store', [CabangDinamisController::class, 'manageCabangStore'])
+        ->name('inventaris.cabang.store');
+
+    Route::put('/inventaris/cabang/update/{id}', [CabangDinamisController::class, 'manageCabangUpdate'])
+        ->name('inventaris.cabang.update');
+
+    Route::delete('/inventaris/cabang/delete/{id}', [CabangDinamisController::class, 'manageCabangDelete'])
+        ->name('inventaris.cabang.delete');
+
+    // ================== CABANG {slug} ==================
+    Route::prefix('cabang/{slug}')->name('cabang.')->group(function () {
+
+        // Barang
+        Route::get('/barang', [CabangDinamisController::class, 'barang'])->name('barang');
+        Route::post('/barang/store', [CabangDinamisController::class, 'barangStore'])->name('barang.store');
+        Route::put('/barang/update/{id}', [CabangDinamisController::class, 'barangUpdate'])->name('barang.update');
+        Route::delete('/barang/delete/{id}', [CabangDinamisController::class, 'barangDestroy'])->name('barang.destroy');
+
+        // Stok
+        Route::get('/stok', [CabangDinamisController::class, 'stok'])->name('stok');
+        Route::post('/stok/store', [CabangDinamisController::class, 'stokStore'])->name('stok.store');
+        Route::put('/stok/update/{id}', [CabangDinamisController::class, 'stokUpdate'])->name('stok.update');
+        Route::delete('/stok/delete/{id}', [CabangDinamisController::class, 'stokDestroy'])->name('stok.destroy');
+
+        // Inventaris
+        Route::get('/inventaris', [CabangDinamisController::class, 'inventaris'])->name('inventaris');
+        Route::post('/inventaris/store', [CabangDinamisController::class, 'inventarisStore'])->name('inventaris.store');
+        Route::put('/inventaris/update/{id}', [CabangDinamisController::class, 'inventarisUpdate'])->name('inventaris.update');
+        Route::delete('/inventaris/delete/{id}', [CabangDinamisController::class, 'inventarisDestroy'])->name('inventaris.destroy');
+
+        // Riwayat pengiriman
+        Route::get('/riwayat', [CabangDinamisController::class, 'riwayat'])->name('riwayat');
+        Route::put('/riwayat/terima/{id}', [CabangDinamisController::class, 'riwayatTerima'])->name('riwayat.terima');
+    });
+
+
+    // ===================== GUDANG PUSAT =====================
+    //barang
+    Route::get('/gudangpusat/barang', [PengirimanGudangController::class, 'barang'])
+        ->name('gudangpusat.barang');
+
+    Route::post('/gudangpusat/barang/store', [PengirimanGudangController::class, 'storeBarang'])
+        ->name('gudangpusat.barang.store');
+
+    Route::put('/gudangpusat/barang/update/{id}', [PengirimanGudangController::class, 'updateBarang'])
+        ->name('gudangpusat.barang.update');
+
+    Route::delete('/gudangpusat/barang/delete/{id}', [PengirimanGudangController::class, 'destroyBarang'])
+        ->name('gudangpusat.barang.destroy');
+
+    // stok
+    Route::get('/gudangpusat/stok', [PengirimanGudangController::class, 'stok'])
+        ->name('gudangpusat.stok');
+
+    Route::post('/gudangpusat/stok/tambah', [PengirimanGudangController::class, 'tambahStok'])
+        ->name('gudangpusat.stok.tambah');
+
+    Route::put('/gudangpusat/stok/update/{id}', [PengirimanGudangController::class, 'updateStok'])
+        ->name('gudangpusat.stok.update');
+
+    Route::delete('/gudangpusat/stok/delete/{id}', [PengirimanGudangController::class, 'deleteStok'])
+        ->name('gudangpusat.stok.delete');
+
+    // Pengiriman
+    Route::get('/gudangpusat/pengiriman', [PengirimanGudangController::class, 'index'])
+        ->name('gudangpusat.pengiriman.index');
+
+    Route::post('/gudangpusat/pengiriman/store', [PengirimanGudangController::class, 'store'])
+        ->name('gudangpusat.pengiriman.store');
+
+    Route::put('/gudangpusat/pengiriman/update-status/{id}', [PengirimanGudangController::class, 'updateStatus'])
+        ->name('gudangpusat.pengiriman.updateStatus');
+
+    Route::delete('/gudangpusat/pengiriman/delete/{id}', [PengirimanGudangController::class, 'destroy'])
+        ->name('gudangpusat.pengiriman.destroy');
+});
+
+// Manajemen Angsuran Penjualan
+Route::middleware(['auth'])->group(function () {
+
+    // Halaman utama
+    Route::get('/angsuran-penjualan', [AngsuransController::class, 'index'])
+        ->middleware('permission:manage-angsuranpenjualan')
+        ->name('angsuran.index');
+
+    // Load datatable AJAX
+    Route::get('/angsuran-penjualan/data', [AngsuransController::class, 'data'])
+        ->middleware('permission:manage-angsuranpenjualan')
+        ->name('angsuran.data');
+
+    // Tambah angsuran
+    Route::post('/angsuran-penjualan/bayar/{id}', [AngsuransController::class, 'bayar'])
+        ->middleware('permission:add-angsuranpenjualan')
+        ->name('angsuran.bayar');
+
+    // Hapus angsuran
+    Route::delete('/angsuran-penjualan/{id}/hapus', [AngsuransController::class, 'hapus'])
+        ->middleware('permission:delete-angsuranpenjualan')
+        ->name('angsuran.hapus');
+
+    // Detail satu transaksi
+    Route::get('/angsuran-penjualan/detail/{id}', [AngsuransController::class, 'detail'])
+        ->middleware('permission:manage-angsuranpenjualan')
+        ->name('angsuran.detail');
+
+    Route::get('/angsuran-penjualan/show-detail', [AngsuransController::class, 'showDetailAngsuran'])
+        ->middleware('permission:manage-angsuranpenjualan')
+        ->name('angsuran.showdetail');
 });

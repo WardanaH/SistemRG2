@@ -38,7 +38,8 @@ class TransaksiPenjualansController extends Controller
     {
         DB::beginTransaction();
         try {
-            // ================== VALIDASI DASAR ==================
+
+            // VALIDASI DASAR
             $request->validate([
                 'inputtanggal' => 'required|date',
                 'inputtotal' => 'required',
@@ -46,9 +47,8 @@ class TransaksiPenjualansController extends Controller
                 'items' => 'required|array|min:1',
                 'items.*.produk_id' => 'required|integer',
             ]);
-            // dd($request->all());
 
-            // ================== SIMPAN DATA TRANSAKSI ==================
+            // SIMPAN TRANSAKSI
             $transaksi = new MTransaksiPenjualans();
             $transaksi->nomor_nota = $request->nonota ?? 'TRX-' . now()->timestamp;
             $transaksi->tanggal = $request->inputtanggal;
@@ -65,60 +65,79 @@ class TransaksiPenjualansController extends Controller
             $transaksi->cabang_id = Auth::user()->cabang->id ?? null;
             $transaksi->designer_id = $request->inputdesigner;
             $transaksi->save();
-            // dd($transaksi);
 
-            // ================== SIMPAN DETAIL ITEM ==================
+            // SIMPAN DETAIL ITEM
             foreach ($request->items as $item) {
+
+                $produk = MProduks::find($item['produk_id']);     // <= WAJIB
+                $hitungLuas = $produk->hitung_luas;               // <= WAJIB
+
                 $sub = new MSubTransaksiPenjualans();
                 $sub->penjualan_id = $transaksi->id;
                 $sub->produk_id = $item['produk_id'];
                 $sub->harga_satuan = $item['harga'] ?? 0;
-                $sub->panjang = $item['panjang'] ?? 0;
-                $sub->lebar = $item['lebar'] ?? 0;
-                $sub->banyak = $item['kuantitas'] ?? 1;
                 $sub->finishing = $item['finishing'] ?? 'Tanpa Finishing';
                 $sub->diskon = $item['diskon'] ?? 0;
-                $sub->subtotal = $item['subtotal'] ?? 0;
                 $sub->no_spk = $item['no_spk'] ?? '-';
                 $sub->keterangan = $item['keterangan'] ?? '-';
-                $sub->satuan = 'PCS'; // default, bisa diubah sesuai kebutuhan
+                $sub->satuan = 'PCS';
                 $sub->user_id = Auth::id();
+
+                // ===== LOGIKA BARU =====
+                if ($hitungLuas == 1) {
+                    // Produk menggunakan panjang × lebar
+                    $sub->panjang = $item['panjang'] ?? 0;
+                    $sub->lebar = $item['lebar'] ?? 0;
+                    $sub->banyak = $item['kuantitas'];
+
+                    $sub->subtotal =
+                        $item['harga'] *
+                        ($item['panjang'] * $item['lebar']) *
+                        $item['kuantitas'];
+                } else {
+                    // Produk tidak menggunakan luas
+                    $sub->panjang = 0;
+                    $sub->lebar = 0;
+                    $sub->banyak = $item['kuantitas'];
+
+                    $sub->subtotal = $item['harga'] * $item['kuantitas'];
+                }
+
                 $sub->save();
 
-                // ================== UPDATE STOK BAHAN BAKU ==================
+                // ================= UPDATE STOK BAHAN =================
                 $relasiBahan = MRelasiBahanBaku::where('produk_id', $item['produk_id'])->get();
 
                 foreach ($relasiBahan as $rel) {
+
+                    $bahan = MBahanBakus::find($rel->bahanbaku_id);
+
                     $stok = MStokBahanBakus::firstOrNew([
                         'bahanbaku_id' => $rel->bahanbaku_id,
                         'cabang_id' => Auth::user()->cabangs->id,
                     ]);
 
-                    $bahan = MBahanBakus::find($rel->bahanbaku_id);
                     $stok->satuan = $bahan->satuan;
                     $stok->stokhitungluas = $bahan->hitung_luas;
 
-                    // hitung pengurangan stok
-                    $luas = $this->hitungLuas(
-                        $item['panjang'],
-                        $item['lebar'],
-                        $item['kuantitas'],
-                        $bahan->satuan ?? 'PCS',
-                        'PCS' // bisa ubah sesuai satuan item
-                    );
+                    // ====== PENGURANGAN STOK BENAR ======
+                    if ($hitungLuas == 1) {
+                        $luas = $this->hitungLuas(
+                            $item['panjang'],
+                            $item['lebar'],
+                            $item['kuantitas'],
+                            $bahan->satuan,
+                            'PCS'
+                        );
+                    } else {
+                        $luas = $item['kuantitas']; // cuma QTY, tanpa luas
+                    }
 
                     $stok->banyakstok = ($stok->banyakstok ?? 0) - ($luas * $rel->qtypertrx);
                     $stok->save();
                 }
             }
 
-            // ================== LOG AKTIVITAS ==================
-            // $this->createlog(
-            //     Auth::user()->username . " menambah transaksi penjualan #{$transaksi->no_nota} di cabang " . Auth::user()->cabangs->Nama_Cabang,
-            //     "add"
-            // );
-
-            Log::info('Sebelum commit', ['transaksi_id' => $transaksi->id]);
             DB::commit();
             return response()->json([
                 'status' => 'success',
@@ -126,11 +145,12 @@ class TransaksiPenjualansController extends Controller
                 'id' => encrypt($transaksi->id),
             ]);
         } catch (\Exception $e) {
-            Log::error('Gagal transaksi', ['error' => $e->getMessage()]);
             DB::rollBack();
+            Log::error('Gagal transaksi', ['error' => $e->getMessage()]);
             return back()->with('error', 'Gagal menyimpan transaksi: ' . $e->getMessage());
         }
     }
+
 
     private function hitungLuas($panjang, $lebar, $qty, $satuanBahan, $satuanItem)
     {
@@ -149,31 +169,69 @@ class TransaksiPenjualansController extends Controller
 
     public function index(Request $request)
     {
-        $query = MTransaksiPenjualans::with(['user', 'cabang', 'designer'])
-            ->when($request->no, fn($q) => $q->where('nomor_nota', 'like', "%{$request->no}%"))
-            ->when($request->tanggal, fn($q) => $q->whereDate('tanggal', $request->tanggal))
-            ->when($request->cabang, fn($q) => $q->where('cabang_id', $request->cabang))
-            ->orderBy('created_at', 'desc');
+        $user = Auth::user();
 
-        $datas = $query->paginate(10);
-        // dd($datas);
+        $query = MTransaksiPenjualans::with(['user', 'cabang', 'designer']);
+
+        // 🔹 Jika bukan owner / direktur → hanya cabangnya sendiri
+        if (!$user->hasRole(['owner', 'direktur'])) {
+            $query->where('cabang_id', $user->cabang_id);
+        }
+
+        // 🔹 Filter jika user memilih manual dari dropdown
+        if ($request->cabang && $request->cabang !== 'semua') {
+            $query->where('cabang_id', $request->cabang);
+        }
+
+        // 🔹 Filter lain
+        $query->when(
+            $request->no,
+            fn($q) =>
+            $q->where('nomor_nota', 'like', "%{$request->no}%")
+        );
+        $query->when(
+            $request->tanggal,
+            fn($q) =>
+            $q->whereDate('tanggal', $request->tanggal)
+        );
+
+        $datas = $query->orderBy('created_at', 'desc')->paginate(10);
 
         $cabangs = Cabang::all();
 
         return view('admin.transaksis.list', compact('datas', 'cabangs'));
     }
 
+
     public function indexdeleted(Request $request)
     {
-        $query = MTransaksiPenjualans::onlyTrashed()
-            ->with(['user', 'cabang', 'designer'])
-            ->when($request->no, fn($q) => $q->where('nomor_nota', 'like', "%{$request->no}%"))
-            ->when($request->tanggal, fn($q) => $q->whereDate('tanggal', $request->tanggal))
-            ->when($request->cabang, fn($q) => $q->where('cabang_id', $request->cabang))
-            ->orderBy('created_at', 'desc');
+        $user = Auth::user();
 
-        $datas = $query->paginate(10);
-        // dd($datas);
+        $query = MTransaksiPenjualans::onlyTrashed(['user', 'cabang', 'designer']);
+
+        // 🔹 Jika bukan owner / direktur → hanya cabangnya sendiri
+        if (!$user->hasRole(['owner', 'direktur'])) {
+            $query->where('cabang_id', $user->cabang_id);
+        }
+
+        // 🔹 Filter jika user memilih manual dari dropdown
+        if ($request->cabang && $request->cabang !== 'semua') {
+            $query->where('cabang_id', $request->cabang);
+        }
+
+        // 🔹 Filter lain
+        $query->when(
+            $request->no,
+            fn($q) =>
+            $q->where('nomor_nota', 'like', "%{$request->no}%")
+        );
+        $query->when(
+            $request->tanggal,
+            fn($q) =>
+            $q->whereDate('tanggal', $request->tanggal)
+        );
+
+        $datas = $query->orderBy('created_at', 'desc')->paginate(10);
 
         $cabangs = Cabang::all();
 

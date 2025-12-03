@@ -28,7 +28,7 @@ class AuthController extends Controller
             if ($user->hasRole('operator indoor') || $user->hasRole('operator outdoor') || $user->hasRole('operator multi')) {
                 return redirect()->route('operator.dashboard')->with('success', 'Selamat datang kembali!');
             } elseif ($user->hasRole('designer')) {
-                return redirect()->route('designer.index')->with('success', 'Selamat datang kembali!');
+                return redirect()->route('designer.dashboard')->with('success', 'Selamat datang kembali!');
             } elseif ($user->hasRole('inventaris')) {
                 return redirect()->route('inventaris.dashboard')->with('success', 'Selamat datang kembali!');
             } elseif ($user->hasRole('adversting')) {
