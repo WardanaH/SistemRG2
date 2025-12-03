@@ -157,6 +157,7 @@
 @push('scripts')
 <script>
     document.addEventListener('click', async function(e) {
+
         const btn = e.target.closest('.btn-detail');
         if (!btn) return;
 
@@ -183,74 +184,74 @@
             const deleted = data.deleted || [];
 
             let html = `
-        <tr class="detail-row">
-            <td colspan="${colCount}" class="p-0">
-                <table class="table table-sm mb-0 table-bordered bg-light">
-                    <thead class="table-success text-center">
-                        <tr><th colspan="9">Produk Dibeli</th></tr>
-                        <tr>
-                            <th>Nama Barang</th>
-                            <th>Harga Satuan</th>
-                            <th>P</th>
-                            <th>L</th>
-                            <th>Kuantitas</th>
-                            <th>Finishing</th>
-                            <th>Keterangan</th>
-                            <th>Diskon (%)</th>
-                            <th>Subtotal</th>
-                        </tr>
-                    </thead>
-                    <tbody>`;
+                        <tr class="detail-row">
+                            <td colspan="${colCount}" class="p-0">
+                                <table class="table table-sm mb-0 table-bordered bg-light">
+                                    <thead class="table-success text-center">
+                                        <tr><th colspan="9">Produk Dibeli</th></tr>
+                                        <tr>
+                                            <th>Nama Barang</th>
+                                            <th>Harga Satuan</th>
+                                            <th>P</th>
+                                            <th>L</th>
+                                            <th>Kuantitas</th>
+                                            <th>Finishing</th>
+                                            <th>Keterangan</th>
+                                            <th>Diskon (%)</th>
+                                            <th>Subtotal</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>`;
 
             if (current.length === 0) {
                 html += `<tr><td colspan="9" class="text-center text-muted">Tidak ada data produk</td></tr>`;
             } else {
                 current.forEach(item => {
                     html += `
-                <tr>
-                    <td>${item.produk?.nama_produk || '-'}</td>
-                    <td>Rp ${parseFloat(item.harga_satuan).toLocaleString('id-ID')}</td>
-                    <td>${item.panjang}</td>
-                    <td>${item.lebar}</td>
-                    <td>${item.banyak}</td>
-                    <td>${item.finishing || '-'}</td>
-                    <td>${item.keterangan || '-'}</td>
-                    <td>${item.diskon}%</td>
-                    <td>Rp ${parseFloat(item.subtotal).toLocaleString('id-ID')}</td>
-                </tr>`;
+                                        <tr>
+                                            <td>${item.produk?.nama_produk || '-'}</td>
+                                            <td>Rp ${parseFloat(item.harga_satuan).toLocaleString('id-ID')}</td>
+                                            <td>${item.panjang}</td>
+                                            <td>${item.lebar}</td>
+                                            <td>${item.banyak}</td>
+                                            <td>${item.finishing || '-'}</td>
+                                            <td>${item.keterangan || '-'}</td>
+                                            <td>${item.diskon}%</td>
+                                            <td>Rp ${parseFloat(item.subtotal).toLocaleString('id-ID')}</td>
+                                        </tr>`;
                 });
             }
 
             html += `
-            <tr>
-                <th colspan="8" class="text-end">Total:</th>
-                <th class="text-end">${total}</th>
-            </tr>
-        </tbody>
-        `;
+                        <tr>
+                            <th colspan="8" class="text-end">Total:</th>
+                            <th class="text-end">${total}</th>
+                        </tr>
+                    </tbody>
+                    `;
 
             // Jika ada data deleted
             if (deleted.length > 0) {
                 html += `
-                <thead class="table-danger text-center">
-                    <tr><th colspan="9">Produk Sebelumnya (Terhapus)</th></tr>
-                </thead>
-                <tbody>
-            `;
+                            <thead class="table-danger text-center">
+                                <tr><th colspan="9">Produk Sebelumnya (Terhapus)</th></tr>
+                            </thead>
+                            <tbody>
+                        `;
 
                 deleted.forEach(item => {
                     html += `
-                <tr>
-                    <td>${item.nama_produk || '-'}</td>
-                    <td>Rp ${parseFloat(item.harga_satuan).toLocaleString('id-ID')}</td>
-                    <td>${item.panjang}</td>
-                    <td>${item.lebar}</td>
-                    <td>${item.banyak}</td>
-                    <td>${item.finishing || '-'}</td>
-                    <td>${item.keterangan || '-'}</td>
-                    <td>${item.diskon}%</td>
-                    <td>Rp ${parseFloat(item.subtotal).toLocaleString('id-ID')}</td>
-                </tr>`;
+                            <tr>
+                                <td>${item.nama_produk || '-'}</td>
+                                <td>Rp ${parseFloat(item.harga_satuan).toLocaleString('id-ID')}</td>
+                                <td>${item.panjang}</td>
+                                <td>${item.lebar}</td>
+                                <td>${item.banyak}</td>
+                                <td>${item.finishing || '-'}</td>
+                                <td>${item.keterangan || '-'}</td>
+                                <td>${item.diskon}%</td>
+                                <td>Rp ${parseFloat(item.subtotal).toLocaleString('id-ID')}</td>
+                            </tr>`;
                 });
 
                 html += `</tbody>`;
@@ -260,14 +261,15 @@
 
             row.insertAdjacentHTML('afterend', html);
 
-            catch (err) {
-                console.error(err);
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Gagal!',
-                    text: 'Gagal memuat detail transaksi.'
-                });
-            }
+        } catch (err) {
+            console.error(err);
+            Swal.fire({
+                icon: 'error',
+                title: 'Gagal!',
+                text: 'Gagal memuat detail transaksi.'
+            });
+        }
+
 
     });
 </script>
