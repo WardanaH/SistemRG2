@@ -23,7 +23,14 @@ class OperatorController extends Controller
 
     public function dashboard()
     {
-        return view('operator.dashboard');
+        $selesai = MSubTransaksiPenjualans::where('status_sub_transaksi', 'selesai')->count();
+        $belum_selesai = MSubTransaksiPenjualans::where('status_sub_transaksi', '<>', 'selesai')->count();
+
+
+        return view(
+            'operator.dashboard',
+            compact('selesai', 'belum_selesai')
+        );
     }
     public function profile()
     {
