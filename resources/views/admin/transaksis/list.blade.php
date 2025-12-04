@@ -322,7 +322,7 @@
                             </thead>
 
                             <thead>
-                                <th>#</th>
+                                <th>No Nota Angsuran</th>
                                 <th>Tanggal</th>
                                 <th>Nominal</th>
                                 <th>Pembayaran</th>
@@ -348,7 +348,7 @@
                 angsuran.forEach(v => {
                     $("#tbody-angsuran").append(`
                     <tr>
-                        <td>#${v.id}</td>
+                        <td>#${v.nomor_nota}</td>
                         <td>${v.tanggal_angsuran}</td>
                         <td>Rp ${Number(v.nominal_angsuran).toLocaleString('id-ID')}</td>
                         <td>${v.metode_pembayaran}</td>

@@ -183,59 +183,59 @@ class AngsuransController extends Controller
     }
 
     public function showDetailAngsuranTransaksi(Request $request)
-{
-    try {
+    {
+        try {
 
-        Log::info("[DETAIL] Request masuk ke showDetailAngsuran", [
-            'req_id' => $request->id
-        ]);
+            Log::info("[DETAIL] Request masuk ke showDetailAngsuran", [
+                'req_id' => $request->id
+            ]);
 
-        // decrypt ID
-        $id = Crypt::decrypt($request->id);
+            // decrypt ID
+            $id = Crypt::decrypt($request->id);
 
-        Log::info("[DETAIL] ID setelah decrypt", ['id' => $id]);
+            Log::info("[DETAIL] ID setelah decrypt", ['id' => $id]);
 
-        // cari transaksi
-        $transaksi = MTransaksiPenjualans::with([
-            'subTransaksi.produk:id,nama_produk',
-            'user:id,username',
-            'cabang:id,nama'
-        ])->find($id);
+            // cari transaksi
+            $transaksi = MTransaksiPenjualans::with([
+                'subTransaksi.produk:id,nama_produk',
+                'user:id,username',
+                'cabang:id,nama'
+            ])->find($id);
 
-        if (!$transaksi) {
-            Log::warning("[DETAIL] Transaksi tidak ditemukan", ['id' => $id]);
-            return response()->json(['error' => 'Transaksi tidak ditemukan'], 404);
+            if (!$transaksi) {
+                Log::warning("[DETAIL] Transaksi tidak ditemukan", ['id' => $id]);
+                return response()->json(['error' => 'Transaksi tidak ditemukan'], 404);
+            }
+
+            // ambil list angsuran
+            $angsuran = MAngsurans::where('transaksi_penjualan_id', $id)
+                ->orderBy('created_at')
+                ->get();
+
+            return response()->json([
+                'success' => true,
+                'detail' => $transaksi,
+                'angsuran' => $angsuran
+            ]);
+        } catch (\Exception $e) {
+
+            Log::error("[DETAIL] ERROR showDetailAngsuran", [
+                'message' => $e->getMessage(),
+                'line'    => $e->getLine(),
+                'file'    => $e->getFile()
+            ]);
+
+            return response()->json(['error' => $e->getMessage()], 500);
         }
-
-        // ambil list angsuran
-        $angsuran = MAngsurans::where('transaksi_penjualan_id', $id)
-            ->orderBy('created_at')
-            ->get();
-
-        return response()->json([
-            'success' => true,
-            'detail' => $transaksi,
-            'angsuran' => $angsuran
-        ]);
-
-    } catch (\Exception $e) {
-
-        Log::error("[DETAIL] ERROR showDetailAngsuran", [
-            'message' => $e->getMessage(),
-            'line'    => $e->getLine(),
-            'file'    => $e->getFile()
-        ]);
-
-        return response()->json(['error' => $e->getMessage()], 500);
     }
-}
 
 
     public function bayar(Request $request, $id)
     {
         $request->validate([
             'nominal' => 'required|numeric|min:1',
-            'metode' => 'required|string'
+            'metode' => 'required|string',
+            'nomor_nota' => 'required|string'
         ]);
 
         // Ambil transaksi by ID
@@ -253,6 +253,7 @@ class AngsuransController extends Controller
             'tanggal_angsuran' => $date,
             'nominal_angsuran' => $nominal,
             'sisa_angsuran' => $sisa,
+            'nomor_nota' => $request->nomor_nota,
             'metode_pembayaran' => $request->metode,
             'user_id' => auth()->id(),
             'cabang_id' => auth()->user()->cabang_id ?? auth()->user()->cabangs->id,

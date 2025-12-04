@@ -86,6 +86,12 @@
             <div class="modal-body">
 
                 <p>
+                    Nomor Nota:
+                    <strong id="nomorNotaText">RG-{{ now()->timestamp }}</strong>
+                    <input type="hidden" id="nomorNotaInput">
+                </p>
+
+                <p>
                     Sisa Tagihan:
                     <strong id="sisaTagihanText" data-raw="0">Rp 0</strong>
                 </p>
@@ -270,6 +276,7 @@
                         <thead class="table-primary text-center">
                             <tr><th colspan="6">Riwayat Pembayaran Angsuran</th></tr>
                             <tr>
+                                <th>Nomor Nota Angsuran</th>
                                 <th>Tanggal</th>
                                 <th>Metode</th>
                                 <th colspan="4">Nominal</th>
@@ -284,6 +291,7 @@
                     angsurans.forEach(a => {
                         html += `
                             <tr>
+                                <td>${a.nomor_nota}</td>
                                 <td>${a.tanggal_angsuran}</td>
                                 <td>${a.metode_pembayaran}</td>
                                 <td colspan="4">Rp ${parseFloat(a.nominal_angsuran).toLocaleString('id-ID')}</td>
@@ -315,7 +323,11 @@
             let id = $(this).data('id');
             let rawSisa = $(this).data('sisa');
 
-            // Pastikan nilai sisa bukan NaN
+            // Generate nomor nota baru
+            let nomorNota = "RG-" + Math.floor(Date.now() / 1000);
+            $("#nomorNotaText").text(nomorNota);
+            $("#nomorNotaInput").val(nomorNota);
+
             if (typeof rawSisa === "string") {
                 rawSisa = rawSisa.replace(/[^\d.-]/g, "");
             }
@@ -332,7 +344,6 @@
 
             $("#modalBayar").modal('show');
         });
-
 
         // 2. SIMPAN PEMBAYARAN ANGSURAN
         $("#btnSimpanBayar").click(function() {
@@ -358,10 +369,10 @@
                 data: {
                     nominal: nominal,
                     metode: metode,
+                    nomor_nota: $("#nomorNotaInput").val(),
                     _token: $('meta[name="csrf-token"]').attr('content')
                 },
                 success: function(res) {
-
                     if (res.msg === "success") {
                         Swal.fire("Berhasil!", "Pembayaran angsuran berhasil!", "success");
                         $("#modalBayar").modal('hide');
@@ -374,7 +385,6 @@
                     Swal.fire("Error!", "Terjadi kesalahan server!", "error");
                 }
             });
-
         });
 
         // ================= DELETE =================
