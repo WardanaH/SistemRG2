@@ -110,7 +110,7 @@
 
                                             <div class="mb-3">
                                                 <label class="form-label">Kategori</label>
-                                                <select name="kategori_id" class="form-select" required>
+                                                <select name="kategori_id" class="select2" required>
                                                     @foreach($kategori as $kat)
                                                         <option value="{{ $kat->id }}"
                                                             {{ $item->kategori_id == $kat->id ? 'selected' : '' }}>
@@ -136,7 +136,7 @@
 
                                             <div class="mb-3">
                                                 <label class="form-label">Satuan</label>
-                                                <select name="satuan" class="form-select" required>
+                                                <select name="satuan" class="select2" required>
                                                     <option value="PCS" {{ $item->satuan == 'PCS' ? 'selected' : '' }}>PCS</option>
                                                     <option value="PAKET" {{ $item->satuan == 'PAKET' ? 'selected' : '' }}>PAKET</option>
                                                     <option value="CENTIMETER" {{ $item->satuan == 'CENTIMETER' ? 'selected' : '' }}>CENTIMETER</option>
@@ -212,7 +212,7 @@
 
                     <div class="mb-3">
                         <label class="form-label">Kategori</label>
-                        <select name="kategori_id" class="form-select" required>
+                        <select name="kategori_id" class="select2" required>
                             <option value="">-- Pilih Kategori --</option>
                             @foreach($kategori as $kat)
                                 <option value="{{ $kat->id }}">{{ $kat->Nama_Kategori }}</option>
@@ -232,7 +232,7 @@
 
                     <div class="mb-3">
                         <label class="form-label">Satuan</label>
-                        <select name="satuan" class="form-select" required>
+                        <select name="satuan" class="select2" required>
                             <option value="">-- Pilih Satuan --</option>
                             <option value="PCS">PCS</option>
                             <option value="PAKET">PAKET</option>

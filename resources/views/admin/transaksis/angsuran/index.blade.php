@@ -21,7 +21,7 @@
                 </div>
 
                 <div class="col-md-2">
-                    <select id="filter_bayar" class="form-select">
+                    <select id="filter_bayar" class="select2">
                         <option value="semua">Semua Pembayaran</option>
                         <option value="Cash">Cash</option>
                         <option value="Transfer">Transfer</option>
@@ -30,7 +30,7 @@
 
                 @if(Auth::user()->hasRole(['owner','direktur']))
                 <div class="col-md-2">
-                    <select id="filter_cabang" class="form-select">
+                    <select id="filter_cabang" class="select2">
                         <option value="semua">Semua Cabang</option>
                         @foreach($cabangs as $c)
                         <option value="{{ $c->id }}">{{ $c->nama }}</option>

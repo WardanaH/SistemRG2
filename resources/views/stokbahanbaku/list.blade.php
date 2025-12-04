@@ -12,7 +12,7 @@
             <form action="{{ route('stokbahanbaku.index') }}" method="GET" class="row g-2 mb-4 align-items-end">
                 <div class="col-md-4">
                     <label for="bahanbaku_id" class="form-label fw-semibold">Pilih Bahan Baku</label>
-                    <select class="form-select" id="bahanbaku_id" name="bahanbaku_id">
+                    <select class="select2" id="bahanbaku_id" name="bahanbaku_id">
                         <option value="" {{ $bahanbaku_id == '' ? 'selected' : '' }}>Semua Bahan Baku</option>
                         @foreach ($bahanbakus as $bahanbaku)
                             <option value="{{ encrypt($bahanbaku->id) }}"
@@ -26,7 +26,7 @@
                 @if (Auth::user()->roles->first()->name == 'owner')
                 <div class="col-md-4">
                     <label for="cabang_id" class="form-label fw-semibold">Pilih Cabang</label>
-                    <select class="form-select" id="cabang_id" name="cabang_id">
+                    <select class="select2" id="cabang_id" name="cabang_id">
                         <option value="" {{ $cabang_id == '' ? 'selected' : '' }}>Semua Cabang</option>
                         @foreach ($cabangs as $cabang)
                             <option value="{{ encrypt($cabang->id) }}"
@@ -38,10 +38,20 @@
                 </div>
                 @endif
 
-                <div class="col-md-2 d-flex gap-2">
-                    <button type="submit" class="btn btn-primary flex-fill">🔍 Tampilkan</button>
-                    <a href="{{ route('stokbahanbaku.index') }}" class="btn btn-secondary flex-fill">🔄 Reset</a>
+                <div class="col-md-4 d-flex">
+                    <button type="submit" 
+                        class="btn btn-primary"
+                        style="width: auto !important; margin-right: 12px !important;">
+                        🔍 Tampilkan
+                    </button>
+
+                    <a href="{{ route('stokbahanbaku.index') }}" 
+                        class="btn btn-secondary"
+                        style="width: auto !important;">
+                        🔄 Reset
+                    </a>
                 </div>
+
             </form>
 
             {{-- 🔹 Table --}}

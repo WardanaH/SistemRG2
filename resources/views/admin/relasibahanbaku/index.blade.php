@@ -38,7 +38,7 @@
         <div class="modal-body">
           <div class="mb-3">
             <label class="form-label">Produk</label>
-            <select name="tambah_r_produk" class="form-select" required>
+            <select name="tambah_r_produk" class="select2" required>
               <option value="">-- Pilih Produk --</option>
               @foreach($produks as $p)
                 <option value="{{ encrypt($p->id) }}">{{ $p->nama_produk }}</option>
@@ -47,7 +47,7 @@
           </div>
           <div class="mb-3">
             <label class="form-label">Bahan Baku</label>
-            <select name="tambah_r_bahan_baku" class="form-select" required>
+            <select name="tambah_r_bahan_baku" class="select2" required>
               <option value="">-- Pilih Bahan Baku --</option>
               @foreach($bahanbakus as $b)
                 <option value="{{ encrypt($b->id) }}">{{ $b->nama_bahan }}</option>
@@ -81,7 +81,7 @@
         <div class="modal-body">
           <div class="mb-3">
             <label class="form-label">Produk</label>
-            <select name="edit_r_produk" id="edit_r_produk" class="form-select" required>
+            <select name="edit_r_produk" id="edit_r_produk" class="select2" required>
               @foreach($produks as $p)
                 <option value="{{ $p->id }}">{{ $p->nama_produk }}</option>
               @endforeach
@@ -89,7 +89,7 @@
           </div>
           <div class="mb-3">
             <label class="form-label">Bahan Baku</label>
-            <select name="edit_r_bahan_baku" id="edit_r_bahan_baku" class="form-select" required>
+            <select name="edit_r_bahan_baku" id="edit_r_bahan_baku" class="select2" required>
               @foreach($bahanbakus as $b)
                 <option value="{{ $b->id }}">{{ $b->nama_bahan }}</option>
               @endforeach

@@ -26,6 +26,12 @@
 
     {{-- ============ FONT FAMILY ============ --}}
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <!-- Select2 Core -->
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet">
+
+    <!-- Select2 Bootstrap 5 Theme -->
+    <link href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" rel="stylesheet">
+
     <style>
         body,
         h1,
@@ -40,12 +46,6 @@
             font-family: 'Poppins', sans-serif !important;
         }
     </style>
-
-    <!-- Select2 Core -->
-    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet">
-
-    <!-- Select2 Bootstrap 5 Theme -->
-    <link href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" rel="stylesheet">
 
     <!-- ====================== CUSTOM STYLE ====================== -->
     @stack('styles')
@@ -101,40 +101,39 @@
 
         /* ===========================================================
        STYLE GLOBAL UNTUK SEMUA DROPDOWN / SELECT=========================================================== */
-        select.form-select,
+        /* select.form-select,
         select {
             border: 1.5px solid #dcdcdc;
             border-bottom: 2px solid #5f9df7;
-            /* Biru muda bawah */
             border-radius: 10px;
             padding: 6px 10px;
             font-size: 0.95rem;
             transition: all 0.2s ease-in-out;
             font-weight: 500;
             color: #2b2b2b;
-        }
+        } */
 
-        select.form-select:focus,
+        /* select.form-select:focus,
         select:focus {
             border-color: #5f9df7 !important;
             box-shadow: 0 0 0 3px rgba(119, 161, 224, 0.5);
             outline: none;
-        }
+        } */
 
-        select option {
+        /* select option {
             color: #333;
             font-weight: 500;
-        }
+        } */
 
         /* === Select2 Styling === */
-        .select2-container--bootstrap-5 .select2-selection {
+        /* .select2-container--bootstrap-5 .select2-selection {
             border-radius: 10px !important;
             border: 1.5px solid #dcdcdc !important;
             border-bottom: 2px solid #5f9df7 !important;
             min-height: 38px !important;
             padding: 4px 10px !important;
             transition: all 0.2s ease-in-out;
-        }
+        } */
 
         .select2-container--bootstrap-5.select2-container--focus .select2-selection {
             border-color: #5f9df7 !important;
@@ -145,6 +144,34 @@
             max-height: 180px !important;
             border-radius: 0 0 10px 10px !important;
         }
+
+        /* === Select2 Final Clean Style === */
+        .select2-container--bootstrap-5 .select2-selection {
+            border-radius: 10px !important;
+            border: 1.5px solid #2793beff !important;
+            border-bottom: 2px solid #5f9df7 !important;
+            min-height: 42px !important;
+            padding: 6px 10px !important;
+            display: flex !important;
+            align-items: center !important;
+        }
+
+        .select2-container--bootstrap-5 .select2-selection__rendered {
+            font-size: 0.95rem !important;
+            font-weight: 500 !important;
+            color: #2b2b2b !important;
+        }
+
+        .select2-container--bootstrap-5.select2-container--focus .select2-selection {
+            border-color: #5f9df7 !important;
+            box-shadow: 0 0 0 3px rgba(119, 161, 224, 0.4) !important;
+        }
+
+        .select2-container--bootstrap-5 .select2-dropdown {
+            border-radius: 10px !important;
+            border-color: #5f9df7 !important;
+        }
+
 
         /* ===========================================================
        WARNA TOMBOL PUTIH DI HEADER CARD=========================================================== */
@@ -331,9 +358,121 @@
         .modal-footer .btn-secondary:hover {
             background-color: #e3e3e3 !important;
         }
+
+        .btn-close {
+            background: none !important;
+            border: none !important;
+            width: 1.2rem !important;
+            height: 1.2rem !important;
+            opacity: 1 !important;
+            position: relative;
+        }
+
+        .btn-close::before,
+        .btn-close::after {
+            content: "" !important;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 1.2rem;
+            height: 2px;
+            background-color: #fff; /* warna X */
+            transform-origin: center;
+        }
+
+        .btn-close::before {
+            transform: translate(-50%, -50%) rotate(45deg);
+        }
+
+        .btn-close::after {
+            transform: translate(-50%, -50%) rotate(-45deg);
+        }
+
+
+
     </style>
 
     </style>
+    <style>
+    /* .select2-container--bootstrap-5 .select2-selection {
+        border-radius: 10px !important;
+        border: 1.5px solid #dcdcdc !important;
+        border-bottom: 2px solid #5f9df7 !important;
+        height: 38px !important;
+        padding: 6px 10px !important;
+    } */
+
+    .select2-container--bootstrap-5 .select2-selection__rendered {
+        padding-left: 4px !important;
+        padding-right: 20px !important;
+        font-size: 0.95rem !important;
+        font-weight: 500 !important;
+    }
+
+    .select2-container--bootstrap-5 .select2-dropdown {
+        border-radius: 10px !important;
+        border-color: #5f9df7 !important;
+    }
+</style>
+<style>
+    /* ================= CUSTOM MODERN SELECT WITH SEARCH ================= */
+
+    .custom-dropdown {
+        position: relative;
+        width: 100%;
+    }
+
+    .custom-dropdown .dropdown-display {
+        border: 1.5px solid #dcdcdc;
+        border-bottom: 2px solid #5f9df7;
+        border-radius: 10px;
+        padding: 8px 10px;
+        cursor: pointer;
+        background: #fff;
+        font-weight: 500;
+        color: #2b2b2b;
+    }
+
+    .custom-dropdown .dropdown-display:hover {
+        background: #f7f9ff;
+    }
+
+    .custom-dropdown .dropdown-panel {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: #fff;
+        border: 1px solid #ddd;
+        border-radius: 0 0 10px 10px;
+        max-height: 220px;
+        overflow-y: auto;
+        display: none;
+        z-index: 99999;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
+    }
+
+    .custom-dropdown input.search {
+        width: 100%;
+        border: none;
+        padding: 8px 12px;
+        border-bottom: 1px solid #eee;
+        outline: none;
+        font-size: 0.9rem;
+    }
+
+    .custom-dropdown .item {
+        padding: 8px 12px;
+        cursor: pointer;
+        font-size: 0.9rem;
+    }
+
+    .custom-dropdown .item:hover {
+        background: #eef4ff;
+    }
+</style>
+
+
 </head>
 
 <body>
@@ -409,6 +548,16 @@
 
 
     {{-- ============ SCRIPT CHILD VIEW ============ --}}
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            $('.select2').select2({
+                theme: 'bootstrap-5',
+                width: '100%',
+                dropdownAutoWidth: false,
+            });
+        });
+    </script>
+
     @stack('scripts')
 
     <script>

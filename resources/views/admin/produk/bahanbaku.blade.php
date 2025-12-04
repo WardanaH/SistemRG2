@@ -40,7 +40,7 @@
                 <div class="modal-body">
                     <div class="row g-2">
                         <div class="col-md-6">
-                            <select name="tambah_kategori_bb" class="form-select">
+                            <select name="tambah_kategori_bb" class="select2">
                                 <option value="">-- Pilih Kategori --</option>
                                 @foreach($kategories as $k)
                                 <option value="{{ $k->id }}">{{ $k->Nama_Kategori }}</option>
@@ -50,7 +50,7 @@
                         </div>
                         <div class="col-md-6" style="display: flex; align-items: center;"><input name="tambah_nama_bahan" class="form-control" placeholder="Nama Bahan" required><span style="color: red;">*</span></div>
                         <div class="col-md-6">
-                            <select name="tambah_satuan" class="form-select">
+                            <select name="tambah_satuan" class="select2">
                                 <option value="">-- Satuan --</option>
                                 <option value="CENTIMETER">Centimeter</option>
                                 <option value="METER">Meter</option>
@@ -86,7 +86,7 @@
                 <div class="modal-body">
                     <div class="row g-2">
                         <div class="col-md-6">
-                            <select name="edit_kategori_bb" id="edit_kategori_bb" class="form-select">
+                            <select name="edit_kategori_bb" id="edit_kategori_bb" class="select2">
                                 @foreach($kategories as $k)
                                 <option value="{{ $k->id }}">{{ $k->Nama_Kategori }}</option>
                                 @endforeach
@@ -94,7 +94,7 @@
                         </div>
                         <div class="col-md-6"><input name="edit_nama_bahan" id="edit_nama_bahan" class="form-control" placeholder="Nama Bahan"></div>
                         <div class="col-md-6">
-                            <select name="edit_satuan" id="edit_satuan" class="form-select">
+                            <select name="edit_satuan" id="edit_satuan" class="select2">
                                 <option value="CENTIMETER">Centimeter</option>
                                 <option value="METER">Meter</option>
                                 <option value="PCS">Pcs</option>

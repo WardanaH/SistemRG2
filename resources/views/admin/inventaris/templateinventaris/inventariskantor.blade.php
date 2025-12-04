@@ -180,7 +180,7 @@
 
                     <div class="mb-3">
                         <label class="form-label fw-semibold text-dark">Kondisi</label>
-                        <select name="kondisi" class="form-select border-secondary">
+                        <select name="kondisi" class="select2 border-secondary">
                             <option value="Baik">Baik</option>
                             <option value="Rusak">Rusak</option>
                             <option value="Perlu Perbaikan">Perlu Perbaikan</option>
@@ -259,7 +259,7 @@
 
                     <div class="mb-3">
                         <label class="form-label fw-semibold">Kondisi</label>
-                        <select name="kondisi" class="form-select">
+                        <select name="kondisi" class="select2">
                             <option {{ $item->kondisi == 'Baik' ? 'selected' : '' }}>Baik</option>
                             <option {{ $item->kondisi == 'Rusak' ? 'selected' : '' }}>Rusak</option>
                             <option {{ $item->kondisi == 'Perlu Perbaikan' ? 'selected' : '' }}>Perlu Perbaikan</option>

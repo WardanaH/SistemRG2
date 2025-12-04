@@ -39,7 +39,7 @@
                     <div class="row g-2">
                         <div class="col-md-6">
                             <label>Jenis Pelanggan</label>
-                            <select name="tambah_jenis_pelanggan" class="form-select">
+                            <select name="tambah_jenis_pelanggan" class="select2">
                                 @foreach($jenispelanggans as $j)
                                 <option value="{{ encrypt($j->id) }}">{{ $j->jenis_pelanggan }}</option>
                                 @endforeach
@@ -91,7 +91,7 @@
                         </div>
                         <div class="col-md-6 mt-2">
                             <label>Status</label>
-                            <select name="tambah_statuspelanggan" class="form-select">
+                            <select name="tambah_statuspelanggan" class="select2">
                                 <option value="1">Aktif</option>
                                 <option value="0">Tidak Aktif</option>
                             </select>
@@ -141,7 +141,7 @@
                         </div>
                         <div class="col-md-6">
                             <label>Status</label>
-                            <select name="edit_statuspelanggan" id="edit_statuspelanggan" class="form-select">
+                            <select name="edit_statuspelanggan" id="edit_statuspelanggan" class="select2">
                                 <option value="1">Aktif</option>
                                 <option value="0">Tidak Aktif</option>
                             </select>
