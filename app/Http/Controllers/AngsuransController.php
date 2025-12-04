@@ -9,6 +9,7 @@ use Yajra\DataTables\DataTables;
 use Illuminate\Support\Facades\Log;
 use App\Models\MTransaksiPenjualans;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Crypt;
 
 class AngsuransController extends Controller
 {
@@ -180,6 +181,54 @@ class AngsuransController extends Controller
             return response()->json(['error' => $e->getMessage()], 500);
         }
     }
+
+    public function showDetailAngsuranTransaksi(Request $request)
+{
+    try {
+
+        Log::info("[DETAIL] Request masuk ke showDetailAngsuran", [
+            'req_id' => $request->id
+        ]);
+
+        // decrypt ID
+        $id = Crypt::decrypt($request->id);
+
+        Log::info("[DETAIL] ID setelah decrypt", ['id' => $id]);
+
+        // cari transaksi
+        $transaksi = MTransaksiPenjualans::with([
+            'subTransaksi.produk:id,nama_produk',
+            'user:id,username',
+            'cabang:id,nama'
+        ])->find($id);
+
+        if (!$transaksi) {
+            Log::warning("[DETAIL] Transaksi tidak ditemukan", ['id' => $id]);
+            return response()->json(['error' => 'Transaksi tidak ditemukan'], 404);
+        }
+
+        // ambil list angsuran
+        $angsuran = MAngsurans::where('transaksi_penjualan_id', $id)
+            ->orderBy('created_at')
+            ->get();
+
+        return response()->json([
+            'success' => true,
+            'detail' => $transaksi,
+            'angsuran' => $angsuran
+        ]);
+
+    } catch (\Exception $e) {
+
+        Log::error("[DETAIL] ERROR showDetailAngsuran", [
+            'message' => $e->getMessage(),
+            'line'    => $e->getLine(),
+            'file'    => $e->getFile()
+        ]);
+
+        return response()->json(['error' => $e->getMessage()], 500);
+    }
+}
 
 
     public function bayar(Request $request, $id)
