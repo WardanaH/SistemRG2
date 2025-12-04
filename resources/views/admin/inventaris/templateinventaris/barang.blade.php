@@ -3,7 +3,7 @@
 @section('content')
 
 <div class="page-header d-flex justify-content-between align-items-center">
-    <h3>Data Bahan Baku - Cabang {{ ucfirst($cabang->nama) }}</h3>
+    <h3>Data Bahan Baku - {{ ucfirst($cabang->nama) }}</h3>
     <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalTambahBarang">
         <i class="bi bi-plus-circle"></i> Tambah Bahan
     </button>
@@ -18,10 +18,10 @@
 
 <div class="card mt-3">
     <div class="card-body">
-        <h4 class="card-title">Daftar Bahan Baku</h4>
+        <!-- <h4 class="card-title">Daftar Bahan Baku</h4> -->
 
         <div class="table-responsive">
-            <table class="table table-striped text-center align-middle">
+            <table class="table table-bordered table-striped text-center align-middle styletable">
                 <thead class="table-light">
                     <tr>
                         <th>No</th>

@@ -49,7 +49,7 @@
 
             {{-- DATATABLE --}}
             <div style="overflow-x:auto;">
-                <table class="table table-bordered table-striped" id="tabelAngsuran">
+                <table class="table table-bordered table-striped styletable" id="tabelAngsuran">
                     <thead class="table-primary">
                         <tr>
                             <th>No</th>

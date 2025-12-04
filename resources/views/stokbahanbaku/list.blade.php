@@ -55,7 +55,7 @@
             </form>
 
             {{-- 🔹 Table --}}
-            <table class="table table-bordered align-middle">
+            <table class="table table-bordered align-middle styletable">
                 <thead class="table-primary text-center">
                     <tr>
                         <th>#</th>

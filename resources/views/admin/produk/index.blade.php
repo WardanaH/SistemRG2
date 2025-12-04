@@ -9,7 +9,7 @@
         </div>
 
         <div class="card-body">
-            <table class="table table-bordered table-striped text-center align-middle" id="tabel_produk">
+            <table class="table table-bordered table-striped text-center align-middle styletable" id="tabel_produk">
                 <thead class="table-primary">
                     <tr>
                         <th>Nama Produk</th>

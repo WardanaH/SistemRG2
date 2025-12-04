@@ -21,7 +21,7 @@
     @else
 
       <div class="table-responsive">
-        <table class="table table-bordered align-middle">
+        <table class="table table-stripped table-bordered align-middle styletable">
 
           <thead>
             <tr>
