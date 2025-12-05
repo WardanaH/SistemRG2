@@ -251,13 +251,13 @@
         <div class="content-body">
             <div class="container-fluid">
                 {{-- Flash Messages --}}
-                @if(session('success'))
+                <!-- @if(session('success'))
                     <div class="alert alert-success">{{ session('success') }}</div>
-                @endif
+                @endif -->
 
-                @if($errors->any())
+                <!-- @if($errors->any())
                     <div class="alert alert-danger">{{ $errors->first() }}</div>
-                @endif
+                @endif -->
 
                 {{-- Konten Dinamis --}}
                 @yield('content')

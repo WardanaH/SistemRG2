@@ -18,10 +18,9 @@
 
 <div class="card mt-3">
     <div class="card-body">
-        <h4 class="card-title">Daftar Bahan Baku</h4>
 
         <div class="table-responsive">
-            <table class="table table-striped text-center align-middle">
+            <table class="table table-bordered table-striped text-center align-middle styletable">
                 <thead class="table-light">
                     <tr>
                         <th>No</th>
@@ -55,7 +54,6 @@
                                 $badgeClass = 'bg-success';
                             }
 
-                            // stok_id tersedia dari select di controller
                             $stokId = $item->stok_id ?? null;
                         @endphp
 
@@ -68,47 +66,33 @@
                             <td>{{ $stok }}</td>
                             <td><span class="badge {{ $badgeClass }}">{{ $status }}</span></td>
 
-                            <td class="d-flex justify-content-center gap-1">
-
-                            {{-- TOMBOL EDIT --}}
-                            @if ($stokId)
+                            <td>
                                 <button class="btn btn-warning btn-sm"
-                                        data-bs-toggle="modal"
-                                        data-bs-target="#modalEditBarang{{ $stokId }}">
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#modalEditBarang{{ $stokId }}"
+                                    {{ $stokId ? '' : 'disabled' }}>
                                     Edit
                                 </button>
-                            @else
-                                <button class="btn btn-secondary btn-sm" disabled>
-                                    Edit
-                                </button>
-                            @endif
 
-                            {{-- TOMBOL HAPUS --}}
-                            @if ($stokId)
-                                <form action="{{ route('gudangpusat.barang.destroy', $stokId) }}"
-                                    method="POST"
-                                    class="d-inline">
-                                    @csrf
-                                    @method('DELETE')
-
-                                    <button type="submit"
-                                            class="btn btn-danger btn-sm"
-                                            onclick="return confirm('Hapus stok bahan ini di gudang?')">
-                                        Hapus
-                                    </button>
-                                </form>
-                            @else
-                                <button class="btn btn-secondary btn-sm" disabled>
-                                    Hapus
-                                </button>
-                            @endif
-
-                        </td>
-
+                                @if ($stokId)
+                                    <form action="{{ route('gudangpusat.barang.destroy', $stokId) }}"
+                                          method="POST"
+                                          class="d-inline">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button class="btn btn-danger btn-sm"
+                                            onclick="return confirm('Hapus stok ini?')">
+                                            Hapus
+                                        </button>
+                                    </form>
+                                @else
+                                    <button class="btn btn-secondary btn-sm" disabled>Hapus</button>
+                                @endif
+                            </td>
                         </tr>
 
-                        <!-- MODAL EDIT (gunakan stok_id sebagai id modal) -->
                         @if ($stokId)
+                        <!-- MODAL EDIT -->
                         <div class="modal fade" id="modalEditBarang{{ $stokId }}" tabindex="-1">
                             <div class="modal-dialog">
                                 <div class="modal-content">
@@ -123,12 +107,13 @@
                                         </div>
 
                                         <div class="modal-body">
+
                                             <div class="mb-3">
                                                 <label class="form-label">Kategori</label>
-                                                <select name="kategori_id" class="form-select">
-                                                    <option value="">-- (Tidak diubah) --</option>
+                                                <select name="kategori_id" class="select2" required>
                                                     @foreach($kategori as $kat)
-                                                        <option value="{{ $kat->id }}" {{ ($item->kategori_id ?? '') == $kat->id ? 'selected' : '' }}>
+                                                        <option value="{{ $kat->id }}"
+                                                            {{ ($item->kategori_id ?? '') == $kat->id ? 'selected' : '' }}>
                                                             {{ $kat->nama_kategori }}
                                                         </option>
                                                     @endforeach
@@ -151,7 +136,7 @@
 
                                             <div class="mb-3">
                                                 <label class="form-label">Satuan</label>
-                                                <select name="satuan" class="form-select" required>
+                                                <select name="satuan" class="select2" required>
                                                     <option value="PCS" {{ ($item->satuan ?? '') == 'PCS' ? 'selected' : '' }}>PCS</option>
                                                     <option value="PAKET" {{ ($item->satuan ?? '') == 'PAKET' ? 'selected' : '' }}>PAKET</option>
                                                     <option value="CENTIMETER" {{ ($item->satuan ?? '') == 'CENTIMETER' ? 'selected' : '' }}>CENTIMETER</option>
@@ -176,16 +161,14 @@
 
                                             <div class="mb-3">
                                                 <label class="form-label">Keterangan</label>
-                                                <textarea name="keterangan" class="form-control">{{ $item->keterangan ?? '' }}</textarea>
+                                                <textarea name="keterangan"
+                                                          class="form-control">{{ $item->keterangan ?? '' }}</textarea>
                                             </div>
 
                                         </div>
 
                                         <div class="modal-footer">
-                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                                                Batal
-                                            </button>
-
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
                                             <button type="submit" class="btn btn-primary">Simpan</button>
                                         </div>
 
@@ -194,8 +177,8 @@
                                 </div>
                             </div>
                         </div>
-                        @endif
                         <!-- END MODAL EDIT -->
+                        @endif
 
                     @empty
                         <tr>
@@ -227,7 +210,7 @@
 
                     <div class="mb-3">
                         <label class="form-label">Kategori</label>
-                        <select name="kategori_id" class="form-select">
+                        <select name="kategori_id" class="select2" required>
                             <option value="">-- Pilih Kategori --</option>
                             @foreach($kategori as $kat)
                                 <option value="{{ $kat->id }}">{{ $kat->nama_kategori }}</option>
@@ -247,7 +230,7 @@
 
                     <div class="mb-3">
                         <label class="form-label">Satuan</label>
-                        <select name="satuan" class="form-select" required>
+                        <select name="satuan" class="select2" required>
                             <option value="">-- Pilih Satuan --</option>
                             <option value="PCS">PCS</option>
                             <option value="PAKET">PAKET</option>
