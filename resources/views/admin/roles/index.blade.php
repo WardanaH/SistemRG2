@@ -40,7 +40,7 @@
         </div>
     </form>
 
-    <table class="table table-bordered mt-3">
+    <table class="table table-bordered mt-3 styletable">
         <thead>
             <tr>
                 <th>Nama Role</th>

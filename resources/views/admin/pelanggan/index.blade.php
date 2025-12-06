@@ -1,4 +1,45 @@
 @extends('layouts.app')
+
+@push('styles')
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+
+<style>
+    /* FIX TEKS MODAL TRANSPARAN */
+    .modal-content,
+    .modal-body,
+    .modal-header,
+    .modal-footer,
+    .modal-title,
+    label,
+    input,
+    textarea,
+    select {
+        color: #000 !important;
+        opacity: 1 !important;
+    }
+
+    /* Select2 agar tidak transparan & tidak menghilang */
+    .select2-container .select2-selection--single {
+        height: 38px !important;
+        padding: 6px 10px !important;
+        border: 1px solid #ced4da !important;
+        border-radius: 5px !important;
+    }
+
+    .select2-selection__rendered {
+        color: #000 !important;
+    }
+
+    .select2-dropdown {
+        z-index: 999999 !important;
+    }
+
+    .select2-results__option {
+    color: #000 !important;
+    }
+</style>
+@endpush
+
 @section('content')
 <div class="container-fluid">
     <div class="card shadow">
@@ -39,7 +80,7 @@
                     <div class="row g-2">
                         <div class="col-md-6">
                             <label>Jenis Pelanggan</label>
-                            <select name="tambah_jenis_pelanggan" class="form-select">
+                            <select class="select2" name="tambah_jenis_pelanggan">
                                 @foreach($jenispelanggans as $j)
                                 <option value="{{ encrypt($j->id) }}">{{ $j->jenis_pelanggan }}</option>
                                 @endforeach
@@ -91,7 +132,7 @@
                         </div>
                         <div class="col-md-6 mt-2">
                             <label>Status</label>
-                            <select name="tambah_statuspelanggan" class="form-select">
+                            <select name="tambah_statuspelanggan" class="select2">
                                 <option value="1">Aktif</option>
                                 <option value="0">Tidak Aktif</option>
                             </select>
@@ -141,7 +182,7 @@
                         </div>
                         <div class="col-md-6">
                             <label>Status</label>
-                            <select name="edit_statuspelanggan" id="edit_statuspelanggan" class="form-select">
+                            <select name="edit_statuspelanggan" id="edit_statuspelanggan" class="select2">
                                 <option value="1">Aktif</option>
                                 <option value="0">Tidak Aktif</option>
                             </select>
@@ -168,6 +209,7 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.8/js/dataTables.bootstrap5.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
 <script>
 $(function() {
@@ -179,6 +221,7 @@ $(function() {
     const table = $('#tabel_pelanggan').DataTable({
         processing: true,
         serverSide: true,
+        searching: false,
         ajax: "{{ route('pelanggan.data') }}",
         columns: [
             { data: 'nama_perusahaan' },
@@ -189,7 +232,18 @@ $(function() {
             { data: 'limit_pelanggan' },
             { data: 'status_pelanggan', orderable:false, searchable:false },
             { data: 'action', orderable:false, searchable:false },
-        ]
+        ],
+            columnDefs: [
+        {
+            targets: 7, // kolom 'action'
+            render: function(data, type, row){
+                return `
+                    <button class="btn btn-warning btn-sm editBtn" data-id="${row.id}">Edit</button>
+                    <button class="btn btn-danger btn-sm deleteBtn" data-id="${row.id}">Hapus</button>
+                `;
+            }
+        }
+    ]
     });
 
     // Buka modal tambah
@@ -328,7 +382,25 @@ $(function() {
         });
 
     });
+    // INITIAL SELECT2 GLOBAL
+    $('.select2').select2({
+        dropdownParent: $('#addModal')
+        
+    });
 
+    // KETIKA MODAL TAMBAH DIBUKA
+    $('#addModal').on('shown.bs.modal', function () {
+        $('.select2').select2({
+            dropdownParent: $('#addModal')
+        });
+    });
+
+    // KETIKA MODAL EDIT DIBUKA
+    $('#editModal').on('shown.bs.modal', function () {
+        $('#edit_statuspelanggan').select2({
+            dropdownParent: $('#editModal')
+        });
+    });
 });
 </script>
 @endpush

@@ -21,7 +21,7 @@
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Cabang</label>
-                            <select name="cabang" class="form-select select2">
+                            <select name="cabang" class="select2">
                                 <option value="">Semua Cabang</option>
                                 @foreach ($cabangs as $c)
                                 <option value="{{ $c->id }}" {{ request('cabang') == $c->id ? 'selected' : '' }}>

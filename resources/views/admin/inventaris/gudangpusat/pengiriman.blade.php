@@ -73,7 +73,7 @@
                                 @method('PUT')
 
                                 <select name="status_pengiriman"
-                                        class="form-select form-select-sm"
+                                        class="select2 select2-sm"
                                         onchange="this.form.submit()"
                                         {{ $item->status_pengiriman != 'Dikemas' ? 'disabled' : '' }}>
                                     <option value="Dikemas" {{ $item->status_pengiriman == 'Dikemas' ? 'selected' : '' }}>
@@ -138,21 +138,20 @@
                     {{-- Pilih Barang --}}
                     <div class="mb-3">
                         <label class="form-label">Nama Barang</label>
-                        <select name="id_barang"
-                                class="form-select @error('id_barang') is-invalid @enderror"
+                        <select name="id_stok"
+                                class="select2 @error('id_stok') is-invalid @enderror"
                                 required>
 
                             <option value="">-- Pilih Barang --</option>
 
                             @foreach($barangs as $barang)
                                 <option value="{{ $barang->id }}"
-                                    {{ old('id_barang') == $barang->id ? 'selected' : '' }}>
-                                    {{ $barang->nama_barang }} (Stok: {{ $barang->stok }})
+                                    {{ old('id_stok') == $barang->id ? 'selected' : '' }}>
+                                    {{ $barang->bahanbaku->nama_bahan }} (Stok: {{ $barang->banyak_stok }})
                                 </option>
                             @endforeach
 
                         </select>
-
                         @error('id_barang')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
@@ -174,19 +173,16 @@
                     {{-- Tujuan --}}
                     <div class="mb-3">
                         <label class="form-label">Tujuan Pengiriman</label>
-                        <select name="tujuan_pengiriman"
-                                class="form-select @error('tujuan_pengiriman') is-invalid @enderror"
+                        <select name="tujuan"
+                                class="select2 @error('tujuan') is-invalid @enderror"
                                 required>
-
                             <option value="">-- Pilih Cabang --</option>
-
                             @foreach($cabangs as $cabang)
                                 <option value="{{ $cabang->slug }}"
-                                    {{ old('tujuan_pengiriman') == $cabang->slug ? 'selected' : '' }}>
+                                    {{ old('tujuan') == $cabang->slug ? 'selected' : '' }}>
                                     {{ ucfirst($cabang->nama) }}
                                 </option>
                             @endforeach
-
                         </select>
 
                         @error('tujuan_pengiriman')
@@ -198,10 +194,10 @@
                     <div class="mb-3">
                         <label class="form-label">Tanggal Pengiriman</label>
                         <input type="date"
-                               name="tanggal_pengiriman"
-                               value="{{ old('tanggal_pengiriman') }}"
-                               class="form-control @error('tanggal_pengiriman') is-invalid @enderror"
-                               required>
+                            name="tanggal"
+                            value="{{ old('tanggal') }}"
+                            class="form-control @error('tanggal') is-invalid @enderror"
+                            required>
                         @error('tanggal_pengiriman')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
@@ -220,16 +216,23 @@
     </div>
 </div>
 
-
 @endsection
 
 
 {{-- AUTO OPEN MODAL JIKA ADA ERROR --}}
 @push('scripts')
 <script>
-@if($errors->any())
-    var modalAdd = new bootstrap.Modal(document.getElementById('modalTambahPengiriman'));
-    modalAdd.show();
-@endif
+    $(document).ready(function() {
+        $('.select2-barang').select2({
+            width: '100%',
+            dropdownParent: $('#modalTambahPengiriman')
+        });
+    });
 </script>
+
+@if($errors->any())
+<script>
+    new bootstrap.Modal(document.getElementById('modalTambahPengiriman')).show();
+</script>
+@endif
 @endpush

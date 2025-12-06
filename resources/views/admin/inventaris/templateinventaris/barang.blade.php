@@ -3,7 +3,7 @@
 @section('content')
 
 <div class="page-header d-flex justify-content-between align-items-center">
-    <h3>Data Bahan Baku - Cabang {{ ucfirst($cabang->nama) }}</h3>
+    <h3>Data Bahan Baku - {{ ucfirst($cabang->nama) }}</h3>
     <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalTambahBarang">
         <i class="bi bi-plus-circle"></i> Tambah Bahan
     </button>
@@ -18,10 +18,10 @@
 
 <div class="card mt-3">
     <div class="card-body">
-        <h4 class="card-title">Daftar Bahan Baku</h4>
+        <!-- <h4 class="card-title">Daftar Bahan Baku</h4> -->
 
         <div class="table-responsive">
-            <table class="table table-striped text-center align-middle">
+            <table class="table table-bordered table-striped text-center align-middle styletable">
                 <thead class="table-light">
                     <tr>
                         <th>No</th>
@@ -110,7 +110,7 @@
 
                                             <div class="mb-3">
                                                 <label class="form-label">Kategori</label>
-                                                <select name="kategori_id" class="form-select" required>
+                                                <select name="kategori_id" class="select2" required>
                                                     @foreach($kategori as $kat)
                                                         <option value="{{ $kat->id }}"
                                                             {{ $item->kategori_id == $kat->id ? 'selected' : '' }}>
@@ -136,7 +136,7 @@
 
                                             <div class="mb-3">
                                                 <label class="form-label">Satuan</label>
-                                                <select name="satuan" class="form-select" required>
+                                                <select name="satuan" class="select2" required>
                                                     <option value="PCS" {{ $item->satuan == 'PCS' ? 'selected' : '' }}>PCS</option>
                                                     <option value="PAKET" {{ $item->satuan == 'PAKET' ? 'selected' : '' }}>PAKET</option>
                                                     <option value="CENTIMETER" {{ $item->satuan == 'CENTIMETER' ? 'selected' : '' }}>CENTIMETER</option>
@@ -212,7 +212,7 @@
 
                     <div class="mb-3">
                         <label class="form-label">Kategori</label>
-                        <select name="kategori_id" class="form-select" required>
+                        <select name="kategori_id" class="select2" required>
                             <option value="">-- Pilih Kategori --</option>
                             @foreach($kategori as $kat)
                                 <option value="{{ $kat->id }}">{{ $kat->Nama_Kategori }}</option>
@@ -232,7 +232,7 @@
 
                     <div class="mb-3">
                         <label class="form-label">Satuan</label>
-                        <select name="satuan" class="form-select" required>
+                        <select name="satuan" class="select2" required>
                             <option value="">-- Pilih Satuan --</option>
                             <option value="PCS">PCS</option>
                             <option value="PAKET">PAKET</option>

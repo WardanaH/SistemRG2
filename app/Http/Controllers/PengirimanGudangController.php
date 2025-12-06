@@ -15,10 +15,7 @@ class PengirimanGudangController extends Controller
      */
     private function getGudang()
     {
-        return Cabang::where('slug', 'gudangpusat')
-            ->orWhere('jenis', 'pusat')
-            ->orWhere('kode', 'GDG-UTM')
-            ->firstOrFail();
+        return Cabang::where('kode', 'GDG-UTM')->firstOrFail();
     }
 
     /* ============================================================
@@ -146,25 +143,32 @@ class PengirimanGudangController extends Controller
     /* ============================================================
        2. CRUD STOK GUDANG PUSAT (halaman stok)
        ============================================================ */
-    public function stok()
-    {
-        $gudang = $this->getGudang();
+        public function stok()
+        {
+            $gudang = $this->getGudang();
 
-        // semua stok gudang
-        $datas = MStokBahanBakus::with('bahanbaku')
-                    ->where('cabang_id', $gudang->id)
-                    ->orderByDesc('banyak_stok')
-                    ->get();
+            // Ambil stok + join ke tabel bahan baku
+            $datas = MStokBahanBakus::leftJoin('bahanbakus', 'bahanbakus.id', '=', 'stok_bahan_bakus.bahanbaku_id')
+                ->where('stok_bahan_bakus.cabang_id', $gudang->id)
+                ->select(
+                    'stok_bahan_bakus.id as stok_id',
+                    'stok_bahan_bakus.banyak_stok',
+                    'stok_bahan_bakus.satuan as satuan_stok',
+                    'bahanbakus.nama_bahan'
+                )
+                ->orderBy('bahanbakus.nama_bahan', 'ASC')
+                ->get();
 
-        // semua daftar bahan baku
-        $barangs = MBahanBakus::orderBy('nama_bahan')->get();
+            // Semua daftar bahan untuk modal tambah
+            $barangs = MBahanBakus::orderBy('nama_bahan')->get();
 
-        return view('admin.inventaris.gudangpusat.stok', [
-            'gudang'  => $gudang,
-            'datas'   => $datas,
-            'barangs' => $barangs  
-        ]);
-    }
+            return view('admin.inventaris.gudangpusat.stok', [
+                'gudang'  => $gudang,
+                'datas'   => $datas,
+                'barangs' => $barangs
+            ]);
+        }
+
 
 
     public function tambahStok(Request $req)
