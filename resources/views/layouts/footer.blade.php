@@ -9,9 +9,9 @@
         <!-- COPYRIGHT TENGAH -->
         <div class="footer-center text-center">
             &copy; Tim PKL Politala 2025–2026 — 
-            <a href="https://www.instagram.com/wrdxxzz?igsh=YnBveWIxbHJ0Y2Vw" target="_blank">Wardana</a> | 
-            <a href="https://www.instagram.com/diahmfr_?igsh=cmR5OG1mdHU5cXc5" target="_blank">Diah</a> | 
-            <a href="https://www.instagram.com/iamfinethankyoundsinn?igsh=aTR2NTcwM3Q5Mmhq" target="_blank">Mujayhid</a>
+            <a href="https://www.instagram.com/wrdxxzz/" target="_blank">Wardana</a> | 
+            <a href="https://www.instagram.com/diahmfr_/" target="_blank">Diah</a> | 
+            <a href="https://www.instagram.com/iamfinethankyoundsinn/" target="_blank">Mujayhid</a>
         </div>
 
         <!-- COPYRIGHT KANAN -->
