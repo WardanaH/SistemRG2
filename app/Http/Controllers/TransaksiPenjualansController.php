@@ -249,6 +249,11 @@ class TransaksiPenjualansController extends Controller
             $transaksi->reason_on_delete = $request->reason_on_delete ?? 'Tanpa alasan';
             $transaksi->save();
 
+            // Soft delete semua angsuran yang berhubungan
+            foreach ($transaksi->angsuran as $a) {
+                $a->delete();
+            }
+
             // Soft delete semua sub transaksi-nya
             foreach ($transaksi->subTransaksi as $sub) {
                 $sub->delete();
@@ -260,8 +265,9 @@ class TransaksiPenjualansController extends Controller
             DB::commit();
 
             return redirect()->route('transaksiindex')
-                ->with('success', 'Transaksi berhasil dihapus. Alasan: ' . $transaksi->reason_on_delete);
+                ->with('success', 'Transaksi & angsuran berhasil dihapus. Alasan: ' . $transaksi->reason_on_delete);
         } catch (\Exception $e) {
+
             DB::rollBack();
             Log::error('Gagal menghapus transaksi: ' . $e->getMessage());
 

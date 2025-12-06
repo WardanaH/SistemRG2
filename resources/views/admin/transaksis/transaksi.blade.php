@@ -659,9 +659,24 @@
 
             total += subtotal;
             updateTotal();
+            resetAddModal();
             $('#modal_add').modal('hide');
-            $('#modal_add input, #add_keterangan').val('');
         });
+
+        function resetAddModal() {
+            $('#add_produk').val('').trigger('change'); // Reset select2
+            $('#add_finishing').val('Tanpa Finishing').trigger('change');
+
+            $('#add_harga').val('');
+            $('#add_panjang').val('0');
+            $('#add_lebar').val('0');
+            $('#add_kuantitas').val('1');
+            $('#add_diskon').val('0');
+            $('#add_subtotal').val('');
+            $('#add_nospk').val('');
+            $('#add_keterangan').val('');
+        }
+
 
         // ================== REFRESH INPUT ITEMS (Biar Laravel baca array) ==================
         function refreshHiddenInputs() {

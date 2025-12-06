@@ -13,20 +13,10 @@
                 </a>
             </li>
 
-            <li>
-                <a class="has-arrow" href="javascript:void(0)" aria-expanded="false">
-                    <i class="fa fa-cogs"></i>
-                    <span class="nav-text">Panel Operator</span>
-                </a>
-                <ul aria-expanded="false">
+            <li class="nav-label">PANEL OPERATOR</li>
 
-                    <li>
-                        <a href="{{ route('operator.pesanan') }}">Status Item Pesanan</a>
-                    </li>
-                    <li>
-                        <a href="{{ route('operator.riwayat') }}">Riwayat Pesanan</a>
-                    </li>
-                </ul>
+            <li>
+                <a href="#">Status Item Pesanan</a>
             </li>
             <!-- <li class="nav-label">SYSTEM</li>
             <li>

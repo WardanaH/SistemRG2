@@ -45,7 +45,7 @@ class KategoriController extends Controller
     {
         try {
             $rules = [
-                'editnama_kategori' => 'required|string|max:128',
+                'edit_nama_kategori' => 'required|string|max:128',
                 'edit_keterangan'    => 'required|string',
             ];
 
@@ -54,7 +54,8 @@ class KategoriController extends Controller
                 return response()->json(['errors' => $validator->getMessageBag()]);
             }
 
-            $category = MKategories::findOrFail($request->category_id);
+            // Perbaikan di sini
+            $category = MKategories::findOrFail($request->edit_kategori_id);
 
             $category->update([
                 'Nama_Kategori' => $request->edit_nama_kategori,
