@@ -58,6 +58,7 @@ Route::middleware('auth')->group(function () {
 //     $user = auth()->user();
 //     return [
 //         'roles' => $user->getRoleNames(),
+//         'permissions' => $user->getAllPermissions()->pluck('name'),
 //         'has_edit_users' => $user->can('edit-users'),
 //     ];
 // });

@@ -22,7 +22,7 @@
             <li>
                 <a class="has-arrow" href="javascript:void(0)" aria-expanded="false">
                     <i class="icon icon-credit-card"></i>
-                    <span class="nav-text">Transaksi Transaksi</span>
+                    <span class="nav-text">Transaksi</span>
                 </a>
                 <ul aria-expanded="false">
                     @can('add-transaksipenjualan')

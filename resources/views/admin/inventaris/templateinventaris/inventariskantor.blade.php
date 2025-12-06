@@ -3,13 +3,6 @@
 @section('content')
 <div class="container-fluid mt-4">
 
-    {{-- ALERT SUCCESS --}}
-    @if(session('success'))
-        <div class="alert alert-success fw-semibold">
-            {{ session('success') }}
-        </div>
-    @endif
-
     {{-- ALERT ERROR GLOBAL --}}
     @if ($errors->any())
         <div class="alert alert-danger">
@@ -21,7 +14,6 @@
             </ul>
         </div>
     @endif
-
 
     {{-- CARD --}}
     <div class="card shadow">
@@ -37,7 +29,7 @@
         </div>
 
         <div class="card-body bg-light">
-            <table class="table table-bordered table-hover align-middle text-center shadow-sm">
+            <table class="table table-bordered table-stripped table-hover align-middle text-center shadow-sm styletable">
                 <thead style="background-color:#e9d8fd; color:#4b0082;">
                 <tr>
                     <th>Kode</th>
@@ -46,7 +38,7 @@
                     <th>Kondisi</th>
                     <th>Tanggal Input</th>
                     <th>QR Code</th>
-                    <th>Aksi</th> {{-- TAMBAHAN --}}
+                    <th>Aksi</th>
                 </tr>
                 </thead>
 
@@ -71,16 +63,13 @@
                             {{ $item->tanggal_input ? \Carbon\Carbon::parse($item->tanggal_input)->format('d M Y') : '-' }}
                         </td>
 
-                        {{-- QR CODE --}}
                         <td>
                             @if($item->qr_code)
                                 <img src="{{ asset('storage/' . $item->qr_code) }}"
                                      alt="QR Code"
                                      width="60"
                                      class="mb-1">
-
                                 <br>
-
                                 <a href="{{ asset('storage/' . $item->qr_code) }}"
                                    download
                                    class="btn btn-sm btn-outline-primary mt-1">
@@ -91,9 +80,7 @@
                             @endif
                         </td>
 
-                        {{-- AKSI --}}
                         <td>
-
                             {{-- EDIT --}}
                             <button class="btn btn-sm btn-warning"
                                     data-bs-toggle="modal"
@@ -101,20 +88,18 @@
                                 Edit
                             </button>
 
-                            {{-- HAPUS --}}
+                            {{-- HAPUS (SweetAlert) --}}
                             <form action="{{ route('cabang.inventaris.destroy', ['slug' => $cabang->slug, 'id' => $item->id]) }}"
                                   method="POST"
-                                  class="d-inline">
+                                  class="formDelete d-inline">
                                 @csrf
                                 @method('DELETE')
-                                <button class="btn btn-sm btn-danger"
-                                        onclick="return confirm('Yakin ingin menghapus?')">
+                                <button type="button" class="btn btn-sm btn-danger btnDelete">
                                     Hapus
                                 </button>
                             </form>
 
                         </td>
-
                     </tr>
                 @empty
                     <tr>
@@ -124,7 +109,6 @@
                     </tr>
                 @endforelse
                 </tbody>
-
             </table>
         </div>
     </div>
@@ -132,7 +116,7 @@
 </div>
 
 {{-- =======================================================
-        MODAL TAMBAH BARANG
+        MODAL TAMBAH
 ======================================================= --}}
 <div class="modal fade" id="modalTambah" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
@@ -148,39 +132,26 @@
                 </div>
 
                 <div class="modal-body bg-light">
-
                     <input type="hidden" name="cabang_id" value="{{ $cabang->id }}">
 
                     <div class="mb-3">
                         <label class="form-label fw-semibold text-dark">Kode Barang</label>
-                        <input type="text"
-                               name="kode_barang"
-                               class="form-control border-secondary"
-                               value="{{ old('kode_barang') }}"
-                               required>
+                        <input type="text" name="kode_barang" class="form-control border-secondary" required>
                     </div>
 
                     <div class="mb-3">
                         <label class="form-label fw-semibold text-dark">Nama Barang</label>
-                        <input type="text"
-                               name="nama_barang"
-                               class="form-control border-secondary"
-                               value="{{ old('nama_barang') }}"
-                               required>
+                        <input type="text" name="nama_barang" class="form-control border-secondary" required>
                     </div>
 
                     <div class="mb-3">
                         <label class="form-label fw-semibold text-dark">Jumlah</label>
-                        <input type="number"
-                               name="jumlah"
-                               class="form-control border-secondary"
-                               value="{{ old('jumlah') }}"
-                               required>
+                        <input type="number" name="jumlah" class="form-control border-secondary" required>
                     </div>
 
                     <div class="mb-3">
                         <label class="form-label fw-semibold text-dark">Kondisi</label>
-                        <select name="kondisi" class="form-select border-secondary">
+                        <select name="kondisi" class="select2 border-secondary">
                             <option value="Baik">Baik</option>
                             <option value="Rusak">Rusak</option>
                             <option value="Perlu Perbaikan">Perlu Perbaikan</option>
@@ -189,13 +160,8 @@
 
                     <div class="mb-3">
                         <label class="form-label fw-semibold text-dark">Tanggal Input</label>
-                        <input type="date"
-                               name="tanggal_input"
-                               class="form-control border-secondary"
-                               value="{{ old('tanggal_input') }}"
-                               required>
+                        <input type="date" name="tanggal_input" class="form-control border-secondary" required>
                     </div>
-
                 </div>
 
                 <div class="modal-footer" style="background-color:#f8f9fa;">
@@ -216,7 +182,7 @@
 </div>
 
 {{-- =======================================================
-        MODAL EDIT BARANG (AUTO LOOP)
+        MODAL EDIT (LOOP)
 ======================================================= --}}
 @foreach($data as $item)
 <div class="modal fade" id="modalEdit{{ $item->id }}" tabindex="-1">
@@ -259,7 +225,7 @@
 
                     <div class="mb-3">
                         <label class="form-label fw-semibold">Kondisi</label>
-                        <select name="kondisi" class="form-select">
+                        <select name="kondisi" class="select2">
                             <option {{ $item->kondisi == 'Baik' ? 'selected' : '' }}>Baik</option>
                             <option {{ $item->kondisi == 'Rusak' ? 'selected' : '' }}>Rusak</option>
                             <option {{ $item->kondisi == 'Perlu Perbaikan' ? 'selected' : '' }}>Perlu Perbaikan</option>
@@ -292,31 +258,65 @@
 </div>
 @endforeach
 
-
 @endsection
 
 
 {{-- =======================================================
-        SCRIPT — AUTO OPEN MODAL KETIKA ERROR
+        SCRIPT SWEETALERT
 ======================================================= --}}
 @push('scripts')
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <script>
 document.addEventListener('DOMContentLoaded', function () {
 
+    // BUKA MODAL TAMBAH KALO ADA ERROR
     @if ($errors->any())
-    let modalTambah = new bootstrap.Modal(document.getElementById('modalTambah'));
-    let modalEl = document.getElementById('modalTambah');
+        let modalTambah = new bootstrap.Modal(document.getElementById('modalTambah'));
+        modalTambah.show();
+    @endif
 
-    modalTambah.show();
-
-    modalEl.addEventListener('shown.bs.modal', function () {
-        let firstError = document.querySelector('.is-invalid');
-        if (firstError) firstError.focus();
+    // SWEETALERT SUCCESS
+    @if (session('success'))
+    Swal.fire({
+        icon: 'success',
+        title: 'Berhasil!',
+        text: '{{ session("success") }}',
+        showConfirmButton: false,
+        timer: 1800
     });
     @endif
+
+    // DELETE SWEETALERT
+    document.querySelectorAll('.btnDelete').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+
+            let form = this.closest('.formDelete');
+
+            Swal.fire({
+                title: 'Apakah Anda yakin?',
+                text: "Data ini akan dihapus selamanya!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Ya, hapus!',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    form.submit();
+                }
+            });
+
+        })
+    });
+
 });
 </script>
+
 @endpush
+
 
 @push('styles')
 <style>

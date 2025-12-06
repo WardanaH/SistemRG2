@@ -25,7 +25,7 @@
     {{-- Table Data --}}
     <div class="card shadow-sm">
         <div class="card-body p-0">
-            <table class="table table-striped table-hover align-middle mb-0">
+            <table class="table table-bordered table-striped table-hover align-middle mb-0 styletable">
                 <thead class="table-primary">
                     <tr>
                         <th width="60" class="text-center">#</th>
@@ -41,10 +41,10 @@
                         <td class="text-center">
 
                             {{-- Tombol Edit --}}
-                            <button class="btn btn-info btn-sm"
+                            <button class="btn btn-warning btn-sm"
                                 data-bs-toggle="modal"
                                 data-bs-target="#modalEdit{{ $jp->id }}">
-                                ✏️ Edit
+                                Edit
                             </button>
 
                             {{-- Tombol Hapus (SweetAlert) --}}
@@ -57,7 +57,7 @@
                                        value="{{ encrypt($jp->id) }}">
 
                                 <button type="submit" class="btn btn-danger btn-sm">
-                                    🗑️ Hapus
+                                    Hapus
                                 </button>
                             </form>
                         </td>
