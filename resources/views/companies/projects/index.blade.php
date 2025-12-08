@@ -38,10 +38,10 @@
             <td>{{ $project->description }}</td>
             <td>Rp {{ number_format($project->value_projects, 0, ',', '.') }}</td>
             <td>
-                <span class="badge bg-info">{{ $project->status }}</span>
+                <span class="badge bg-info text-black">{{ $project->status }}</span>
             </td>
             <td>
-                <span class="badge bg-warning">{{ $project->paid_status }}</span>
+                <span class="badge bg-warning text-black">{{ $project->paid_status }}</span>
             </td>
             <td>
 
@@ -77,7 +77,10 @@
                 {{-- Jika sudah LUNAS, disable semua tombol --}}
                 @if($project->paid_status == 'Lunas')
 
-                <button class="btn btn-sm btn-secondary" disabled>Progress</button>
+                <a href="{{ route('projects.progress', $project->id) }}"
+                    class="btn btn-sm btn-success">
+                    Progress
+                </a>
                 <button class="btn btn-sm btn-secondary" disabled>Edit</button>
                 <button class="btn btn-sm btn-secondary" disabled>Hapus</button>
 

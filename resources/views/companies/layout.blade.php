@@ -17,7 +17,7 @@
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary mb-4">
         <div class="container">
-            <a class="navbar-brand" href="/">
+            <a class="navbar-brand" href="/companies">
                 <i class="bi bi-speedometer2 me-2"></i>Manajemen Proyek
             </a>
             <div class="ms-auto d-flex align-items-center">
