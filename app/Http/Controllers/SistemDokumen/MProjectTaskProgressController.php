@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\SistemDokumen;
 
+use App\Http\Controllers\Controller;
 use App\Models\MProjects;
 use Illuminate\Http\Request;
 use App\Models\MProjectTaskProgress;

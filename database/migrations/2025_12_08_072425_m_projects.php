@@ -18,6 +18,7 @@ return new class extends Migration
             $table->integer('value_projects');
             $table->enum('status', ['Pending', 'Ongoing', 'Selesai'])->default('Pending');
             $table->enum('paid_status', ['Belum Lunas', 'Lunas'])->default('Belum Lunas');
+            $table->string('file_bukti')->nullable();
 
             $table->foreignId('m_company_id')
                 ->constrained('m_companies')

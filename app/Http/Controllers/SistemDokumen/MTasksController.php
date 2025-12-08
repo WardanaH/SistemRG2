@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\SistemDokumen;
 
+use App\Http\Controllers\Controller;
 use App\Models\MCompany;
 use App\Models\MTasks;
 use Illuminate\Http\Request;
