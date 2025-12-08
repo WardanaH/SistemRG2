@@ -1,10 +1,11 @@
 <?php
 
+use App\Http\Controllers\SistemDokumen\MCompanyController;
+use App\Http\Controllers\SistemDokumen\MProjectsController;
+use App\Http\Controllers\SistemDokumen\MProjectTaskProgressController;
+use App\Http\Controllers\SistemDokumen\MTasksController;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\MTasksController;
-use App\Http\Controllers\MCompanyController;
-use App\Http\Controllers\MProjectsController;
-use App\Http\Controllers\MProjectTaskProgressController;
+
 
 // Route::get('/', function () {
 //     return redirect()->route('companies.index');
@@ -22,6 +23,8 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/projects', [MProjectsController::class, 'store'])->name('projects.store');
     Route::put('/projects/{project}', [MProjectsController::class, 'update'])->name('projects.update');
     Route::delete('/projects/{project}', [MProjectsController::class, 'destroy'])->name('projects.destroy');
+    Route::post('/projects/{project}/upload-proof', [MProjectsController::class, 'uploadProof'])
+        ->name('projects.upload-proof');
 
     //task
     Route::get('/companies/{company}/tasks', [MTasksController::class, 'index'])->name('task.index');

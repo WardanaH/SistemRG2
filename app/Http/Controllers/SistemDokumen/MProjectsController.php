@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\SistemDokumen;
 
+use App\Http\Controllers\Controller;
 use App\Models\MTasks;
 use App\Models\MCompany;
 use App\Models\MProjects;
@@ -75,5 +76,24 @@ class MProjectsController extends Controller
         return redirect()
             ->route('companies.show', $project->mCompany->id)
             ->with('success', 'Proyek berhasil diperbarui.');
+    }
+
+    public function uploadProof(Request $request, MProjects $project)
+    {
+        $request->validate([
+            'proof_file' => 'required|mimes:jpg,jpeg,png,pdf|max:2048',
+        ]);
+
+        // upload file
+        if ($request->hasFile('proof_file')) {
+            $file = $request->file('proof_file');
+            $path = $file->store('proofs', 'public');
+
+            $project->file_bukti = $path;
+            $project->paid_status = 'Lunas'; // otomatis jadi lunas
+            $project->save();
+        }
+
+        return back()->with('success', 'File bukti berhasil diupload dan status pembayaran diubah menjadi Lunas.');
     }
 }

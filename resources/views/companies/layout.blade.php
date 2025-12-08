@@ -15,31 +15,15 @@
 </head>
 
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark mb-4">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary mb-4">
         <div class="container">
             <a class="navbar-brand" href="/">
                 <i class="bi bi-speedometer2 me-2"></i>Manajemen Proyek
             </a>
             <div class="ms-auto d-flex align-items-center">
-                <a class="nav-link text-white d-inline-block me-3" href="/dashboard">
+                <a class="nav-link text-white d-inline-block me-3" href="/companies">
                     <i class="bi bi-house-door me-1"></i>Dashboard
                 </a>
-
-                <a class="nav-link text-white d-inline-block me-3" href="/projek">
-                    <i class="bi bi-folder2-open me-1"></i>Proyek
-                </a>
-
-                {{-- === TAB KHUSUS UNTUK SUPER ADMIN === --}}
-                @if(Auth::check() && Auth::user()->role === 'super_admin')
-                <a class="nav-link text-white d-inline-block me-3" href="/akun">
-                    <i class="bi bi-people me-1"></i>Akun
-                </a>
-
-                <a class="nav-link text-white d-inline-block me-3" href="{{ route('backup.index') }}">
-                    <i class="bi bi-hdd-network me-1"></i>Backup
-                </a>
-                @endif
-
 
                 {{-- (Opsional) Tambahkan dropdown user / logout --}}
                 <div class="dropdown">

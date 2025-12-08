@@ -33,7 +33,9 @@ class AuthController extends Controller
                 return redirect()->route('inventaris.dashboard')->with('success', 'Selamat datang kembali!');
             } elseif ($user->hasRole('adversting')) {
                 return redirect()->route('adversting.index')->with('success', 'Selamat datang kembali!');
-            } else {
+            } elseif ($user->hasRole('documentation')) {
+                return redirect()->route('companies.index')->with('success', 'Selamat datang kembali!');
+            }else {
                 return redirect()->route('dashboard')->with('success', 'Selamat datang kembali!');
             }
         }
