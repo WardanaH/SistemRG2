@@ -28,6 +28,7 @@ use App\Http\Controllers\TransaksiPenjualansController;
 require __DIR__ . '/operator.php';
 require __DIR__ . '/designer.php';
 require __DIR__ . '/projects.php';
+require __DIR__ . '/adversting.php';
 
 Route::get('/', function () {
     $user = auth()->user();
