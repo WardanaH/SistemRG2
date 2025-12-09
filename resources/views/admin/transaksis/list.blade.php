@@ -105,7 +105,12 @@
                                                 <i class="fa fa-eye"></i>
                                             </button>
 
-                                            <button type="button" class="btn btn-warning">
+                                            <button type="button"
+                                                class="btn btn-warning btn-angsuran"
+                                                data-id="{{ encrypt($data->id) }}"
+                                                data-sisa="{{ $data->sisa_tagihan }}"
+                                                data-nonota="{{ $data->nomor_nota }}"
+                                                data-pembayaran="{{ $data->jumlah_pembayaran }}">
                                                 <i class="fa fa-money"></i>
                                             </button>
 
@@ -184,41 +189,41 @@
             const deleted = data.deleted || [];
 
             let html = `
-                        <tr class="detail-row">
-                            <td colspan="${colCount}" class="p-0">
-                                <table class="table table-sm mb-0 table-bordered bg-light">
-                                    <thead class="table-success text-center">
-                                        <tr><th colspan="9">Produk Dibeli</th></tr>
-                                        <tr>
-                                            <th>Nama Barang</th>
-                                            <th>Harga Satuan</th>
-                                            <th>P</th>
-                                            <th>L</th>
-                                            <th>Kuantitas</th>
-                                            <th>Finishing</th>
-                                            <th>Keterangan</th>
-                                            <th>Diskon (%)</th>
-                                            <th>Subtotal</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>`;
+            <tr class="detail-row">
+                <td colspan="${colCount}" class="p-0">
+                    <table class="table table-sm mb-0 table-bordered bg-light">
+                        <thead class="table-success text-center">
+                            <tr><th colspan="9">Produk Dibeli</th></tr>
+                            <tr>
+                                <th>Nama Barang</th>
+                                <th>Harga Satuan</th>
+                                <th>P</th>
+                                <th>L</th>
+                                <th>Kuantitas</th>
+                                <th>Finishing</th>
+                                <th>Keterangan</th>
+                                <th>Diskon (%)</th>
+                                <th>Subtotal</th>
+                            </tr>
+                        </thead>
+                        <tbody>`;
 
             if (current.length === 0) {
                 html += `<tr><td colspan="9" class="text-center text-muted">Tidak ada data produk</td></tr>`;
             } else {
                 current.forEach(item => {
                     html += `
-                                        <tr>
-                                            <td>${item.produk?.nama_produk || '-'}</td>
-                                            <td>Rp ${parseFloat(item.harga_satuan).toLocaleString('id-ID')}</td>
-                                            <td>${item.panjang}</td>
-                                            <td>${item.lebar}</td>
-                                            <td>${item.banyak}</td>
-                                            <td>${item.finishing || '-'}</td>
-                                            <td>${item.keterangan || '-'}</td>
-                                            <td>${item.diskon}%</td>
-                                            <td>Rp ${parseFloat(item.subtotal).toLocaleString('id-ID')}</td>
-                                        </tr>`;
+                        <tr>
+                            <td>${item.produk?.nama_produk || '-'}</td>
+                            <td>Rp ${parseFloat(item.harga_satuan).toLocaleString('id-ID')}</td>
+                            <td>${item.panjang}</td>
+                            <td>${item.lebar}</td>
+                            <td>${item.banyak}</td>
+                            <td>${item.finishing || '-'}</td>
+                            <td>${item.keterangan || '-'}</td>
+                            <td>${item.diskon}%</td>
+                            <td>Rp ${parseFloat(item.subtotal).toLocaleString('id-ID')}</td>
+                        </tr>`;
                 });
             }
 
@@ -273,6 +278,110 @@
 
     });
 </script>
+
+<script>
+    $(document).on('click', '.btn-angsuran', function() {
+
+        let id = $(this).data('id'); // encrypt ID sama seperti lama
+        let row = $(this).closest('tr');
+        let colCount = row.find('td').length;
+
+        // jika sudah terbuka → tutup
+        if (row.next().hasClass('detail_click angsuran')) {
+            $(".detail_click").remove();
+            return;
+        }
+
+        $(".detail_click").remove();
+
+        $.ajax({
+            url: "{{ route('angsuran.showdetail.transaksi') }}", // route baru milik kamu
+            type: "GET",
+            data: {
+                id: id
+            },
+            success: function(res) {
+
+                if (!res.success) {
+                    alert("Gagal mengambil data");
+                    return;
+                }
+
+                let transaksi = res.detail;
+                let angsuran = res.angsuran;
+
+                // Tambahkan row detail angsuran
+                row.after(`
+                <tr class="detail_click angsuran">
+                    <td colspan="${colCount}" style="padding:0;background:#fcfcfc">
+                        <table class="table table-hover" style="margin:0;background:#fcfcfc">
+                            <thead>
+                                <tr style="background:#00a65a;color:white">
+                                    <th colspan="8" class="text-center">Angsuran</th>
+                                </tr>
+                            </thead>
+
+                            <thead>
+                                <th>No Nota Angsuran</th>
+                                <th>Tanggal</th>
+                                <th>Nominal</th>
+                                <th>Pembayaran</th>
+                                <th>Cabang</th>
+                                <th>User</th>
+                                <th style="text-align:right">Tools</th>
+                            </thead>
+
+                            <tbody id="tbody-angsuran"></tbody>
+
+                            <tfoot>
+                                <tr>
+                                    <th colspan="6" class="text-end">Sisa Tagihan:</th>
+                                    <th class="text-end">Rp ${Number(transaksi.sisa_tagihan).toLocaleString('id-ID')}</th>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </td>
+                </tr>
+            `);
+
+                // Loop angsuran
+                angsuran.forEach(v => {
+                    $("#tbody-angsuran").append(`
+                    <tr>
+                        <td>#${v.nomor_nota}</td>
+                        <td>${v.tanggal_angsuran}</td>
+                        <td>Rp ${Number(v.nominal_angsuran).toLocaleString('id-ID')}</td>
+                        <td>${v.metode_pembayaran}</td>
+                        <td>${transaksi.cabang?.nama ?? '-'}</td>
+                        <td>${transaksi.user?.username ?? '-'}</td>
+
+                        <td class="text-end">
+                            <div class="btn-group btn-group-sm">
+                                <button class="btn btn-danger btn-delete-angsuran"
+                                    data-id="${v.id}"
+                                    data-nominal="${v.nominal_angsuran}">
+                                    <i class="fa fa-trash"></i>
+                                </button>
+
+                                <button class="btn btn-success btn-print-angsuran"
+                                    data-id="${v.id}">
+                                    <i class="fa fa-print"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `);
+                });
+
+            },
+            error: function(xhr) {
+                console.error(xhr.responseText);
+                alert("Terjadi kesalahan saat mengambil angsuran.");
+            }
+        });
+    });
+</script>
+
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         document.querySelectorAll('.btn-delete').forEach(button => {

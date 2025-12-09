@@ -12,6 +12,7 @@ class MAngsurans extends Model
     protected $table = 'angsurans';
 
     protected $fillable = [
+        'nomor_nota',
         'tanggal_angsuran',
         'nominal_angsuran',
         'sisa_angsuran',

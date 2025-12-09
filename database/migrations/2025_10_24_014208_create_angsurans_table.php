@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('angsurans', function (Blueprint $table) {
             $table->id();
+            $table->string('nomor_nota', 128)->unique();
             $table->date('tanggal_angsuran');
             $table->double('nominal_angsuran');
             $table->double('sisa_angsuran')->default(0);

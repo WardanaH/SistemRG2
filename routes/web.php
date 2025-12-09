@@ -27,6 +27,7 @@ use App\Http\Controllers\TransaksiPenjualansController;
 
 require __DIR__ . '/operator.php';
 require __DIR__ . '/designer.php';
+require __DIR__ . '/projects.php';
 
 Route::get('/', function () {
     $user = auth()->user();
@@ -337,4 +338,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/angsuran-penjualan/show-detail', [AngsuransController::class, 'showDetailAngsuran'])
         ->middleware('permission:manage-angsuranpenjualan')
         ->name('angsuran.showdetail');
+    Route::get('/angsuran-penjualan/show-detail-transaksi', [AngsuransController::class, 'showDetailAngsuranTransaksi'])
+        ->middleware('permission:manage-angsuranpenjualan')
+        ->name('angsuran.showdetail.transaksi');
 });
