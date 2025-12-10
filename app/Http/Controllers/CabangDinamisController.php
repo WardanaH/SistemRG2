@@ -391,4 +391,25 @@ public function riwayatTerima($slug, $id)
         return back()->with('success', 'Cabang berhasil dihapus');
     }
 
+    public function toggle($id)
+    {
+        $configPath = config_path('cabang_nonaktif.php');
+        $data = config('cabang_nonaktif.ids');
+
+        if (in_array($id, $data)) {
+            // Jika sudah nonaktif → aktifkan lagi
+            $data = array_diff($data, [$id]);
+        } else {
+            // Jika aktif → nonaktifkan
+            $data[] = $id;
+        }
+
+        // Simpan kembali ke file config
+        file_put_contents(
+            $configPath,
+            "<?php\n\nreturn ['ids' => " . var_export(array_values($data), true) . "];"
+        );
+
+        return back()->with('success', 'Status cabang telah diperbarui.');
+    }
 }

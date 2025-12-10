@@ -30,7 +30,7 @@
                         <th>Harga</th>
                         <th>Stok</th>
                         <th>Status</th>
-                        <th>Aksi</th>
+                        {{-- <th>Aksi</th> --}}
                     </tr>
                 </thead>
 
@@ -66,7 +66,7 @@
                             <td>{{ $stok }}</td>
                             <td><span class="badge {{ $badgeClass }}">{{ $status }}</span></td>
 
-                            <td>
+                            {{-- <td>
                                 <button class="btn btn-warning btn-sm"
                                     data-bs-toggle="modal"
                                     data-bs-target="#modalEditBarang{{ $stokId }}"
@@ -88,7 +88,7 @@
                                 @else
                                     <button class="btn btn-secondary btn-sm" disabled>Hapus</button>
                                 @endif
-                            </td>
+                            </td> --}}
                         </tr>
 
                         @if ($stokId)

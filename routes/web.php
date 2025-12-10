@@ -225,6 +225,10 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('/inventaris/cabang/delete/{id}', [CabangDinamisController::class, 'manageCabangDelete'])
         ->name('inventaris.cabang.delete');
 
+    //toggle
+    Route::post('/inventaris/cabang/toggle/{id}', [CabangDinamisController::class, 'toggle'])
+        ->name('inventaris.cabang.toggle');
+
     // ================== CABANG {slug} ==================
     Route::prefix('cabang/{slug}')->name('cabang.')->group(function () {
 

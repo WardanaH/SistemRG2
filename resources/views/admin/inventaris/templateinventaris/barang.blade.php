@@ -31,7 +31,7 @@
                         <th>Harga</th>
                         <th>Stok</th>
                         <th>Status</th>
-                        <th>Aksi</th>
+                        {{-- <th>Aksi</th> --}}
                     </tr>
                 </thead>
 
@@ -65,7 +65,7 @@
                             <td>{{ $stok }}</td>
                             <td><span class="badge {{ $badgeClass }}">{{ $status }}</span></td>
 
-                            <td>
+                            {{-- <td>
                                 <button class="btn btn-warning btn-sm"
                                         data-bs-toggle="modal"
                                         data-bs-target="#modalEditBarang{{ $item->id_bahanbaku }}">
@@ -85,7 +85,7 @@
                                         Hapus
                                     </button>
                                 </form>
-                            </td>
+                            </td> --}}
                         </tr>
 
                         <!-- MODAL EDIT -->

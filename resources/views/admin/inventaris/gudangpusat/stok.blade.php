@@ -25,7 +25,7 @@
                         <th>Nama Bahan</th>
                         <th>Stok</th>
                         <th>Satuan</th>
-                        <th>Aksi</th>
+                        {{-- <th>Aksi</th> --}}
                     </tr>
                 </thead>
 
@@ -43,7 +43,7 @@
                     <!-- Satuan -->
                     <td>{{ $d->satuan_stok ?? '-' }}</td>
 
-                    <!-- Aksi -->
+                    {{-- <!-- Aksi -->
                     <td>
 
                         <!-- EDIT hanya jika stok_id ada -->
@@ -70,7 +70,7 @@
                         </form>
                         @endif
 
-                    </td>
+                    </td> --}}
                 </tr>
 
                 <!-- MODAL EDIT STOK -->
