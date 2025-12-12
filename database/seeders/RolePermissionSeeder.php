@@ -92,6 +92,12 @@ class RolePermissionSeeder extends Seeder
             // Laporan & Timeline
             'view-laporan',
             'index-timeline',
+
+            // Manajemen Gudang
+            'manage-gudang','add-gudang','edit-gudang','delete-gudang',
+
+            // Manajemen Proyek
+            'manage-proyek','add-proyek','edit-proyek','delete-proyek',
         ];
 
         foreach ($permissions as $p) {
