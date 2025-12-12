@@ -433,16 +433,19 @@
                             <select id="add_produk" class="form-select select2" style="width:100%;">
                                 <option value="">-- Pilih Produk --</option>
                                 @foreach ($produks as $produk)
-                                <option value="{{ $produk->id }}" data-harga="{{ $produk->harga_jual }}" data-hitung_luas="{{ $produk->hitung_luas }}">
+                                <option value="{{ $produk->id }}"
+                                    data-harga="{{ $produk->harga_jual }}"
+                                    data-hitung_luas="{{ $produk->hitung_luas }}"
+                                    data-satuan="{{ $produk->satuan }}">
                                     {{ $produk->nama_produk }}
                                 </option>
                                 @endforeach
                             </select>
                         </div>
                         <div class="row">
-                            <div class="col-md-6 mb-2">
+                            <div class="col-md-3 mb-2">
                                 <label>Harga</label>
-                                <input id="add_harga" class="form-control" type="number" readonly>
+                                <input id="add_harga" class="form-control" type="number">
                             </div>
                             <div class="col-md-3 mb-2">
                                 <label>P</label>
@@ -451,6 +454,10 @@
                             <div class="col-md-3 mb-2">
                                 <label>L</label>
                                 <input id="add_lebar" class="form-control" type="number" value="0">
+                            </div>
+                            <div class="col-md-3 mb-2">
+                                <label>Satuan</label>
+                                <input type="text" id="add_satuan" class="form-control" readonly>
                             </div>
                         </div>
                         <div class="mb-2">
@@ -562,8 +569,10 @@
             const option = $('option:selected', this);
             const harga = option.data('harga') || 0;
             const hitungLuas = option.data('hitung_luas'); // <= PENTING
+            const satuan = option.data('satuan') || '-';
 
             $('#add_harga').val(harga);
+            $('#add_satuan').val(satuan);
 
             if (hitungLuas == 0) {
                 // Matikan input
@@ -584,21 +593,35 @@
             const lebar = parseFloat($('#add_lebar').val()) || 0;
             const qty = parseFloat($('#add_kuantitas').val()) || 1;
             const diskon = parseFloat($('#add_diskon').val()) || 0;
+
             const option = $('#add_produk option:selected');
             const hitungLuas = option.data('hitung_luas');
+            const satuan = (option.data('satuan') || '').toLowerCase();
 
             let subtotal = 0;
 
+            let p = panjang;
+            let l = lebar;
+
+            // 🟩 KONVERSI SATUAN
             if (hitungLuas == 1) {
-                subtotal = harga * (panjang * lebar) * qty;
+                if (satuan === 'cm' || satuan === 'centimeter') {
+                    p = p / 100;
+                    l = l / 100;
+                }
+                // jika sudah meter → langsung hitung
+                subtotal = harga * (p * l) * qty;
+
             } else {
                 subtotal = harga * qty;
             }
 
+            // diskon
             subtotal = subtotal - (subtotal * diskon / 100);
 
             $('#add_subtotal').val('Rp ' + subtotal.toLocaleString('id-ID'));
         }
+
 
         // ================== FIX SELECT2 DI MODAL ==================
         $('#modal_add').on('shown.bs.modal', function() {
@@ -619,7 +642,7 @@
             const qty = parseFloat($('#add_kuantitas').val()) || 1;
             const finishing = $('#add_finishing').val();
             const diskon = parseFloat($('#add_diskon').val()) || 0;
-            const subtotal = harga * (panjang && lebar ? panjang * lebar : 1) * qty * (1 - diskon / 100);
+            const subtotal = parseFloat($('#add_subtotal').val().replace(/[^0-9]/g, '')) || 0;
             const no_spk = $('#add_nospk').val() || '-';
             const keterangan = $('#add_keterangan').val() || '-';
 
