@@ -3,12 +3,14 @@
 @section('content')
 
 <div class="container">
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+            <h4 class="mb-0">Manajemen Cabang Inventaris</h4>
+            <!-- <button class="btn btn-light btn-sm" onclick="tambahCabang()">+ Tambah Cabang</button> -->
+        </div>
 
-    <h3 class="mb-4">Manajemen Cabang</h3>
-
-    <!-- <button class="btn btn-primary mb-3" onclick="tambahCabang()">Tambah Cabang</button> -->
-
-    <table class="table table-bordered">
+    <div class="card-body">
+    <table class="table table-bordered table-striped align-middle text-center styletable">
         <thead>
             <tr>
                 <th>Kode</th>
@@ -30,24 +32,19 @@
                     <td>{{ $c->email }}</td>
                     <td>{{ $c->jenis }}</td>
                     <td>
+                        
+                         {{-- Tombol aktif dan nonaktif --}}
+                        @php
+                        $nonaktif = config('cabang_nonaktif.ids');
+                        @endphp
 
-                        {{-- BUTTON EDIT --}}
-                        <button class="btn btn-warning btn-sm"
-                            onclick="editCabang({{ $c }})">
-                            Edit
-                        </button>
-
-                        {{-- FORM DELETE (PAKE ID AGAR DIPANGGIL SWEETALERT) --}}
-                        <form id="form-delete-{{ $c->id }}"
-                              action="{{ route('cabangs.destroy', $c->id) }}"
-                              method="POST" class="d-inline">
+                        <form action="{{ route('inventaris.cabang.toggle', $c->id) }}" method="POST" class="d-inline">
                             @csrf
-                            @method('DELETE')
-
-                            <button type="button" class="btn btn-danger btn-sm"
-                                onclick="hapusCabang({{ $c->id }})">
-                                Hapus
-                            </button>
+                            @if(in_array($c->id, $nonaktif))
+                                <button class="btn btn-success btn-sm">Aktifkan</button>
+                            @else
+                                <button class="btn btn-secondary btn-sm">Nonaktif</button>
+                            @endif
                         </form>
 
                     </td>

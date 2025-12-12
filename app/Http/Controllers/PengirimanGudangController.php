@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Cabang;
 use App\Models\MBahanBakus;
 use App\Models\MStokBahanBakus;
-use App\Models\MPengiriman;
+use App\Models\MPengirimanGudang;
 
 class PengirimanGudangController extends Controller
 {
@@ -15,10 +15,7 @@ class PengirimanGudangController extends Controller
      */
     private function getGudang()
     {
-        return Cabang::where('slug', 'gudangpusat')
-            ->orWhere('jenis', 'pusat')
-            ->orWhere('kode', 'GDG-UTM')
-            ->firstOrFail();
+        return Cabang::where('kode', 'GDG-UTM')->firstOrFail();
     }
 
     /* ============================================================
@@ -146,26 +143,31 @@ class PengirimanGudangController extends Controller
     /* ============================================================
        2. CRUD STOK GUDANG PUSAT (halaman stok)
        ============================================================ */
-    public function stok()
-    {
-        $gudang = $this->getGudang();
+        public function stok()
+        {
+            $gudang = $this->getGudang();
 
-        // semua stok gudang
-        $datas = MStokBahanBakus::with('bahanbaku')
-                    ->where('cabang_id', $gudang->id)
-                    ->orderByDesc('banyak_stok')
-                    ->get();
+            // Ambil stok + join ke tabel bahan baku
+            $datas = MStokBahanBakus::leftJoin('bahanbakus', 'bahanbakus.id', '=', 'stok_bahan_bakus.bahanbaku_id')
+                ->where('stok_bahan_bakus.cabang_id', $gudang->id)
+                ->select(
+                    'stok_bahan_bakus.id as stok_id',
+                    'stok_bahan_bakus.banyak_stok',
+                    'stok_bahan_bakus.satuan as satuan_stok',
+                    'bahanbakus.nama_bahan'
+                )
+                ->orderBy('bahanbakus.nama_bahan', 'ASC')
+                ->get();
 
-        // semua daftar bahan baku
-        $barangs = MBahanBakus::orderBy('nama_bahan')->get();
+            // Semua daftar bahan untuk modal tambah
+            $barangs = MBahanBakus::orderBy('nama_bahan')->get();
 
-        return view('admin.inventaris.gudangpusat.stok', [
-            'gudang'  => $gudang,
-            'datas'   => $datas,
-            'barangs' => $barangs  
-        ]);
-    }
-
+            return view('admin.inventaris.gudangpusat.stok', [
+                'gudang'  => $gudang,
+                'datas'   => $datas,
+                'barangs' => $barangs
+            ]);
+        }
 
     public function tambahStok(Request $req)
     {
@@ -199,22 +201,28 @@ class PengirimanGudangController extends Controller
     }
 
     /* ============================================================
-       3. PENGIRIMAN BAHAN KE CABANG (index + store + update status + destroy)
-       ============================================================ */
+    3. PENGIRIMAN BAHAN KE CABANG (FULL STATUS + AUTO STOK TERIMA)
+    ============================================================ */
+
     public function index()
     {
         $gudang = $this->getGudang();
 
         $barangs = MStokBahanBakus::with('bahanbaku')
-                    ->where('cabang_id', $gudang->id)
-                    ->get();
+            ->where('cabang_id', $gudang->id)
+            ->get();
 
         $cabangs = Cabang::where('jenis', 'cabang')->get();
 
-        $pengiriman = MPengiriman::with(['stok.bahanbaku'])
-                        ->where('id_gudang', $gudang->id)
-                        ->orderBy('id_pengiriman', 'DESC')
-                        ->get();
+        $pengiriman = \App\Models\MPengirimanGudang::with([
+            'bahanbaku',
+            'cabangAsal',
+            'cabangTujuan',
+            'user'
+        ])
+        ->where('cabang_asal_id', $gudang->id)
+        ->latest()
+        ->get();
 
         return view('admin.inventaris.gudangpusat.pengiriman', [
             'gudang'     => $gudang,
@@ -224,64 +232,94 @@ class PengirimanGudangController extends Controller
         ]);
     }
 
+    /* ============================
+    SIMPAN PENGIRIMAN BARU
+    ============================ */
     public function store(Request $req)
     {
         $req->validate([
             'id_stok'   => 'required',
             'jumlah'    => 'required|numeric|min:1',
-            'tujuan'    => 'required',
+            'tujuan'    => 'required|exists:cabangs,id',
             'tanggal'   => 'required|date',
         ]);
 
         $gudang = $this->getGudang();
 
         $stokGudang = MStokBahanBakus::where('id', $req->id_stok)
-                        ->where('cabang_id', $gudang->id)
-                        ->first();
+            ->where('cabang_id', $gudang->id)
+            ->firstOrFail();
 
-        if (!$stokGudang || $stokGudang->banyak_stok < $req->jumlah) {
+        if ($stokGudang->banyak_stok < $req->jumlah) {
             return back()->with('error', 'Stok gudang tidak mencukupi!');
         }
 
+        // KURANGI STOK GUDANG
         $stokGudang->banyak_stok -= $req->jumlah;
         $stokGudang->save();
 
-        MPengiriman::create([
-            'id_gudang' => $gudang->id,
-            'id_stok'   => $req->id_stok,
-            'jumlah'    => $req->jumlah,
-            'tujuan_pengiriman'  => $req->tujuan,
-            'tanggal_pengiriman' => $req->tanggal,
-            'status_pengiriman'  => 'Dikemas',
+        // SIMPAN PENGIRIMAN
+        \App\Models\MPengirimanGudang::create([
+            'cabang_asal_id'   => $gudang->id,
+            'cabang_tujuan_id'=> $req->tujuan,
+            'bahanbaku_id'    => $stokGudang->bahanbaku_id,
+            'jumlah'          => $req->jumlah,
+            'satuan'          => $stokGudang->satuan,
+            'tujuan_pengiriman'=> $req->tujuan,
+            'tanggal_pengiriman'=> $req->tanggal,
+            'status_pengiriman'=> 'Dikemas',
+            'user_id'         => auth()->id()
         ]);
 
-        return back()->with('success', 'Pengiriman berhasil ditambahkan!');
+        return back()->with('success', 'Pengiriman berhasil dibuat!');
     }
 
-    public function updateStatus(Request $req, $id)
-    {
-        $req->validate(['status_pengiriman' => 'required|in:Dikemas,Dikirim']);
+/* ============================
+UPDATE STATUS (DIKEMAS → DIKIRIM)
+DITERIMA HANYA DARI CABANG
+============================ */
+public function updateStatus(Request $req, $id)
+{
+    // ✅ GUDANG HANYA BOLEH UBAH KE DIKIRIM
+    $req->validate([
+        'status_pengiriman' => 'required|in:Dikemas,Dikirim'
+    ]);
 
-        $pengiriman = MPengiriman::findOrFail($id);
-        $pengiriman->status_pengiriman = $req->status_pengiriman;
-        $pengiriman->save();
+    $pengiriman = \App\Models\MPengirimanGudang::findOrFail($id);
 
-        return back()->with('success', 'Status pengiriman diperbarui!');
+    // ❌ JIKA SUDAH DITERIMA, TIDAK BOLEH DIUBAH LAGI
+    if ($pengiriman->status_pengiriman === 'Diterima') {
+        return back()->with('error', 'Pengiriman ini sudah DITERIMA cabang dan tidak bisa diubah lagi!');
     }
 
+    // ✅ UPDATE STATUS DARI GUDANG
+    $pengiriman->status_pengiriman = $req->status_pengiriman;
+
+    // ✅ JIKA BERUBAH KE DIKIRIM
+    if ($req->status_pengiriman === 'Dikirim') {
+        $pengiriman->tanggal_pengiriman = now();
+    }
+
+    $pengiriman->save();
+
+    return back()->with('success', 'Status pengiriman berhasil diperbarui!');
+}
+
+    /* ============================
+    HAPUS PENGIRIMAN (HANYA SAAT DIKEMAS)
+    ============================ */
     public function destroy($id)
     {
-        $pengiriman = MPengiriman::findOrFail($id);
+        $pengiriman = \App\Models\MPengirimanGudang::findOrFail($id);
 
         if ($pengiriman->status_pengiriman !== 'Dikemas') {
-            return back()->with('error', 'Hanya pengiriman yang masih Dikemas dapat dihapus!');
+            return back()->with('error', 'Pengiriman hanya bisa dibatalkan saat masih Dikemas!');
         }
 
-        $gudang = $this->getGudang();
-
-        $stokGudang = MStokBahanBakus::where('id', $pengiriman->id_stok)
-                        ->where('cabang_id', $gudang->id)
-                        ->first();
+        // KEMBALIKAN STOK KE GUDANG
+        $stokGudang = MStokBahanBakus::where('bahanbaku_id', $pengiriman->bahanbaku_id)
+            ->where('cabang_id', $pengiriman->cabang_asal_id)
+            ->first();
 
         if ($stokGudang) {
             $stokGudang->banyak_stok += $pengiriman->jumlah;
@@ -290,6 +328,7 @@ class PengirimanGudangController extends Controller
 
         $pengiriman->delete();
 
-        return back()->with('success', 'Pengiriman berhasil dihapus!');
+        return back()->with('success', 'Pengiriman berhasil dibatalkan!');
     }
+
 }

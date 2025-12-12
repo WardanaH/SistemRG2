@@ -22,7 +22,7 @@
             <li>
                 <a class="has-arrow" href="javascript:void(0)" aria-expanded="false">
                     <i class="icon icon-credit-card"></i>
-                    <span class="nav-text">Transaksi Transaksi</span>
+                    <span class="nav-text">Transaksi</span>
                 </a>
                 <ul aria-expanded="false">
                     @can('add-transaksipenjualan')
@@ -145,11 +145,12 @@
             </li>
 
             @php
-            // CABANG BENERAN (bukan gudang)
+            $nonaktif = config('cabang_nonaktif.ids');
             $cabangs = App\Models\Cabang::where('jenis', 'cabang')->get();
             @endphp
 
             @foreach($cabangs as $c)
+                @if(!in_array($c->id, $nonaktif))
             <li>
                 <a class="has-arrow" href="javascript:void(0)">
                     <i class="icon icon-home"></i>
@@ -162,6 +163,7 @@
                     <li><a href="{{ url('cabang/'.$c->slug.'/inventaris') }}">Inventaris Kantor</a></li>
                 </ul>
             </li>
+            @endif
             @endforeach
 
             {{-- ===================== GUDANG PUSAT ===================== --}}

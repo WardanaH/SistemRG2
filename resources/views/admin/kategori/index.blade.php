@@ -8,18 +8,17 @@
             <button id="openAddModal" class="btn btn-light btn-sm">+ Tambah Kategori</button>
         </div>
 
-        <div class="card-body">
-            <table class="table table-bordered table-striped text-center align-middle" id="tabel_kategori">
-                <thead class="table-primary">
-                    <tr>
-                        <th>Nama Kategori</th>
-                        <th>Keterangan</th>
-                        <th>Aksi</th>
-                    </tr>
-                </thead>
-                <tbody id="kategoriBody"></tbody>
-            </table>
-        </div>
+    <div class="card-body">
+      <table class="table table-bordered table-striped text-center align-middle styletable" id="tabel_kategori">
+        <thead class="table-primary">
+          <tr>
+            <th>Nama Kategori</th>
+            <th>Keterangan</th>
+            <th>Aksi</th>
+          </tr>
+        </thead>
+        <tbody id="kategoriBody"></tbody>
+      </table>
     </div>
 </div>
 

@@ -59,6 +59,7 @@ Route::middleware('auth')->group(function () {
 //     $user = auth()->user();
 //     return [
 //         'roles' => $user->getRoleNames(),
+//         'permissions' => $user->getAllPermissions()->pluck('name'),
 //         'has_edit_users' => $user->can('edit-users'),
 //     ];
 // });
@@ -238,6 +239,10 @@ Route::middleware(['auth'])->group(function () {
 
     Route::delete('/inventaris/cabang/delete/{id}', [CabangDinamisController::class, 'manageCabangDelete'])
         ->name('inventaris.cabang.delete');
+
+    //toggle
+    Route::post('/inventaris/cabang/toggle/{id}', [CabangDinamisController::class, 'toggle'])
+        ->name('inventaris.cabang.toggle');
 
     // ================== CABANG {slug} ==================
     Route::prefix('cabang/{slug}')->name('cabang.')->group(function () {
