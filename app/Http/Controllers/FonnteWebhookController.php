@@ -11,66 +11,29 @@ class FonnteWebhookController extends Controller
 {
     public function handle(Request $request)
     {
-        Log::info("WEBHOOK RAW PAYLOAD", [
-            'raw' => $request->getContent()
-        ]);
+        Log::info("WEBHOOK RAW", [$request->getContent()]);
 
-        // WAJIB PAKAI INI
         $data = json_decode($request->getContent(), true) ?? [];
 
-        Log::info("WEBHOOK DECODE", $data);
-
-        $pengirim = $data['sender'] ?? '';
+        $pengirim = $data['sender'] ?? null;
         $pesan    = trim(strtolower($data['message'] ?? ''));
 
-        if (!$pesan) {
-            return response("NO MESSAGE", 200);
-        }
+        if (!$pengirim) return response("NO SENDER", 200);
 
-        /** =========================
-         * 1. PERINTAH: CEK NOTA
-         * Format:
-         * CEK NOTA 2401220001
-         =========================== */
-        if (preg_match('/cek nota (\w+)/i', $pesan, $m)) {
-            $nota = $m[1];
-            return $this->replyCekNota($pengirim, $nota);
-        }
+        /** ======================================================
+         *   CEK APAKAH CUSTOMER BARU (BELUM PERNAH CHAT)
+         * ====================================================== */
+        $isNew = \App\Models\ChatHistory::where('wa_number', $pengirim)->doesntExist();
 
-        /** =========================
-         * 2. PERINTAH: CEK STATUS
-         * Format:
-         * CEK STATUS 2401220001
-         =========================== */
-        if (preg_match('/cek status (\w+)/i', $pesan, $m)) {
-            $nota = $m[1];
-            return $this->replyStatusPesanan($pengirim, $nota);
-        }
+        if ($isNew) {
 
-        /** =========================
-         * 3. PERINTAH: CEK PESANAN (Nama)
-         * Format:
-         * CEK PESANAN Restu
-         =========================== */
-        if (preg_match('/cek pesanan (.+)/i', $pesan, $m)) {
-            $nama = $m[1];
-            return $this->replyPesananByNama($pengirim, $nama);
-        }
+            // SIMPAN SEBAGAI SUDAH CHAT
+            \App\Models\ChatHistory::create(['wa_number' => $pengirim]);
 
-        /** =========================
-         * 4. PERINTAH: CEK ITEM
-         * Format:
-         * CEK ITEM 2401220001
-         =========================== */
-        if (preg_match('/cek item (\w+)/i', $pesan, $m)) {
-            $nota = $m[1];
-            return $this->replyItemPesanan($pengirim, $nota);
-        }
-
-        // Default balasan
-        return $this->sendText(
-            $pengirim,
-            "*Perintah tidak dikenali.*
+            // KIRIM PANDUAN
+            return $this->sendText(
+                $pengirim,
+                "*Selamat datang!* 👋
 
 Gunakan perintah berikut:
 
@@ -81,8 +44,40 @@ Gunakan perintah berikut:
 
 Contoh:
 CEK NOTA 2401220001"
-        );
+            );
+        }
+
+        /** ======================================================
+         *   JIKA TIDAK ADA PESAN → BOT DIAM
+         * ====================================================== */
+        if (!$pesan) return response("NO MESSAGE", 200);
+
+        /** ======================================================
+         *   CEK PERINTAH
+         * ====================================================== */
+
+        if (preg_match('/cek nota (\w+)/i', $pesan, $m)) {
+            return $this->replyCekNota($pengirim, $m[1]);
+        }
+
+        if (preg_match('/cek status (\w+)/i', $pesan, $m)) {
+            return $this->replyStatusPesanan($pengirim, $m[1]);
+        }
+
+        if (preg_match('/cek pesanan (.+)/i', $pesan, $m)) {
+            return $this->replyPesananByNama($pengirim, $m[1]);
+        }
+
+        if (preg_match('/cek item (\w+)/i', $pesan, $m)) {
+            return $this->replyItemPesanan($pengirim, $m[1]);
+        }
+
+        /** ======================================================
+         *   BUKAN PERINTAH → BOT DIAM
+         * ====================================================== */
+        return response("NO REPLY", 200);
     }
+
 
 
     /* ====================================================
@@ -90,7 +85,7 @@ CEK NOTA 2401220001"
      * ==================================================== */
     private function replyCekNota($target, $nota)
     {
-        $trx = MTransaksiPenjualans::where('nomor_nota', 'RG-'.$nota)->first();
+        $trx = MTransaksiPenjualans::where('nomor_nota', 'RG-' . $nota)->first();
 
         if (!$trx) {
             return $this->sendText($target, "*Nomor nota tidak ditemukan!*");
@@ -114,7 +109,7 @@ Status: *{$trx->status_transaksi}*
      * ==================================================== */
     private function replyStatusPesanan($target, $nota)
     {
-        $trx = MTransaksiPenjualans::with('subTransaksi.produk')->where('nomor_nota', 'RG-'.$nota)->first();
+        $trx = MTransaksiPenjualans::with('subTransaksi.produk')->where('nomor_nota', 'RG-' . $nota)->first();
 
         if (!$trx) {
             return $this->sendText($target, "*Nomor nota tidak ditemukan!*");
@@ -156,7 +151,7 @@ Status: *{$trx->status_transaksi}*
      * ==================================================== */
     private function replyItemPesanan($target, $nota)
     {
-        $trx = MTransaksiPenjualans::with('subTransaksi.produk')->where('nomor_nota', 'RG-'.$nota)->first();
+        $trx = MTransaksiPenjualans::with('subTransaksi.produk')->where('nomor_nota', 'RG-' . $nota)->first();
 
         if (!$trx) {
             return $this->sendText($target, "*Nomor nota tidak ditemukan!*");
