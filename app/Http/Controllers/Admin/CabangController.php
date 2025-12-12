@@ -26,6 +26,7 @@ class CabangController extends Controller
             $request->validate([
                 'kode' => 'required|string|max:20|unique:cabangs',
                 'nama' => 'required|string|max:255',
+                'slug' => str_replace(' ', '-', strtolower($request->input('nama'))),
                 'email' => 'nullable|email',
                 'telepon' => 'nullable|string|max:20',
                 'alamat' => 'nullable|string',
