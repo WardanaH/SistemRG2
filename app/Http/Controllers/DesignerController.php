@@ -22,6 +22,10 @@ class DesignerController extends Controller
         return view('admin.users.designer.index', compact('designers'));
     }
 
+    public function dashboard()
+    {
+        return view('designer.dashboard');
+    }
 
     /**
      * Show the form for creating a new resource.
