@@ -519,6 +519,8 @@
         });
 
         let total = 0;
+        let subtotalNumeric = 0;
+
         const storeUrl = "{{ route('storetransaksipenjualan') }}";
         const form = $(`form[action='${storeUrl}']`);
         let items = [];
@@ -598,30 +600,34 @@
             const hitungLuas = option.data('hitung_luas');
             const satuan = (option.data('satuan') || '').toLowerCase();
 
-            let subtotal = 0;
-
             let p = panjang;
             let l = lebar;
 
-            // 🟩 KONVERSI SATUAN
+            let subtotal = 0;
+
             if (hitungLuas == 1) {
                 if (satuan === 'cm' || satuan === 'centimeter') {
-                    p = p / 100;
-                    l = l / 100;
+                    p /= 100;
+                    l /= 100;
                 }
-                // jika sudah meter → langsung hitung
                 subtotal = harga * (p * l) * qty;
-
             } else {
                 subtotal = harga * qty;
             }
+            console.log(subtotal);
 
-            // diskon
-            subtotal = subtotal - (subtotal * diskon / 100);
+            subtotal -= subtotal * diskon / 100;
 
-            $('#add_subtotal').val('Rp ' + subtotal.toLocaleString('id-ID'));
+            subtotalNumeric = subtotal; // ⬅ SIMPAN ANGKA ASLI
+            console.log('Numerik = ', subtotalNumeric);
+
+            $('#add_subtotal').val(
+                'Rp ' + subtotal.toLocaleString('id-ID', {
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 2
+                })
+            );
         }
-
 
         // ================== FIX SELECT2 DI MODAL ==================
         $('#modal_add').on('shown.bs.modal', function() {
@@ -642,7 +648,7 @@
             const qty = parseFloat($('#add_kuantitas').val()) || 1;
             const finishing = $('#add_finishing').val();
             const diskon = parseFloat($('#add_diskon').val()) || 0;
-            const subtotal = parseFloat($('#add_subtotal').val().replace(/[^0-9]/g, '')) || 0;
+            const subtotal = subtotalNumeric;
             const no_spk = $('#add_nospk').val() || '-';
             const keterangan = $('#add_keterangan').val() || '-';
 
