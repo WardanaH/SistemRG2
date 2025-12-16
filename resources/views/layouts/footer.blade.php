@@ -8,7 +8,10 @@
 
         <!-- COPYRIGHT TENGAH -->
         <div class="footer-center text-center">
-            &copy; Tim PKL Politala 2025–2026 — Wardana | Diah | Mujayhid
+            &copy; Tim PKL Politala 2025–2026 — 
+            <a href="https://www.instagram.com/wrdxxzz/" target="_blank">Wardana</a> | 
+            <a href="https://www.instagram.com/diahmfr_/" target="_blank">Diah</a> | 
+            <a href="https://www.instagram.com/iamfinethankyoundsinn/" target="_blank">Mujayhid</a>
         </div>
 
         <!-- COPYRIGHT KANAN -->

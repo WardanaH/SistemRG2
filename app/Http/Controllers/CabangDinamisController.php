@@ -4,8 +4,9 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Cabang;
-use App\Models\MCabangBarang;
+use App\Models\MStokBahanBakus;
 use App\Models\MInventarisKantor;
+use App\Models\MPengirimanGudang;
 use Illuminate\Support\Facades\Storage;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
@@ -25,13 +26,13 @@ class CabangDinamisController extends Controller
             })
             ->leftJoin('kategories', 'kategories.id', '=', 'bahanbakus.kategori_id')
             ->select(
-                'bahanbakus.*',                               
+                'bahanbakus.*',
                 'bahanbakus.id as id_bahanbaku',
 
                 'stok_bahan_bakus.banyak_stok',
-                'stok_bahan_bakus.satuan as satuan_stok',    
+                'stok_bahan_bakus.satuan as satuan_stok',
 
-                'kategories.Nama_Kategori as nama_kategori'  
+                'kategories.Nama_Kategori as nama_kategori'
             )
             ->orderBy('stok_bahan_bakus.banyak_stok', 'DESC')
             ->get();
@@ -161,7 +162,7 @@ class CabangDinamisController extends Controller
     }
 
  /* ===========================================================
-🔹 3. INVENTARIS KANTOR 
+🔹 3. INVENTARIS KANTOR
 =========================================================== */
 
 private function getCabang($slug)
@@ -287,79 +288,63 @@ public function inventarisDestroy($slug, $id)
 }
 
 
-    /* ===========================================================
-    🔹 4. RIWAYAT PENERIMAAN PENGIRIMAN BAHAN KE CABANG
-    =========================================================== */
-    public function riwayat($slug)
-    {
-        $cabang = Cabang::where('slug', $slug)->firstOrFail();
+/* ===========================================================
+🔹 4. RIWAYAT PENGIRIMAN KE CABANG (VERSI BARU)
+=========================================================== */
+public function riwayat($slug)
+{
+    $cabang = Cabang::where('slug', $slug)->firstOrFail();
 
-        $riwayat = \App\Models\MPengiriman::leftJoin('bahanbakus', 'pengirimans.id_barang', '=', 'bahanbakus.id')
-            ->where('pengirimans.tujuan_pengiriman', $slug)
-            ->select(
-                'pengirimans.*',
-                'bahanbakus.nama_bahan',
-                'bahanbakus.satuan'
-            )
-            ->orderBy('pengirimans.id_pengiriman', 'DESC')
-            ->get();
+    $riwayat = \App\Models\MPengirimanGudang::with('bahanbaku')
+        ->where('cabang_tujuan_id', $cabang->id)
+        ->orderByDesc('id')
+        ->get();
 
-        return view("admin.inventaris.templateinventaris.riwayat", [
-            'title' => 'Riwayat Pengiriman - ' . $cabang->nama,
-            'riwayat' => $riwayat,
-            'cabang' => $cabang
-        ]);
+    return view("admin.inventaris.templateinventaris.riwayat", [
+        'title'   => 'Riwayat Pengiriman - ' . $cabang->nama,
+        'riwayat' => $riwayat,
+        'cabang'  => $cabang
+    ]);
+}
+
+
+/* ===========================================================
+🔹 5. CABANG MENERIMA BARANG (AUTO TAMBAH STOK)
+=========================================================== */
+public function riwayatTerima($slug, $id)
+{
+    $cabang = Cabang::where('slug', $slug)->firstOrFail();
+
+    $pengiriman = \App\Models\MPengirimanGudang::findOrFail($id);
+
+    // JIKA SUDAH DITERIMA
+    if ($pengiriman->status_pengiriman === 'Diterima') {
+        return back()->with('error', 'Barang ini sudah diterima sebelumnya.');
     }
 
-    /* ===========================================================
-    🔹 5. CABANG MENERIMA BARANG
-    =========================================================== */
-    public function riwayatTerima($slug, $id)
-    {
-        $cabang = $this->getCabang($slug);
+    // TAMBAH / BUAT STOK CABANG
+    $stokCabang = MStokBahanBakus::firstOrCreate(
+        [
+            'bahanbaku_id' => $pengiriman->bahanbaku_id,
+            'cabang_id'    => $cabang->id,
+        ],
+        [
+            'banyak_stok' => 0,
+            'satuan'      => $pengiriman->satuan
+        ]
+    );
 
-        // ambil data pengiriman
-        $pengiriman = \App\Models\MPengiriman::with('barang')
-                        ->where('id_pengiriman', $id)
-                        ->where('tujuan_pengiriman', $slug)   // tujuan = slug
-                        ->firstOrFail();
+    $stokCabang->banyak_stok += $pengiriman->jumlah;
+    $stokCabang->save();
 
-        // jika sudah diterima → stop
-        if ($pengiriman->status_penerimaan === 'Diterima') {
-            return back()->with('error', 'Barang ini sudah diterima sebelumnya.');
-        }
+    // UPDATE STATUS
+    $pengiriman->status_pengiriman = 'Diterima';
+    $pengiriman->tanggal_diterima = now();
+    $pengiriman->save();
 
-        // cek apakah stok bahan di cabang sudah ada
-        $stokCabang = \DB::table('stok_bahan_bakus')
-            ->where('cabang_id', $cabang->id)
-            ->where('bahanbaku_id', $pengiriman->id_barang)
-            ->first();
+    return back()->with('success', 'Barang berhasil diterima oleh cabang!');
+}
 
-        if ($stokCabang) {
-            // jika sudah ada → update stok
-            \DB::table('stok_bahan_bakus')
-                ->where('cabang_id', $cabang->id)
-                ->where('bahanbaku_id', $pengiriman->id_barang)
-                ->update([
-                    'banyak_stok' => $stokCabang->banyak_stok + $pengiriman->jumlah,
-                    'satuan'      => $pengiriman->barang->satuan
-                ]);
-        } else {
-            // jika belum ada → buat stok baru
-            \DB::table('stok_bahan_bakus')->insert([
-                'cabang_id'     => $cabang->id,
-                'bahanbaku_id'  => $pengiriman->id_barang,
-                'banyak_stok'   => $pengiriman->jumlah,
-                'satuan'        => $pengiriman->barang->satuan,
-            ]);
-        }
-
-        // update status penerimaan
-        $pengiriman->status_penerimaan = 'Diterima';
-        $pengiriman->save();
-
-        return back()->with('success', 'Barang berhasil diterima oleh cabang!');
-    }
 
     /* ===========================================================
     🔹 6. MANAJEMEN CABANG
@@ -406,4 +391,25 @@ public function inventarisDestroy($slug, $id)
         return back()->with('success', 'Cabang berhasil dihapus');
     }
 
+    public function toggle($id)
+    {
+        $configPath = config_path('cabang_nonaktif.php');
+        $data = config('cabang_nonaktif.ids');
+
+        if (in_array($id, $data)) {
+            // Jika sudah nonaktif → aktifkan lagi
+            $data = array_diff($data, [$id]);
+        } else {
+            // Jika aktif → nonaktifkan
+            $data[] = $id;
+        }
+
+        // Simpan kembali ke file config
+        file_put_contents(
+            $configPath,
+            "<?php\n\nreturn ['ids' => " . var_export(array_values($data), true) . "];"
+        );
+
+        return back()->with('success', 'Status cabang telah diperbarui.');
+    }
 }

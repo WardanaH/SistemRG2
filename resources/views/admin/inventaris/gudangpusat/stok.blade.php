@@ -18,14 +18,14 @@
         <h4 class="card-title">Daftar Stok Bahan Baku</h4>
 
         <div class="table-responsive">
-            <table class="table table-striped align-middle text-center">
+            <table class="table table-striped table-bordered align-middle text-center">
                 <thead class="table-light">
                     <tr>
                         <th>No</th>
                         <th>Nama Bahan</th>
                         <th>Stok</th>
                         <th>Satuan</th>
-                        <th>Aksi</th>
+                        {{-- <th>Aksi</th> --}}
                     </tr>
                 </thead>
 
@@ -43,7 +43,7 @@
                     <!-- Satuan -->
                     <td>{{ $d->satuan_stok ?? '-' }}</td>
 
-                    <!-- Aksi -->
+                    {{-- <!-- Aksi -->
                     <td>
 
                         <!-- EDIT hanya jika stok_id ada -->
@@ -70,7 +70,7 @@
                         </form>
                         @endif
 
-                    </td>
+                    </td> --}}
                 </tr>
 
                 <!-- MODAL EDIT STOK -->

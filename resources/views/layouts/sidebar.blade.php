@@ -22,7 +22,7 @@
             <li>
                 <a class="has-arrow" href="javascript:void(0)" aria-expanded="false">
                     <i class="icon icon-credit-card"></i>
-                    <span class="nav-text">Transaksi Transaksi</span>
+                    <span class="nav-text">Transaksi</span>
                 </a>
                 <ul aria-expanded="false">
                     @can('add-transaksipenjualan')
@@ -134,6 +134,16 @@
             </li>
             @endcan
 
+            @can('manage-proyek')
+            <li>
+                <a href="{{ route('companies.index') }}">
+                    <i class="icon icon-settings"></i>
+                    <span class="nav-text">Manajemen Proyek</span>
+                </a>
+            </li>
+            @endcan
+
+            @can('manage-gudang')
             {{-- ===================== CABANG & INVENTARIS ===================== --}}
             <li class="nav-label mt-3">CABANG & INVENTARIS</li>
 
@@ -145,11 +155,12 @@
             </li>
 
             @php
-            // CABANG BENERAN (bukan gudang)
+            $nonaktif = config('cabang_nonaktif.ids');
             $cabangs = App\Models\Cabang::where('jenis', 'cabang')->get();
             @endphp
 
             @foreach($cabangs as $c)
+            @if(!in_array($c->id, $nonaktif))
             <li>
                 <a class="has-arrow" href="javascript:void(0)">
                     <i class="icon icon-home"></i>
@@ -162,6 +173,7 @@
                     <li><a href="{{ url('cabang/'.$c->slug.'/inventaris') }}">Inventaris Kantor</a></li>
                 </ul>
             </li>
+            @endif
             @endforeach
 
             {{-- ===================== GUDANG PUSAT ===================== --}}
@@ -179,6 +191,7 @@
                 </ul>
             </li>
         </ul>
+        @endcan
     </div>
 </div>
 <!--**********************************

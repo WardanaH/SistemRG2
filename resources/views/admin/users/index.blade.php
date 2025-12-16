@@ -76,7 +76,7 @@
         <button class="btn btn-primary mt-2">Tambah User</button>
     </form>
 
-    <table class="table table-bordered table-striped">
+    <table class="table table-bordered table-striped styletable">
         <thead>
             <tr>
                 <th>Nama</th>

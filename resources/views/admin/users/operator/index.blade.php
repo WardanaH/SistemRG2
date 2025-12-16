@@ -5,7 +5,7 @@
     <div class="card shadow-sm">
         <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
             <h5 class="mb-0">👩‍🎨 Daftar Operator</h5>
-            <a href="{{ route('dashboard') }}" class="btn btn-light btn-sm">Kembali</a>
+            <a href="{{ route('dashboard') }}" ></a>
         </div>
         <div class="card-body">
             @if ($operators->isEmpty())
@@ -13,7 +13,7 @@
                 Belum ada user dengan role <strong>Operator</strong>.
             </div>
             @else
-            <table class="table table-striped table-bordered align-middle">
+            <table class="table table-striped table-bordered align-middle styletable">
                 <thead class="table-primary">
                     <tr>
                         <th>#</th>

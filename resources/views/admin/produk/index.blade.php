@@ -9,7 +9,7 @@
         </div>
 
         <div class="card-body">
-            <table class="table table-bordered table-striped text-center align-middle" id="tabel_produk">
+            <table class="table table-bordered table-striped text-center align-middle styletable" id="tabel_produk">
                 <thead class="table-primary">
                     <tr>
                         <th>Nama Produk</th>
@@ -40,7 +40,7 @@
                 <div class="modal-body">
                     <div class="row g-2">
                         <div class="col-md-6">
-                            <select name="kategori" class="form-select">
+                            <select name="kategori" class="select2">
                                 <option value="">-- Pilih Kategori --</option>
                                 @foreach($kategories as $k)
                                 <option value="{{ $k->id }}">{{ $k->Nama_Kategori }}</option>
@@ -49,7 +49,7 @@
                         </div>
                         <div class="col-md-6"><input name="nama_produk" class="form-control" placeholder="Nama Produk"></div>
                         <div class="col-md-6">
-                            <select name="satuan" class="form-select">
+                            <select name="satuan" class="select2">
                                 <option value="">-- Satuan --</option>
                                 <option value="CENTIMETER">Centimeter</option>
                                 <option value="METER">Meter</option>
@@ -84,7 +84,7 @@
                 <div class="modal-body">
                     <div class="row g-2">
                         <div class="col-md-6">
-                            <select name="edit_kategori" id="edit_kategori" class="form-select">
+                            <select name="edit_kategori" id="edit_kategori" class="select2">
                                 @foreach($kategories as $k)
                                 <option value="{{ $k->id }}">{{ $k->Nama_Kategori }}</option>
                                 @endforeach
@@ -92,7 +92,7 @@
                         </div>
                         <div class="col-md-6"><input name="edit_nama_produk" id="edit_nama_produk" class="form-control" placeholder="Nama Produk"></div>
                         <div class="col-md-6">
-                            <select name="edit_satuan" id="edit_satuan" class="form-select">
+                            <select name="edit_satuan" id="edit_satuan" class="select2">
                                 <option value="CENTIMETER">Centimeter</option>
                                 <option value="METER">Meter</option>
                                 <option value="PCS">Pcs</option>

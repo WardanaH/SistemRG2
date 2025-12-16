@@ -64,6 +64,9 @@ class TransaksiPenjualansController extends Controller
             $transaksi->user_id = Auth::id();
             $transaksi->cabang_id = Auth::user()->cabang->id ?? null;
             $transaksi->designer_id = $request->inputdesigner;
+
+            // dd($transaksi);
+
             $transaksi->save();
 
             // SIMPAN DETAIL ITEM
@@ -80,28 +83,24 @@ class TransaksiPenjualansController extends Controller
                 $sub->diskon = $item['diskon'] ?? 0;
                 $sub->no_spk = $item['no_spk'] ?? '-';
                 $sub->keterangan = $item['keterangan'] ?? '-';
-                $sub->satuan = 'PCS';
+                $sub->satuan = $produk->satuan;
                 $sub->user_id = Auth::id();
 
                 // ===== LOGIKA BARU =====
                 if ($hitungLuas == 1) {
-                    // Produk menggunakan panjang × lebar
-                    $sub->panjang = $item['panjang'] ?? 0;
-                    $sub->lebar = $item['lebar'] ?? 0;
-                    $sub->banyak = $item['kuantitas'];
-
-                    $sub->subtotal =
-                        $item['harga'] *
-                        ($item['panjang'] * $item['lebar']) *
-                        $item['kuantitas'];
+                    $sub->panjang = $item['panjang'];
+                    $sub->lebar   = $item['lebar'];
+                    $sub->banyak  = $item['kuantitas'];
                 } else {
-                    // Produk tidak menggunakan luas
                     $sub->panjang = 0;
-                    $sub->lebar = 0;
-                    $sub->banyak = $item['kuantitas'];
-
-                    $sub->subtotal = $item['harga'] * $item['kuantitas'];
+                    $sub->lebar   = 0;
+                    $sub->banyak  = $item['kuantitas'];
                 }
+
+                $sub->subtotal = $item['subtotal']; // 🔥 AMAN
+
+
+                // dd($sub);
 
                 $sub->save();
 
