@@ -9,7 +9,7 @@
     </div>
 
     <div class="card-body">
-      <table class="table table-bordered table-striped text-center align-middle" id="tabel_supplier">
+      <table class="table table-bordered table-striped text-center align-middle styletable" id="tabel_supplier">
         <thead class="table-primary">
           <tr>
             <th>Nama</th>
@@ -87,20 +87,24 @@
   </div>
 </div>
 
-{{-- =================== SCRIPT =================== --}}
+{{-- ================= SWEETALERT + SCRIPT ================== --}}
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
 <script>
 $(function(){
+
     const addModal = new bootstrap.Modal(document.getElementById('addModal'));
     const editModal = new bootstrap.Modal(document.getElementById('editModal'));
 
     loadSuppliers();
 
-    // ======= LOAD DATA SUPPLIER =======
-    function loadSuppliers(){
+    // ====================== LOAD SUPPLIER ======================
+    function loadSuppliers() {
         $.get("{{ route('loadsupplier') }}", function(res){
             let rows = '';
+
             if(res.data.length === 0){
                 rows = `<tr><td colspan="8" class="text-muted">Belum ada data supplier.</td></tr>`;
             } else {
@@ -115,48 +119,64 @@ $(function(){
                       <td>${s.rekening_suppliers}</td>
                       <td>${s.keterangan_suppliers ?? '-'}</td>
                       <td>
-                        <button class="btn btn-success btn-sm editBtn" data-id="${s.id}">Edit</button>
+                        <button class="btn btn-warning btn-sm editBtn" data-id="${s.id}">Edit</button>
                         <button class="btn btn-danger btn-sm deleteBtn" data-id="${s.id}">Hapus</button>
                       </td>
                     </tr>`;
                 });
             }
+
             $('#supplierBody').html(rows);
+
+        }).fail(() => {
+            Swal.fire({ icon: 'error', title: 'Gagal memuat data!' })
         });
     }
 
-    // ======= TAMBAH SUPPLIER =======
-    $('#openAddModal').click(()=>addModal.show());
+    // ====================== TAMBAH SUPPLIER ======================
+    $('#openAddModal').click(() => addModal.show());
+
     $('#formAdd').on('submit', function(e){
         e.preventDefault();
+
         $.ajax({
             url: "{{ route('storesupplier') }}",
             method: "POST",
             data: $(this).serialize(),
+
             success: function(res){
                 if(res === "Success"){
-                    alert('Supplier berhasil ditambahkan!');
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Supplier berhasil ditambahkan!',
+                        timer: 1500,
+                        showConfirmButton: false
+                    });
+
                     $('#formAdd')[0].reset();
                     addModal.hide();
                     loadSuppliers();
+
                 } else {
-                    alert('Gagal menambahkan supplier!');
+                    Swal.fire({ icon: 'error', title: 'Gagal menambahkan supplier!' });
                 }
             },
-            error: function(err){
-                console.error(err);
-                alert('Terjadi kesalahan pada server!');
+
+            error: function(){
+                Swal.fire({ icon: 'error', title: 'Terjadi kesalahan pada server!' });
             }
         });
     });
 
-    // ======= EDIT SUPPLIER =======
+    // ====================== EDIT OPEN FORM ======================
     $(document).on('click', '.editBtn', function(){
         const id = $(this).data('id');
+
         $.get("{{ route('loadsupplier') }}", function(res){
             const s = res.data.find(x => x.id == id);
+
             if(s){
-                $('#edit_supplier_id').val(s.id); 
+                $('#edit_supplier_id').val(s.id);
                 $('#edit_nama_supplier').val(s.nama_supplier);
                 $('#edit_pemilik_supplier').val(s.pemilik_supplier);
                 $('#edit_telpon_supplier').val(s.telpon_supplier);
@@ -169,46 +189,86 @@ $(function(){
         });
     });
 
+    // ====================== UPDATE ======================
     $('#formEdit').on('submit', function(e){
         e.preventDefault();
+
         $.ajax({
             url: "{{ route('updatesupplier') }}",
             method: "POST",
             data: $(this).serialize(),
+
             success: function(res){
                 if(res === "Success"){
-                    alert('Data supplier berhasil diupdate!');
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Data supplier berhasil diupdate!',
+                        timer: 1500,
+                        showConfirmButton: false
+                    });
+
                     $('#formEdit')[0].reset();
                     editModal.hide();
                     loadSuppliers();
+
                 } else {
-                    alert('Gagal update supplier!');
+                    Swal.fire({ icon: 'error', title: 'Gagal update supplier!' });
                 }
             },
-            error: function(err){
-                console.error(err);
-                alert('Terjadi kesalahan pada server!');
+
+            error: function(){
+                Swal.fire({ icon: 'error', title: 'Terjadi kesalahan pada server!' });
             }
         });
+
     });
 
-    // ======= HAPUS SUPPLIER =======
+    // ====================== HAPUS ======================
     $(document).on('click', '.deleteBtn', function(){
+
         const id = $(this).data('id');
-        if(confirm('Yakin ingin menghapus supplier ini?')){
-            $.post("{{ route('deletesupplier') }}", {
-                _token: '{{ csrf_token() }}',
-                hapus_supplier_id: id
-            }, function(res){
-                if(res === "Success"){
-                    alert('Supplier berhasil dihapus!');
-                    loadSuppliers();
-                } else {
-                    alert('Gagal menghapus supplier!');
-                }
-            });
-        }
+
+        Swal.fire({
+            title: 'Yakin ingin menghapus?',
+            text: 'Data supplier akan dihapus permanen.',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Ya, Hapus!',
+            cancelButtonText: 'Batal',
+            reverseButtons: true
+        }).then(result => {
+
+            if(result.isConfirmed){
+
+                $.post("{{ route('deletesupplier') }}", {
+                    _token: '{{ csrf_token() }}',
+                    hapus_supplier_id: id
+                }, function(res){
+
+                    if(res === "Success"){
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Supplier berhasil dihapus!',
+                            timer: 1500,
+                            showConfirmButton: false
+                        });
+
+                        loadSuppliers();
+
+                    } else {
+                        Swal.fire({ icon: 'error', title: 'Gagal menghapus supplier!' });
+                    }
+
+                }).fail(() => {
+                    Swal.fire({ icon: 'error', title: 'Terjadi kesalahan server!' });
+                });
+
+            }
+
+        });
+
     });
+
 });
 </script>
 

@@ -12,9 +12,20 @@ class UserSeeder extends Seeder
     public function run(): void
     {
         // --- Buat 2 cabang ---
+        $cabangGDGUtama = Cabang::create([
+            'kode' => 'GDG-UTM',
+            'nama' => 'Gudang Utama',
+            'slug' => 'gudang-utama',
+            'email' => 'utama@example.com',
+            'telepon' => '08123456789',
+            'alamat' => 'Jl. Merdeka No. 1, Jakarta',
+            'jenis' => 'pusat',
+        ]);
+
         $cabangUtama = Cabang::create([
             'kode' => 'CBG-UTM',
             'nama' => 'Cabang Utama',
+            'slug' => 'cabang-pusat',
             'email' => 'utama@example.com',
             'telepon' => '08123456789',
             'alamat' => 'Jl. Merdeka No. 1, Jakarta',
@@ -24,6 +35,7 @@ class UserSeeder extends Seeder
         $cabangBjm = Cabang::create([
             'kode' => 'CBG-BJM',
             'nama' => 'Cabang Banjarmasin',
+            'slug' => 'cabang-banjarmasin',
             'email' => 'banjarmasin@example.com',
             'telepon' => '08234567890',
             'alamat' => 'Jl. Veteran No. 2, Banjarmasin',
@@ -33,6 +45,7 @@ class UserSeeder extends Seeder
         $cabangLgg = Cabang::create([
             'kode' => 'CBG-LGG',
             'nama' => 'Cabang Lianganggang',
+            'slug' => 'cabang-lianganggang',
             'email' => 'lianganggang@example.com',
             'telepon' => '08234567890',
             'alamat' => 'Jl. A. Yani KM 2, Lianganggang',
@@ -42,6 +55,7 @@ class UserSeeder extends Seeder
         $cabangPlh = Cabang::create([
             'kode' => 'CBG-PLH',
             'nama' => 'Cabang Pelaihari',
+            'slug' => 'cabang-pelaihari',
             'email' => 'pelaihari@example.com',
             'telepon' => '08234567890',
             'alamat' => 'Jl. A. Yani KM 12, Pelaihari',
@@ -157,5 +171,35 @@ class UserSeeder extends Seeder
             'cabang_id' => $cabangBjm->id,
         ]);
         $operatorMulti->assignRole('operator multi');
+
+        // --- Buat user Adversting ---
+        $adversting = User::create([
+            'nama' => 'Adversting Cabang',
+            'username' => 'adversting',
+            'email' => 'adversting@example.com',
+            'password' => Hash::make('password'),
+            'cabang_id' => $cabangBjm->id,
+        ]);
+        $adversting->assignRole('adversting');
+
+        // --- Buat user Inventory ---
+        $inventory = User::create([
+            'nama' => 'Inventory Cabang Utama',
+            'username' => 'inventoryUtama',
+            'email' => 'inventory@example.com',
+            'password' => Hash::make('password'),
+            'cabang_id' => $cabangGDGUtama->id,
+        ]);
+        $inventory->assignRole('inventory');
+
+        // --- Buat user Documentation ---
+        $documentation = User::create([
+            'nama' => 'Documentation Cabang',
+            'username' => 'documentation',
+            'email' => 'documentation@example.com',
+            'password' => Hash::make('password'),
+            'cabang_id' => $cabangUtama->id,
+        ]);
+        $documentation->assignRole('documentation');
     }
 }

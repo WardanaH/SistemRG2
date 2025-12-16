@@ -10,31 +10,27 @@
         <div class="card-body">
 
             {{-- FILTER --}}
-            <div class="row mb-3">
+            <div class="row mb-3 g-2 align-items-end">
 
-                {{-- No Nota --}}
                 <div class="col-md-2">
                     <input id="filter_nota" class="form-control" placeholder="No Nota">
                 </div>
 
-                {{-- Nama --}}
                 <div class="col-md-2">
                     <input id="filter_nama" class="form-control" placeholder="Nama Pelanggan">
                 </div>
 
-                {{-- Pembayaran --}}
                 <div class="col-md-2">
-                    <select id="filter_bayar" class="form-select">
+                    <select id="filter_bayar" class="select2">
                         <option value="semua">Semua Pembayaran</option>
                         <option value="Cash">Cash</option>
                         <option value="Transfer">Transfer</option>
                     </select>
                 </div>
 
-                {{-- Cabang (Tampil hanya untuk owner / direktur) --}}
                 @if(Auth::user()->hasRole(['owner','direktur']))
                 <div class="col-md-2">
-                    <select id="filter_cabang" class="form-select">
+                    <select id="filter_cabang" class="select2">
                         <option value="semua">Semua Cabang</option>
                         @foreach($cabangs as $c)
                         <option value="{{ $c->id }}">{{ $c->nama }}</option>
@@ -43,15 +39,17 @@
                 </div>
                 @endif
 
+                {{-- tombol filter --}}
                 <div class="col-md-2">
                     <button id="btnFilter" class="btn btn-success w-100">Filter</button>
                 </div>
 
             </div>
 
+
             {{-- DATATABLE --}}
             <div style="overflow-x:auto;">
-                <table class="table table-bordered table-striped" id="tabelAngsuran">
+                <table class="table table-bordered table-striped styletable" id="tabelAngsuran">
                     <thead class="table-primary">
                         <tr>
                             <th>No</th>
@@ -84,6 +82,12 @@
             </div>
 
             <div class="modal-body">
+
+                <p>
+                    Nomor Nota:
+                    <strong id="nomorNotaText">RG-{{ now()->timestamp }}</strong>
+                    <input type="hidden" id="nomorNotaInput">
+                </p>
 
                 <p>
                     Sisa Tagihan:
@@ -155,6 +159,7 @@
                 processing: true,
                 serverSide: true,
                 destroy: true,
+                searching: false,
                 ajax: {
                     url: "{{ route('angsuran.data') }}",
                     data: {
@@ -270,6 +275,7 @@
                         <thead class="table-primary text-center">
                             <tr><th colspan="6">Riwayat Pembayaran Angsuran</th></tr>
                             <tr>
+                                <th>Nomor Nota Angsuran</th>
                                 <th>Tanggal</th>
                                 <th>Metode</th>
                                 <th colspan="4">Nominal</th>
@@ -284,6 +290,7 @@
                     angsurans.forEach(a => {
                         html += `
                             <tr>
+                                <td>${a.nomor_nota}</td>
                                 <td>${a.tanggal_angsuran}</td>
                                 <td>${a.metode_pembayaran}</td>
                                 <td colspan="4">Rp ${parseFloat(a.nominal_angsuran).toLocaleString('id-ID')}</td>
@@ -315,7 +322,11 @@
             let id = $(this).data('id');
             let rawSisa = $(this).data('sisa');
 
-            // Pastikan nilai sisa bukan NaN
+            // Generate nomor nota baru
+            let nomorNota = "RG-" + Math.floor(Date.now() / 1000);
+            $("#nomorNotaText").text(nomorNota);
+            $("#nomorNotaInput").val(nomorNota);
+
             if (typeof rawSisa === "string") {
                 rawSisa = rawSisa.replace(/[^\d.-]/g, "");
             }
@@ -332,7 +343,6 @@
 
             $("#modalBayar").modal('show');
         });
-
 
         // 2. SIMPAN PEMBAYARAN ANGSURAN
         $("#btnSimpanBayar").click(function() {
@@ -358,10 +368,10 @@
                 data: {
                     nominal: nominal,
                     metode: metode,
+                    nomor_nota: $("#nomorNotaInput").val(),
                     _token: $('meta[name="csrf-token"]').attr('content')
                 },
                 success: function(res) {
-
                     if (res.msg === "success") {
                         Swal.fire("Berhasil!", "Pembayaran angsuran berhasil!", "success");
                         $("#modalBayar").modal('hide');
@@ -374,7 +384,6 @@
                     Swal.fire("Error!", "Terjadi kesalahan server!", "error");
                 }
             });
-
         });
 
         // ================= DELETE =================
@@ -405,4 +414,10 @@
     //     return "Rp " + angka.toLocaleString('id-ID');
     // }
 </script>
+<style>
+    #filter_cabang {
+        max-width: 100%;
+    }
+</style>
+
 @endpush

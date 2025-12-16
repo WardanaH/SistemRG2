@@ -2,10 +2,7 @@
 @section('content')
 
 <style>
-    /* ==========================================
-   STYLE TAMBAHAN KHUSUS HALAMAN TRANSAKSI
-   (Tidak mengubah sidebar, header, dsb)
-========================================== */
+    /* ========================================== STYLE TAMBAHAN KHUSUS HALAMAN TRANSAKSI (Tidak mengubah sidebar, header, dsb) ========================================== */
     .transaksi-page .card {
         border: none;
         border-radius: 8px;
@@ -92,8 +89,7 @@
     }
 
     /* =======================================
-   FIX WARNA TEKS & KONTRAS BUTTON
-======================================= */
+   FIX WARNA TEKS & KONTRAS BUTTON======================================= */
 
     /* Pertegas semua teks di form dan tabel */
     .transaksi-page .form-control,
@@ -138,8 +134,7 @@
     }
 
     /* =====================================
-   FIX SELECT2 AGAR SESUAI TEMPLATE FOCUS
-===================================== */
+   FIX SELECT2 AGAR SESUAI TEMPLATE FOCUS===================================== */
     .transaksi-page .select2-container .select2-selection--single {
         height: 38px !important;
         border: 1px solid #dcdcdc !important;
@@ -438,16 +433,19 @@
                             <select id="add_produk" class="form-select select2" style="width:100%;">
                                 <option value="">-- Pilih Produk --</option>
                                 @foreach ($produks as $produk)
-                                <option value="{{ $produk->id }}" data-harga="{{ $produk->harga_jual }}">
+                                <option value="{{ $produk->id }}"
+                                    data-harga="{{ $produk->harga_jual }}"
+                                    data-hitung_luas="{{ $produk->hitung_luas }}"
+                                    data-satuan="{{ $produk->satuan }}">
                                     {{ $produk->nama_produk }}
                                 </option>
                                 @endforeach
                             </select>
                         </div>
                         <div class="row">
-                            <div class="col-md-6 mb-2">
+                            <div class="col-md-3 mb-2">
                                 <label>Harga</label>
-                                <input id="add_harga" class="form-control" type="number" readonly>
+                                <input id="add_harga" class="form-control" type="number">
                             </div>
                             <div class="col-md-3 mb-2">
                                 <label>P</label>
@@ -456,6 +454,10 @@
                             <div class="col-md-3 mb-2">
                                 <label>L</label>
                                 <input id="add_lebar" class="form-control" type="number" value="0">
+                            </div>
+                            <div class="col-md-3 mb-2">
+                                <label>Satuan</label>
+                                <input type="text" id="add_satuan" class="form-control" readonly>
                             </div>
                         </div>
                         <div class="mb-2">
@@ -517,6 +519,8 @@
         });
 
         let total = 0;
+        let subtotalNumeric = 0;
+
         const storeUrl = "{{ route('storetransaksipenjualan') }}";
         const form = $(`form[action='${storeUrl}']`);
         let items = [];
@@ -543,7 +547,14 @@
                 nama = opt.data('nama');
                 hp = opt.data('hp');
             }
-            if (!nama || !hp) return alert('Isi nama dan nomor HP pelanggan!');
+            if (!nama || !hp) {
+                return Swal.fire({
+                    icon: 'warning',
+                    title: 'Data belum lengkap!',
+                    text: 'Isi nama dan nomor HP pelanggan!',
+                });
+            }
+
 
             $('#kepadalabel').text(nama);
             $('#handphonelabel').text(hp);
@@ -557,8 +568,22 @@
 
         // ================== HITUNG SUBTOTAL ITEM ==================
         $('#add_produk').on('change', function() {
-            const harga = $('option:selected', this).data('harga') || 0;
+            const option = $('option:selected', this);
+            const harga = option.data('harga') || 0;
+            const hitungLuas = option.data('hitung_luas'); // <= PENTING
+            const satuan = option.data('satuan') || '-';
+
             $('#add_harga').val(harga);
+            $('#add_satuan').val(satuan);
+
+            if (hitungLuas == 0) {
+                // Matikan input
+                $('#add_panjang, #add_lebar').val('').prop('disabled', true);
+            } else {
+                // Hidupkan kembali
+                $('#add_panjang, #add_lebar').prop('disabled', false);
+            }
+
             hitungSubtotal();
         });
 
@@ -571,16 +596,45 @@
             const qty = parseFloat($('#add_kuantitas').val()) || 1;
             const diskon = parseFloat($('#add_diskon').val()) || 0;
 
-            let subtotal = harga * (panjang && lebar ? panjang * lebar : 1) * qty;
-            subtotal -= subtotal * (diskon / 100);
+            const option = $('#add_produk option:selected');
+            const hitungLuas = option.data('hitung_luas');
+            const satuan = (option.data('satuan') || '').toLowerCase();
 
-            $('#add_subtotal').val('Rp ' + subtotal.toLocaleString('id-ID'));
+            let p = panjang;
+            let l = lebar;
+
+            let subtotal = 0;
+
+            if (hitungLuas == 1) {
+                if (satuan === 'cm' || satuan === 'centimeter') {
+                    p /= 100;
+                    l /= 100;
+                }
+                subtotal = harga * (p * l) * qty;
+            } else {
+                subtotal = harga * qty;
+            }
+            console.log(subtotal);
+
+            subtotal -= subtotal * diskon / 100;
+
+            subtotalNumeric = subtotal; // ⬅ SIMPAN ANGKA ASLI
+            console.log('Numerik = ', subtotalNumeric);
+
+            $('#add_subtotal').val(
+                'Rp ' + subtotal.toLocaleString('id-ID', {
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 2
+                })
+            );
         }
 
         // ================== FIX SELECT2 DI MODAL ==================
         $('#modal_add').on('shown.bs.modal', function() {
             $('#add_produk, #add_finishing').select2({
-                dropdownParent: $('#modal_add')
+                theme: 'bootstrap-5',
+                dropdownParent: $('#modal_add'),
+                width: '100%'
             });
         });
 
@@ -594,7 +648,7 @@
             const qty = parseFloat($('#add_kuantitas').val()) || 1;
             const finishing = $('#add_finishing').val();
             const diskon = parseFloat($('#add_diskon').val()) || 0;
-            const subtotal = harga * (panjang && lebar ? panjang * lebar : 1) * qty * (1 - diskon / 100);
+            const subtotal = subtotalNumeric;
             const no_spk = $('#add_nospk').val() || '-';
             const keterangan = $('#add_keterangan').val() || '-';
 
@@ -634,9 +688,24 @@
 
             total += subtotal;
             updateTotal();
+            resetAddModal();
             $('#modal_add').modal('hide');
-            $('#modal_add input, #add_keterangan').val('');
         });
+
+        function resetAddModal() {
+            $('#add_produk').val('').trigger('change'); // Reset select2
+            $('#add_finishing').val('Tanpa Finishing').trigger('change');
+
+            $('#add_harga').val('');
+            $('#add_panjang').val('0');
+            $('#add_lebar').val('0');
+            $('#add_kuantitas').val('1');
+            $('#add_diskon').val('0');
+            $('#add_subtotal').val('');
+            $('#add_nospk').val('');
+            $('#add_keterangan').val('');
+        }
+
 
         // ================== REFRESH INPUT ITEMS (Biar Laravel baca array) ==================
         function refreshHiddenInputs() {
@@ -690,54 +759,54 @@
             $('#sisa').val('Rp ' + sisa.toLocaleString('id-ID'));
         }
 
-// ================== TOMBOL TAMBAH ITEM & SIMPAN TRANSAKSI ==================
-const $btnAddItem = $('#btnAddItem');
-const $submitTransaksi = $('#submittransaksi');
+        // ================== TOMBOL TAMBAH ITEM & SIMPAN TRANSAKSI ==================
+        const $btnAddItem = $('#btnAddItem');
+        const $submitTransaksi = $('#submittransaksi');
 
-let adaItem = false; // jadi true setelah klik "Tambah Item"
+        let adaItem = false; // jadi true setelah klik "Tambah Item"
 
-// fungsi update status tombol
-function updateTombolStatus() {
-    const pelangganTerisi =
-        ($('#namapelangganhidden').val() || '') !== '' &&
-        ($('#nomorhandphonehidden').val() || '') !== '';
+        // fungsi update status tombol
+        function updateTombolStatus() {
+            const pelangganTerisi =
+                ($('#namapelangganhidden').val() || '') !== '' &&
+                ($('#nomorhandphonehidden').val() || '') !== '';
 
-    // ===== TOMBOL TAMBAH ITEM =====
-    if (pelangganTerisi) {
-        $btnAddItem.prop('disabled', false)
-            .removeClass('btn-secondary btn-disabled')
-            .addClass('btn-success');
-    } else {
-        $btnAddItem.prop('disabled', true)
-            .removeClass('btn-success')
-            .addClass('btn-secondary btn-disabled');
-    }
+            // ===== TOMBOL TAMBAH ITEM =====
+            if (pelangganTerisi) {
+                $btnAddItem.prop('disabled', false)
+                    .removeClass('btn-secondary btn-disabled')
+                    .addClass('btn-success');
+            } else {
+                $btnAddItem.prop('disabled', true)
+                    .removeClass('btn-success')
+                    .addClass('btn-secondary btn-disabled');
+            }
 
-    // ===== TOMBOL SIMPAN TRANSAKSI =====
-    // aturan lama: aktif setelah pelanggan terisi (WAJIB DIPERTAHANKAN UNTUK PAYLOAD)
-    // aturan baru: harus ada item (tambahan)
-    if (pelangganTerisi && adaItem) {
-        $submitTransaksi.prop('disabled', false)
-            .removeClass('btn-secondary btn-disabled')
-            .addClass('btn-primary');
-    } else {
-        $submitTransaksi.prop('disabled', true)
-            .removeClass('btn-primary')
-            .addClass('btn-secondary btn-disabled');
-    }
-}
+            // ===== TOMBOL SIMPAN TRANSAKSI =====
+            // aturan lama: aktif setelah pelanggan terisi (WAJIB DIPERTAHANKAN UNTUK PAYLOAD)
+            // aturan baru: harus ada item (tambahan)
+            if (pelangganTerisi && adaItem) {
+                $submitTransaksi.prop('disabled', false)
+                    .removeClass('btn-secondary btn-disabled')
+                    .addClass('btn-primary');
+            } else {
+                $submitTransaksi.prop('disabled', true)
+                    .removeClass('btn-primary')
+                    .addClass('btn-secondary btn-disabled');
+            }
+        }
 
-// panggil awal
-updateTombolStatus();
+        // panggil awal
+        updateTombolStatus();
 
-$('#submitpelanggan').on('click', function () {
-    updateTombolStatus();
-});
+        $('#submitpelanggan').on('click', function() {
+            updateTombolStatus();
+        });
 
-$('#btnAddItem').on('click', function () {
-    adaItem = true;
-    updateTombolStatus();
-});
+        $('#btnAddItem').on('click', function() {
+            adaItem = true;
+            updateTombolStatus();
+        });
 
 
         // ================== SUBMIT TRANSAKSI DAN CETAK REPORT ==================

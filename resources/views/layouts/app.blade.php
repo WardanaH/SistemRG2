@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="id">
-
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -16,7 +15,7 @@
     <link href="{{ asset('vendor/jqvmap/css/jqvmap.min.css') }}" rel="stylesheet">
     <link href="{{ asset('vendor/owl-carousel/css/owl.carousel.min.css') }}" rel="stylesheet">
 
-    {{-- ============ ICON PACK ============ --}}
+    {{-- ============ ICON PACK (commented) ============ --}}
     <!-- <link href="{{ asset('vendor/themify-icons/themify-icons.css') }}" rel="stylesheet">
     <link href="{{ asset('vendor/fontawesome/css/all.min.css') }}" rel="stylesheet">
     <link href="{{ asset('vendor/line-awesome/css/line-awesome.min.css') }}" rel="stylesheet"> -->
@@ -24,35 +23,18 @@
     {{-- ============ MAIN STYLE ============ --}}
     <link href="{{ asset('css/style.css') }}" rel="stylesheet">
 
-    {{-- ============ FONT FAMILY ============ --}}
+    {{-- ============ FONT FAMILY & SELECT2 CSS ============ --}}
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
-    <style>
-        body,
-        h1,
-        h2,
-        h3,
-        h4,
-        h5,
-        h6,
-        .nav-text,
-        .card-title,
-        .welcome-text {
-            font-family: 'Poppins', sans-serif !important;
-        }
-    </style>
-
-    <!-- Select2 Core -->
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet">
-
-    <!-- Select2 Bootstrap 5 Theme -->
     <link href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" rel="stylesheet">
 
-    <!-- ====================== CUSTOM STYLE ====================== -->
-    @stack('styles')
     <style>
-        /* ===========================================================
-       HEADER CARD DALAM CONTENT
-    =========================================================== */
+        /* ====================== GLOBAL FONT ====================== */
+        body, h1, h2, h3, h4, h5, h6, .nav-text, .card-title, .welcome-text {
+            font-family: 'Poppins', sans-serif !important;
+        }
+
+        /* ====================== HEADER CARD ====================== */
         .content-body .card-header {
             background-color: #4B28D2 !important;
             color: #ffffff !important;
@@ -65,135 +47,67 @@
             border-top-right-radius: 0.5rem;
             padding: 0.75rem 1rem;
         }
+        .content-body .card-header * { color: #fff !important; }
+        .content-body .card-header i { color: #ffeb3b !important; margin-right: 8px; }
 
-        .content-body .card-header * {
-            color: #fff !important;
-        }
-
-        .content-body .card-header i {
-            color: #ffeb3b !important;
-            margin-right: 8px;
-        }
-
-        /* ===========================================================
-       FIX TEKS TABEL PUCAT / TRANSPARAN
-    =========================================================== */
-        .table,
-        .table td,
-        .table th {
+        /* ====================== TABLES ====================== */
+        .table, .table td, .table th {
             color: #2b2b2b !important;
             opacity: 1 !important;
         }
-
         .content-body .table thead th {
             background-color: #f8f9fc !important;
             color: #212121 !important;
             font-weight: 600 !important;
             border-color: #e5e7eb !important;
         }
-
         .content-body .table tbody td {
             color: #2b2b2b !important;
             font-weight: 500;
             background-color: #fff !important;
         }
-
         .content-body .table tbody tr:nth-child(even) td {
             background-color: #fafafa !important;
         }
 
-        /* ===========================================================
-       STYLE GLOBAL UNTUK SEMUA DROPDOWN / SELECT
-    =========================================================== */
-        select.form-select,
-        select {
-            border: 1.5px solid #dcdcdc;
-            border-bottom: 2px solid #5f9df7;
-            /* Biru muda bawah */
-            border-radius: 10px;
-            padding: 6px 10px;
-            font-size: 0.95rem;
-            transition: all 0.2s ease-in-out;
-            font-weight: 500;
-            color: #2b2b2b;
-        }
-
-        select.form-select:focus,
-        select:focus {
-            border-color: #5f9df7 !important;
-            box-shadow: 0 0 0 3px rgba(119, 161, 224, 0.5);
-            outline: none;
-        }
-
-        select option {
-            color: #333;
-            font-weight: 500;
-        }
-
-        /* === Select2 Styling === */
+        /* ====================== SELECT2 (Final cleaned & merged) ====================== */
         .select2-container--bootstrap-5 .select2-selection {
-            border-radius: 10px !important;
-            border: 1.5px solid #dcdcdc !important;
+            border-radius: 8px !important;
+            border: 1.5px solid #2793beff !important;
             border-bottom: 2px solid #5f9df7 !important;
-            min-height: 38px !important;
-            padding: 4px 10px !important;
-            transition: all 0.2s ease-in-out;
+            min-height: 33px !important;
+            padding: 6px 10px !important;
+            display: flex !important;
+            align-items: center !important;
         }
-
+        .select2-container--bootstrap-5 .select2-selection__rendered {
+            font-size: 0.95rem !important;
+            font-weight: 500 !important;
+            color: #2b2b2b !important;
+            padding-left: 4px !important;
+            padding-right: 20px !important;
+        }
         .select2-container--bootstrap-5.select2-container--focus .select2-selection {
             border-color: #5f9df7 !important;
-            box-shadow: 0 0 0 3px rgba(119, 161, 224, 0.4);
+            box-shadow: 0 0 0 3px rgba(119,161,224,0.4) !important;
         }
+        .select2-container--bootstrap-5 .select2-results__options { max-height: 180px !important; border-radius: 0 0 10px 10px !important; }
+        .select2-container--bootstrap-5 .select2-dropdown { border-radius: 10px !important; border-color: #5f9df7 !important; }
 
-        .select2-container--bootstrap-5 .select2-results__options {
-            max-height: 180px !important;
-            border-radius: 0 0 10px 10px !important;
-        }
-
-        /* ===========================================================
-       WARNA TOMBOL PUTIH DI HEADER CARD
-    =========================================================== */
-        .card-header .btn-light,
-        .card-header .btn-white {
+        /* ====================== HEADER CARD WHITE BUTTONS ====================== */
+        .card-header .btn-light, .card-header .btn-white {
             background-color: #fff !important;
             color: #4B28D2 !important;
             font-weight: 500;
             border: 1px solid #eee;
             transition: all 0.3s ease;
         }
-
-        .card-header .btn-light:hover,
-        .card-header .btn-white:hover {
+        .card-header .btn-light:hover, .card-header .btn-white:hover {
             background-color: #f3f3f3 !important;
             color: #2b0cae !important;
         }
 
-        /* === Perbaiki posisi & rotasi logo di sidebar === */
-        .nav-header .brand-logo .logo-abbr {
-            transform: none !important;
-            /* hilangkan efek miring */
-            rotate: 0deg !important;
-            /* pastikan tidak miring */
-            margin-top: 0 !important;
-            margin-left: 0 !important;
-            display: block;
-        }
-
-        .nav-header .brand-logo {
-            display: flex;
-            align-items: center;
-            justify-content: flex-start;
-        }
-
-        .nav-header .brand-title {
-            color: #ffffff;
-            font-weight: 600;
-            font-size: 16px;
-            line-height: 1.2;
-            margin-left: 8px;
-        }
-
-        /* ==== FIX LOGO NAV-HEADER AGAR TIDAK MIRING ==== */
+        /* ====================== NAV HEADER / LOGO / SIDEBAR ====================== */
         .nav-header .brand-logo {
             display: flex !important;
             align-items: center !important;
@@ -201,18 +115,15 @@
             gap: 8px;
             transform: none !important;
         }
-
-        /* Logo utama di kiri atas */
         .nav-header .brand-logo .logo-abbr {
             transform: none !important;
             rotate: 0deg !important;
             margin: 0 !important;
-            height: 60px !important;
+            height: 38px !important;
             width: auto !important;
             display: inline-block !important;
+            vertical-align: middle !important;
         }
-
-        /* Teks di sebelah logo */
         .nav-header .brand-logo .brand-title {
             display: inline-block !important;
             color: #ffffff !important;
@@ -222,126 +133,102 @@
             margin-left: 6px !important;
             text-align: left !important;
         }
+        .logo-abbr, .brand-logo img { transform: none !important; rotate: 0 !important; }
 
-        /* Hapus rotasi global yang diset Focus di style.css */
-        .logo-abbr,
-        .brand-logo img {
-            transform: none !important;
-            rotate: 0 !important;
-        }
+        /* ====================== COLLAPSE BEHAVIOUR ====================== */
+        .menu-toggle .quixnav .nav-label { opacity: 0 !important; height: 0 !important; margin: 0 !important; padding: 0 !important; overflow: hidden !important; }
+        .menu-toggle .quixnav .nav-text  { opacity: 0 !important; width: 0 !important; overflow: hidden !important; white-space: nowrap !important; }
+        .menu-toggle .quixnav i { margin-right: 0 !important; }
 
-        /* ===== Hapus efek miring default Focus Template ===== */
-        .nav-header .brand-logo .logo-abbr,
-        .nav-header .brand-logo img.logo-abbr,
-        .nav-header img.logo-abbr {
-            transform: none !important;
-            rotate: 0deg !important;
-            margin: 0 !important;
-            height: 38px !important;
-            width: auto !important;
-            display: inline-block !important;
-            vertical-align: middle !important;
-        }
+        /* ====================== HIDE BRAND TEXT WHEN COLLAPSE (small helper) ====================== */
+        body.menu-toggle .nav-header .brand-title { display: none !important; }
+        body.menu-toggle .nav-header .brand-logo { justify-content: center !important; }
 
-        /* Sembunyikan nav label saat sidebar collapse */
-        .menu-toggle .quixnav .nav-label {
-            opacity: 0 !important;
-            height: 0 !important;
-            margin: 0 !important;
-            padding: 0 !important;
-            overflow: hidden !important;
-        }
+        /* ====================== QUICK GLOBAL HELPERS ====================== */
+        .card-header .btn-light, .card-header .btn-white { cursor: pointer; }
 
-        /* Hilangkan tulisan menu saat collapse */
-        .menu-toggle .quixnav .nav-text {
-            opacity: 0 !important;
-            width: 0 !important;
-            overflow: hidden !important;
-            white-space: nowrap !important;
-        }
-
-        /* Biar ikon tetap rapat */
-        .menu-toggle .quixnav i {
-            margin-right: 0 !important;
+        /* ====================== FONT SEBELUM INPUT ====================== */
+        label {
+            color: #2b2b2b !important;
+            font-weight: 500 !important;
         }
     </style>
 
+    {{-- ====================== GLOBAL MODAL STYLE (merged) ====================== --}}
     <style>
-        /* ============================================================
-   GLOBAL MODAL STYLE — Berlaku untuk semua modal Bootstrap
-============================================================ */
-
-        /* Kontainer utama modal */
         .modal-content {
             border-radius: 13px !important;
             border: none !important;
             overflow: hidden !important;
-            box-shadow: 0px 8px 28px rgba(0, 0, 0, 0.18);
+            box-shadow: 0px 8px 28px rgba(0,0,0,0.18);
             animation: modalPop 0.25s ease-out;
         }
-
         @keyframes modalPop {
-            from {
-                transform: scale(0.95);
-                opacity: 0;
-            }
-
-            to {
-                transform: scale(1);
-                opacity: 1;
-            }
+            from { transform: scale(0.95); opacity: 0; }
+            to   { transform: scale(1); opacity: 1; }
         }
-
         .modal-header {
             background: #4B28D2 !important;
             color: #fff !important;
             padding: 16px 20px !important;
             border-bottom: none !important;
         }
+        .modal-header .modal-title { font-weight: 600 !important; font-size: 1.15rem !important; color: #fff !important; }
+        .modal-header .btn-close { filter: brightness(0) invert(1) !important; opacity: .85; }
+        .modal-header .btn-close:hover { opacity: 1; }
+        .modal-body { padding: 20px !important; background: #fff !important; }
+        .modal-footer { border-top: 1px solid #eaeaea !important; padding: 14px 20px !important; background: #fafafa !important; }
+        .modal-footer .btn { border-radius: 10px !important; font-weight: 500 !important; padding: 8px 16px !important; }
+        .modal-footer .btn-primary:hover { background-color: #3a1fba !important; }
+        .modal-footer .btn-secondary:hover { background-color: #e3e3e3 !important; }
 
-        .modal-header .modal-title {
-            font-weight: 600 !important;
-            font-size: 1.15rem !important;
-            color: #fff !important;
+        .btn-close {
+            background: none !important;
+            border: none !important;
+            width: 1.2rem !important;
+            height: 1.2rem !important;
+            opacity: 1 !important;
+            position: relative;
         }
-
-        .modal-header .btn-close {
-            filter: brightness(0) invert(1) !important;
-            opacity: 0.85;
+        .btn-close::before, .btn-close::after {
+            content: "" !important;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 1.2rem;
+            height: 2px;
+            background-color: #fff;
+            transform-origin: center;
         }
-
-        .modal-header .btn-close:hover {
-            opacity: 1;
-        }
-
-        .modal-body {
-            padding: 20px !important;
-            background: #ffffff !important;
-        }
-
-        .modal-footer {
-            border-top: 1px solid #eaeaea !important;
-            padding: 14px 20px !important;
-            background: #fafafa !important;
-        }
-
-        .modal-footer .btn {
-            border-radius: 10px !important;
-            font-weight: 500 !important;
-            padding: 8px 16px !important;
-        }
-
-        .modal-footer .btn-primary:hover {
-            background-color: #3a1fba !important;
-        }
-
-        .modal-footer .btn-secondary:hover {
-            background-color: #e3e3e3 !important;
-        }
+        .btn-close::before { transform: translate(-50%, -50%) rotate(45deg); }
+        .btn-close::after  { transform: translate(-50%, -50%) rotate(-45deg); }
     </style>
 
-
+    {{-- ====================== CUSTOM MODERN SELECT WITH SEARCH (standalone) ====================== --}}
+    <style>
+        .custom-dropdown { position: relative; width: 100%; }
+        .custom-dropdown .dropdown-display {
+            border: 1.5px solid #dcdcdc;
+            border-bottom: 2px solid #5f9df7;
+            border-radius: 10px;
+            padding: 8px 10px;
+            cursor: pointer;
+            background: #fff;
+            font-weight: 500;
+            color: #2b2b2b;
+        }
+        .custom-dropdown .dropdown-display:hover { background: #f7f9ff; }
+        .custom-dropdown .dropdown-panel {
+            position: absolute; top: 100%; left: 0; right: 0;
+            background: #fff; border: 1px solid #ddd;
+            border-radius: 0 0 10px 10px; max-height: 220px; overflow-y: auto;
+            display: none; z-index: 99999; box-shadow: 0 4px 10px rgba(0,0,0,.12);
+        }
+        .custom-dropdown input.search { width: 100%; border: none; padding: 8px 12px; border-bottom: 1px solid #eee; outline: none; font-size: .9rem; }
+        .custom-dropdown .item { padding: 8px 12px; cursor: pointer; font-size: .9rem; }
+        .custom-dropdown .item:hover { background: #eef4ff; }
     </style>
+
 </head>
 
 <body>
@@ -357,19 +244,20 @@
 
     <div id="main-wrapper">
         @auth
-        @include('layouts.header')
-        @include('layouts.sidebar')
+            @include('layouts.header')
+            @include('layouts.sidebar')
         @endauth
 
         <div class="content-body">
             <div class="container-fluid">
                 {{-- Flash Messages --}}
-                @if(session('success'))
-                <div class="alert alert-success">{{ session('success') }}</div>
-                @endif
-                @if($errors->any())
-                <div class="alert alert-danger">{{ $errors->first() }}</div>
-                @endif
+                <!-- @if(session('success'))
+                    <div class="alert alert-success">{{ session('success') }}</div>
+                @endif -->
+
+                <!-- @if($errors->any())
+                    <div class="alert alert-danger">{{ $errors->first() }}</div>
+                @endif -->
 
                 {{-- Konten Dinamis --}}
                 @yield('content')
@@ -391,50 +279,96 @@
     <script src="{{ asset('vendor/pg-calendar/js/pignose.calendar.min.js') }}"></script>
     <!-- <script src="{{ asset('vendor/perfect-scrollbar/perfect-scrollbar.min.js') }}"></script> -->
     <script src="{{ asset('vendor/owl-carousel/js/owl.carousel.min.js') }}"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    {{-- SweetAlert2 (keputusan: pakai 11.10.0 yang lengkap) --}}
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.0/dist/sweetalert2.all.min.js"></script>
 
     {{-- ============ DASHBOARD SCRIPT ============ --}}
     <script src="{{ asset('js/dashboard/dashboard-2.js') }}"></script>
 
     {{-- ============ PRELOADER FIX ============ --}}
     <script>
-        window.addEventListener('load', () => {
-            const pre = document.getElementById('preloader');
+        window.addEventListener('load', function () {
+            var pre = document.getElementById('preloader');
             if (pre) pre.style.display = 'none';
         });
     </script>
 
-    {{-- ============ EXTERNAL LIBRARIES ============ --}}
+    {{-- ============ EXTERNAL LIBRARIES (merged) ============ --}}
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.0/dist/sweetalert2.all.min.js"></script>
 
     {{-- DATATABLES --}}
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+    <script>
+    $(document).ready(function() {
+        $('.styletable').DataTable({
+            pageLength: 10,
+            lengthMenu: [5,10,25,50,100],
+            processing: true,
+            language: {
+                search: "Cari:",
+                lengthMenu: "Tampilkan _MENU_ baris",
+                info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ baris",
+                paginate: { previous: "Previous", next: "Next" }
+            }
+        });
 
-    {{-- ============ SCRIPT CHILD VIEW ============ --}}
-    @stack('scripts')
+        // Apply select2 untuk dropdown di tabel kalau ada
+        $('.styletable').on('draw.dt', function(){
+            $(this).find('select').select2({
+                minimumResultsForSearch: Infinity,
+                theme: 'bootstrap-5',
+                width: '100%'
+            });
+        });
+    });
+    </script>
 
+
+    {{-- ============ SCRIPT CHILD VIEW & INITS (merged select2 init + modal fix) ============ --}}
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-            const searchInput = document.getElementById("globalSearchInput");
+            // init select2 global (kecuali yang berada di modal, handled below)
+            $('.select2:not(.in-modal)').select2({
+                theme: 'bootstrap-5',
+                width: '100%',
+                dropdownAutoWidth: false
+            });
 
+            // init select2 yang ada di modal -> dropdownParent untuk mengatasi z-index
+            $('.modal').on('shown.bs.modal', function () {
+                $(this).find('.select2').select2({
+                    theme: 'bootstrap-5',
+                    width: '100%',
+                    dropdownParent: $(this)
+                });
+            });
+
+            // tambahan: jika ada select2 in modal yang di-open dinamis, juga bisa dipanggil dengan shown.bs.modal handler di atas
+
+            // preloader already hidden on window load listener above
+        });
+    </script>
+
+    @stack('scripts')
+
+    {{-- ============ GLOBAL TABLE SEARCH (preserve original behaviour) ============ --}}
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            var searchInput = document.getElementById("globalSearchInput");
             if (!searchInput) return;
 
             searchInput.addEventListener("input", function() {
-                let keyword = this.value.toLowerCase().trim();
+                var keyword = this.value.toLowerCase().trim();
+                var tables = document.querySelectorAll("table");
 
-                // Ambil semua table yang ada di halaman
-                const tables = document.querySelectorAll("table");
-
-                tables.forEach(table => {
-                    const rows = table.querySelectorAll("tbody tr");
-
-                    rows.forEach(row => {
-                        const text = row.innerText.toLowerCase();
-
+                tables.forEach(function(table) {
+                    var rows = table.querySelectorAll("tbody tr");
+                    rows.forEach(function(row) {
+                        var text = row.innerText.toLowerCase();
                         if (keyword === "" || text.includes(keyword)) {
                             row.style.display = "";
                         } else {
@@ -444,39 +378,30 @@
 
                     // Naikkan row yang cocok ke atas
                     if (keyword !== "") {
-                        let tbody = table.querySelector("tbody");
-                        let matched = [];
-                        let unmatched = [];
+                        var tbody = table.querySelector("tbody");
+                        var matched = [];
+                        var unmatched = [];
 
-                        rows.forEach(row => {
+                        rows.forEach(function(row) {
                             if (row.style.display === "") matched.push(row);
                             else unmatched.push(row);
                         });
 
+                        // kosongkan dan append ulang
                         tbody.innerHTML = "";
-                        matched.forEach(r => tbody.appendChild(r));
-                        unmatched.forEach(r => tbody.appendChild(r));
+                        matched.forEach(function(r){ tbody.appendChild(r); });
+                        unmatched.forEach(function(r){ tbody.appendChild(r); });
                     }
                 });
             });
         });
     </script>
 
-    <style>
-        /* Hide brand text when sidebar collapse */
-        body.menu-toggle .nav-header .brand-title {
-            display: none !important;
-        }
-
-        /* Center logo when text hidden */
-        body.menu-toggle .nav-header .brand-logo {
-            justify-content: center !important;
-        }
-    </style>
-
+    {{-- ============ SIDEBAR TOGGLE (preserve original) ============ --}}
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-            const btn = document.querySelector('.nav-control');
+            var btn = document.querySelector('.nav-control');
+            if (!btn) return;
             btn.addEventListener('click', function() {
                 document.body.classList.toggle('menu-toggle');
             });
@@ -484,5 +409,4 @@
     </script>
 
 </body>
-
 </html>

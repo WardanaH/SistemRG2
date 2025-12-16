@@ -99,8 +99,12 @@
 
 <script>
     $(document).ready(function() {
+
+        // Aktifkan Select2
         $('.select2').select2();
 
+
+        // Jika bahan baku dipilih, load satuan otomatis
         $('#bahanbaku_transaksibahanbaku').on('change', function() {
             const id = $(this).val();
             if (!id) return;
@@ -121,14 +125,21 @@
                     }
                 },
                 error: function(xhr, status, error) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Gagal Memuat Satuan',
+                        text: 'Terjadi kesalahan saat mengambil data.'
+                    });
                     console.error('Gagal memuat satuan bahan baku:', error);
                     console.log(xhr.responseText);
                 }
             });
         });
+
     });
 </script>
 
+{{-- SweetAlert untuk ERROR --}}
 @if (session('error'))
 <script>
     Swal.fire({
@@ -139,6 +150,7 @@
 </script>
 @endif
 
+{{-- SweetAlert untuk SUCCESS --}}
 @if (session('success'))
 <script>
     Swal.fire({
@@ -148,4 +160,5 @@
     });
 </script>
 @endif
+
 @endpush

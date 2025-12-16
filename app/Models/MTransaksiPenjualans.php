@@ -31,6 +31,11 @@ class MTransaksiPenjualans extends Model
         'designer_id',
     ];
 
+    public function angsuran()
+    {
+        return $this->hasMany(MAngsurans::class, 'transaksi_penjualan_id');
+    }
+
     /**
      * Relasi ke detail penjualan (sub transaksi)
      */

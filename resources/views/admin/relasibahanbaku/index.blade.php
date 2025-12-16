@@ -38,7 +38,7 @@
         <div class="modal-body">
           <div class="mb-3">
             <label class="form-label">Produk</label>
-            <select name="tambah_r_produk" class="form-select" required>
+            <select name="tambah_r_produk" class="select2" required>
               <option value="">-- Pilih Produk --</option>
               @foreach($produks as $p)
                 <option value="{{ encrypt($p->id) }}">{{ $p->nama_produk }}</option>
@@ -47,7 +47,7 @@
           </div>
           <div class="mb-3">
             <label class="form-label">Bahan Baku</label>
-            <select name="tambah_r_bahan_baku" class="form-select" required>
+            <select name="tambah_r_bahan_baku" class="select2" required>
               <option value="">-- Pilih Bahan Baku --</option>
               @foreach($bahanbakus as $b)
                 <option value="{{ encrypt($b->id) }}">{{ $b->nama_bahan }}</option>
@@ -81,7 +81,7 @@
         <div class="modal-body">
           <div class="mb-3">
             <label class="form-label">Produk</label>
-            <select name="edit_r_produk" id="edit_r_produk" class="form-select" required>
+            <select name="edit_r_produk" id="edit_r_produk" class="select2" required>
               @foreach($produks as $p)
                 <option value="{{ $p->id }}">{{ $p->nama_produk }}</option>
               @endforeach
@@ -89,7 +89,7 @@
           </div>
           <div class="mb-3">
             <label class="form-label">Bahan Baku</label>
-            <select name="edit_r_bahan_baku" id="edit_r_bahan_baku" class="form-select" required>
+            <select name="edit_r_bahan_baku" id="edit_r_bahan_baku" class="select2" required>
               @foreach($bahanbakus as $b)
                 <option value="{{ $b->id }}">{{ $b->nama_bahan }}</option>
               @endforeach
@@ -111,16 +111,19 @@
 
 {{-- =================== SCRIPT =================== --}}
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <script>
 $(function() {
+
   const addModal = new bootstrap.Modal(document.getElementById('addModal'));
   const editModal = new bootstrap.Modal(document.getElementById('editModal'));
 
-  // === Buka Modal Tambah ===
   $('#openAddModal').on('click', () => addModal.show());
 
-  // === Load Data Relasi ===
   loadRelasi();
+
+  // ======================== LOAD DATA ========================
   function loadRelasi() {
     $.get("{{ route('loadrelasibahanbaku') }}", function(res) {
       let rows = '';
@@ -134,7 +137,7 @@ $(function() {
               <td>${r.bahanbaku?.nama_bahan ?? '-'}</td>
               <td>${r.qtypertrx}</td>
               <td>
-                <button class="btn btn-success btn-sm editBtn"
+                <button class="btn btn-warning btn-sm editBtn"
                         data-id="${r.encrypted_id}"
                         data-produk="${r.produk_id}"
                         data-bahanbaku="${r.bahanbaku_id}"
@@ -150,80 +153,151 @@ $(function() {
     });
   }
 
-  // === Simpan Tambah ===
+  // ======================== TAMBAH ========================
   $('#formAdd').on('submit', function(e) {
     e.preventDefault();
+
     $.ajax({
       url: "{{ route('storerelasibahanbaku') }}",
       method: "POST",
       data: $(this).serialize(),
       success: function(res) {
+
         if (res === "Success") {
-          alert('✅ Relasi berhasil ditambahkan!');
+          Swal.fire({
+            icon: 'success',
+            title: 'Relasi berhasil ditambahkan!',
+            showConfirmButton: false,
+            timer: 1500
+          });
+
           $('#formAdd')[0].reset();
           addModal.hide();
           loadRelasi();
+
         } else {
-          alert('❌ Gagal menambahkan relasi!');
+          Swal.fire({
+            icon: 'error',
+            title: 'Gagal menambahkan relasi!'
+          });
         }
+
       },
       error: function(xhr) {
-        console.error(xhr.responseText);
-        alert('Terjadi kesalahan pada server.');
+        Swal.fire({
+          icon: 'error',
+          title: 'Terjadi kesalahan pada server.'
+        });
       }
     });
+
   });
 
-  // === Klik Edit ===
+  // ======================== EDIT (OPEN MODAL) ========================
   $(document).on('click', '.editBtn', function() {
     $('#edit_relasi_id').val($(this).data('id'));
     $('#edit_r_produk').val($(this).data('produk'));
     $('#edit_r_bahan_baku').val($(this).data('bahanbaku'));
     $('#edit_qty_p_trans').val($(this).data('qty'));
+
     editModal.show();
   });
 
-  // === Simpan Edit ===
+  // ======================== UPDATE ========================
   $('#formEdit').on('submit', function(e) {
     e.preventDefault();
+
     $.ajax({
       url: "{{ route('updaterelasibahanbaku') }}",
       method: "POST",
       data: $(this).serialize(),
       success: function(res) {
+
         if (res === "Success") {
-          alert('✅ Relasi berhasil diperbarui!');
+          Swal.fire({
+            icon: 'success',
+            title: 'Relasi berhasil diperbarui!',
+            showConfirmButton: false,
+            timer: 1500
+          });
+
           $('#formEdit')[0].reset();
           editModal.hide();
           loadRelasi();
+
         } else {
-          alert('❌ Gagal memperbarui relasi!');
+          Swal.fire({
+            icon: 'error',
+            title: 'Gagal memperbarui relasi!'
+          });
         }
+
       },
       error: function(xhr) {
-        console.error(xhr.responseText);
-        alert('Terjadi kesalahan pada server.');
+        Swal.fire({
+          icon: 'error',
+          title: 'Terjadi kesalahan pada server.'
+        });
       }
     });
+
   });
 
-  // === Hapus Relasi ===
+  // ======================== HAPUS ========================
   $(document).on('click', '.deleteBtn', function() {
+
     const id = $(this).data('id');
-    if (confirm('Yakin ingin menghapus relasi ini?')) {
-      $.post("{{ route('deleterelasibahanbaku') }}", {
-        _token: '{{ csrf_token() }}',
-        hapus_relasi_id: id
-      }, function(res) {
-        if (res === "Success") {
-          alert('🗑️ Relasi berhasil dihapus!');
-          loadRelasi();
-        } else {
-          alert('❌ Gagal menghapus relasi!');
-        }
-      }).fail(() => alert('Terjadi kesalahan pada server.'));
-    }
+
+    Swal.fire({
+      title: 'Yakin ingin menghapus?',
+      text: 'Relasi akan hilang secara permanen.',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Ya, Hapus',
+      cancelButtonText: 'Batal',
+      reverseButtons: true
+    }).then((result) => {
+
+      if (result.isConfirmed) {
+
+        $.post("{{ route('deleterelasibahanbaku') }}", {
+          _token: '{{ csrf_token() }}',
+          hapus_relasi_id: id
+        }, function(res) {
+
+          if (res === "Success") {
+
+            Swal.fire({
+              icon: 'success',
+              title: 'Relasi berhasil dihapus!',
+              showConfirmButton: false,
+              timer: 1500
+            });
+
+            loadRelasi();
+
+          } else {
+
+            Swal.fire({
+              icon: 'error',
+              title: 'Gagal menghapus relasi!'
+            });
+
+          }
+
+        }).fail(() => {
+          Swal.fire({
+            icon: 'error',
+            title: 'Terjadi kesalahan pada server.'
+          });
+        });
+
+      }
+
+    });
+
   });
+
 });
 </script>
 @endsection

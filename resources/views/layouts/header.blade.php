@@ -3,8 +3,13 @@
 ***********************************-->
 <div class="nav-header">
     <a href="{{ route('dashboard') }}" class="brand-logo">
-        <img class="logo-abbr" src="{{ asset('images/RGlogo.webp') }}" alt="Logo Restu Guru Promosindo">
-        <span class="brand-title">Restu Guru</span>
+        <img class="logo-abbr" 
+            src="{{ asset('images/logo_cropped.png') }}" 
+            alt="Logo Restu Guru Promosindo"
+            style="height:75px !important; width:auto !important;">
+        <span class="brand-title">
+            Restu Guru<br>Promosindo
+        </span>
     </a>
 
     <div class="nav-control">
@@ -14,66 +19,77 @@
     </div>
 </div>
 
+
 <style>
 /* ============================
    FIX NAV HEADER & LOGO
 ============================= */
 
-/* Pastikan container benar */
 .nav-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    height: 80px !important;
-    padding: 0 20px;
+    height: 85px !important;
+    padding: 0 22px;
+    background: #2f3558;
 }
 
-/* brand-logo selalu flex */
+/* brand-logo sebagai flex horizontal */
 .brand-logo {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 14px;
 }
 
-/* ukuran logo */
-.brand-logo .logo-abbr {
-    height: 55px;
+/* LOGO */
+.logo-abbr {
+    width: 90px;
+    height: 90px;
+    object-fit: contain;
 }
 
-/* styling teks */
+/* Teks 2 baris */
 .brand-logo .brand-title {
     color: #fff;
-    font-size: 16px;
-    font-weight: bold;
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 1.2;
 }
 
-/* -------- COLLAPSE MODE -------- */
+/* ---------- MODE COLLAPSED (sidebar menyempit) ---------- */
 
 /* sembunyikan teks */
 body.menu-toggle .brand-title {
     display: none !important;
 }
 
-/* logo jadi center */
+/* logo ke tengah */
 body.menu-toggle .brand-logo {
     justify-content: center !important;
     width: 100%;
 }
 
-/* hilangkan gap supaya benar2 center */
+/* hilangkan jarak */
 body.menu-toggle .brand-logo {
     gap: 0 !important;
 }
 
-/* ============================
-   Highlight Search Result
-============================= */
-.table-highlight {
-    background-color: #fff3cd !important;
-    transition: background-color .3s ease;
-}
-</style>
+.brand-logo .brand-title {
+    color: #fff !important;
+    font-size: 18px !important;
+    font-weight: 700 !important;
 
+    display: block !important;        
+    white-space: normal !important;   
+    line-height: 1.2 !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    max-width: 120px !important;     
+}
+
+</style>
 
 <!--**********************************
     Header start
