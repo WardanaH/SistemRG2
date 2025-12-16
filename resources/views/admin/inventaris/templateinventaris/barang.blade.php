@@ -4,9 +4,9 @@
 
 <div class="page-header d-flex justify-content-between align-items-center">
     <h3>Data Bahan Baku - {{ ucfirst($cabang->nama) }}</h3>
-    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalTambahBarang">
+    {{-- <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalTambahBarang">
         <i class="bi bi-plus-circle"></i> Tambah Bahan
-    </button>
+    </button> --}}
 </div>
 
 @if(session('success'))

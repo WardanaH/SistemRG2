@@ -42,7 +42,10 @@ class PengirimanGudangController extends Controller
             ->get();
 
         // Kategori dipakai di modal tambah/edit
-        $kategori = \App\Models\MKategories::all();
+        $kategori = \App\Models\MKategories::select(
+            'id',
+            \DB::raw('Nama_Kategori as nama_kategori')
+        )->orderBy('Nama_Kategori')->get();
 
         return view('admin.inventaris.gudangpusat.barang', [
             'title'   => 'Data Barang Gudang Pusat',
@@ -52,44 +55,48 @@ class PengirimanGudangController extends Controller
         ]);
     }
 
-    /* ============================================================
-       TAMBAH BAHAN + STOK AWAL (untuk gudang pusat)
-       ============================================================ */
-    public function storeBarang(Request $req)
-    {
-        $req->validate([
-            'kategori_id' => 'nullable|integer',
-            'nama_bahan'  => 'required|string',
-            'harga'       => 'nullable|numeric',
-            'satuan'      => 'required|string',
-            'stok'        => 'required|numeric|min:0',
-            'batas_stok'  => 'nullable|numeric',
-            'keterangan'  => 'nullable|string',
-        ]);
+    //tambah bahan
+public function storeBarang(Request $request)
+{
+    $gudang = $this->getGudang(); // GDG-UTM
 
-        $gudang = $this->getGudang();
+    $validated = $request->validate([
+        'kategori_id' => 'required|integer',
+        'nama_bahan'  => 'required|string|max:255|unique:bahanbakus,nama_bahan',
+        'harga'       => 'required|numeric|min:0',
+        'satuan'      => 'required|string|max:50',
+        'batas_stok'  => 'nullable|numeric|min:0',
+        'keterangan'  => 'nullable|string',
+        'stok'        => 'required|numeric|min:0'
+    ]);
 
-        // simpan bahan (master)
-        $bahan = MBahanBakus::create([
-            'kategori_id' => $req->kategori_id ?? null,
-            'nama_bahan'  => $req->nama_bahan,
-            'harga'       => $req->harga ?? 0,
-            'satuan'      => $req->satuan,
-            'batas_stok'  => $req->batas_stok ?? 0,
-            'keterangan'  => $req->keterangan ?? '',
-            'hitung_luas' => 0
-        ]);
+    // 1️⃣ SIMPAN KE MASTER BAHAN
+    $bahan = \App\Models\MBahanBakus::create([
+        'kategori_id' => $validated['kategori_id'],
+        'nama_bahan'  => $validated['nama_bahan'],
+        'harga'       => $validated['harga'],
+        'satuan'      => $validated['satuan'],
+        'batas_stok'  => $validated['batas_stok'] ?? 0,
+        'keterangan'  => $validated['keterangan'] ?? '',
+        'hitung_luas' => 0
+    ]);
 
-        // simpan stok awal ke gudang
-        MStokBahanBakus::create([
+    // 2️⃣ BUAT STOK KE SEMUA CABANG
+    foreach (Cabang::all() as $cabang) {
+        \DB::table('stok_bahan_bakus')->insert([
             'bahanbaku_id' => $bahan->id,
-            'cabang_id'    => $gudang->id,
-            'banyak_stok'  => $req->stok,
-            'satuan'       => $req->satuan,
+            'cabang_id'    => $cabang->id,
+            'banyak_stok'  => $cabang->id == $gudang->id
+                                ? $validated['stok']
+                                : 0,
+            'satuan'       => $validated['satuan'],
         ]);
-
-        return back()->with('success', 'Bahan & stok berhasil ditambahkan!');
     }
+
+    return back()->with('success', 'Bahan baku berhasil ditambahkan.');
+}
+
+
 
     /* ============================================================
        UPDATE BAHAN / STOK — menerima $id = stok_id (baris stok)
@@ -169,36 +176,50 @@ class PengirimanGudangController extends Controller
             ]);
         }
 
-    public function tambahStok(Request $req)
-    {
-        $req->validate([
-            'id_bahan' => 'required|integer',
-            'stok'     => 'required|numeric|min:0',
-        ]);
+        public function tambahStok(Request $req)
+        {
+            $req->validate([
+                'bahanbaku_id' => 'required|exists:bahanbakus,id',
+                'banyak_stok'  => 'required|numeric|min:0',
+            ]);
 
-        $stok = MStokBahanBakus::findOrFail($req->id_bahan);
-        $stok->banyak_stok += $req->stok;
-        $stok->save();
+            $gudang = $this->getGudang();
 
-        return back()->with('success', 'Stok berhasil ditambahkan!');
-    }
+            // ambil data bahan (untuk satuan asli)
+            $bahan = MBahanBakus::findOrFail($req->bahanbaku_id);
 
-    public function updateStok(Request $req, $id)
-    {
-        $req->validate(['stok' => 'required|numeric|min:0']);
+            // tambah atau buat stok gudang
+            MStokBahanBakus::updateOrCreate(
+                [
+                    'bahanbaku_id' => $bahan->id,
+                    'cabang_id'    => $gudang->id,
+                ],
+                [
+                    'banyak_stok' => \DB::raw('COALESCE(banyak_stok,0) + '.$req->banyak_stok),
+                    'satuan'      => $bahan->satuan,
+                ]
+            );
 
-        $stok = MStokBahanBakus::findOrFail($id);
-        $stok->banyak_stok = $req->stok;
-        $stok->save();
+            return back()->with('success', 'Stok gudang berhasil disimpan!');
+        }
 
-        return back()->with('success', 'Stok berhasil diperbarui!');
-    }
 
-    public function deleteStok($id)
-    {
-        MStokBahanBakus::findOrFail($id)->delete();
-        return back()->with('success', 'Data stok berhasil dihapus!');
-    }
+        public function updateStok(Request $req, $id)
+        {
+            $req->validate(['stok' => 'required|numeric|min:0']);
+
+            $stok = MStokBahanBakus::findOrFail($id);
+            $stok->banyak_stok = $req->stok;
+            $stok->save();
+
+            return back()->with('success', 'Stok berhasil diperbarui!');
+        }
+
+        public function deleteStok($id)
+        {
+            MStokBahanBakus::findOrFail($id)->delete();
+            return back()->with('success', 'Data stok berhasil dihapus!');
+        }
 
     /* ============================================================
     3. PENGIRIMAN BAHAN KE CABANG (FULL STATUS + AUTO STOK TERIMA)

@@ -9,10 +9,10 @@
     </button>
 </div>
 
-{{-- ALERT SUCCESS --}}
+{{-- ALERT SUCCESS
 @if(session('success'))
     <div class="alert alert-success mt-2">{{ session('success') }}</div>
-@endif
+@endif --}}
 
 {{-- ALERT ERROR --}}
 @if(session('error'))
@@ -64,37 +64,37 @@
                     <td>{{ \Carbon\Carbon::parse($item->tanggal_pengiriman)->format('d M Y') }}</td>
 
                     {{-- ✅ STATUS DROPDOWN FINAL --}}
-<td>
-    @if($item->status_pengiriman === 'Diterima')
-        {{-- ✅ JIKA SUDAH DITERIMA: TAMPIL TEKS SAJA --}}
-        <span class="badge bg-success">Diterima</span>
-    @else
-        {{-- ✅ JIKA BELUM DITERIMA: BOLEH DROPDOWN --}}
-        <form action="{{ route('gudangpusat.pengiriman.updateStatus', $item->id) }}"
-              method="POST"
-              class="form-update-status">
-            @csrf
-            @method('PUT')
+                    <td>
+                        @if($item->status_pengiriman === 'Diterima')
+                            {{-- ✅ JIKA SUDAH DITERIMA: TAMPIL TEKS SAJA --}}
+                            <span class="badge bg-success">Diterima</span>
+                        @else
+                            {{-- ✅ JIKA BELUM DITERIMA: BOLEH DROPDOWN --}}
+                            <form action="{{ route('gudangpusat.pengiriman.updateStatus', $item->id) }}"
+                                method="POST"
+                                class="form-update-status">
+                                @csrf
+                                @method('PUT')
 
-            <select name="status_pengiriman"
-                    class="select2 form-select-sm status-dropdown"
-                    data-status="{{ $item->status_pengiriman }}">
+                                <select name="status_pengiriman"
+                                        class="select2 form-select-sm status-dropdown"
+                                        data-status="{{ $item->status_pengiriman }}"
+                                        {{ in_array($item->status_pengiriman, ['Dikirim','Diterima']) ? 'disabled' : '' }}>
 
-                <option value="Dikemas"
-                    {{ $item->status_pengiriman == 'Dikemas' ? 'selected' : '' }}>
-                    Dikemas
-                </option>
+                                    <option value="Dikemas"
+                                        {{ $item->status_pengiriman == 'Dikemas' ? 'selected' : '' }}>
+                                        Dikemas
+                                    </option>
 
-                <option value="Dikirim"
-                    {{ $item->status_pengiriman == 'Dikirim' ? 'selected' : '' }}>
-                    Dikirim
-                </option>
+                                    <option value="Dikirim"
+                                        {{ $item->status_pengiriman == 'Dikirim' ? 'selected' : '' }}>
+                                        Dikirim
+                                    </option>
 
-            </select>
-        </form>
-    @endif
-</td>
-
+                                </select>
+                            </form>
+                        @endif
+                    </td>
 
                     {{-- ✅ TANGGAL DITERIMA --}}
                     <td>
