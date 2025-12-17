@@ -16,7 +16,7 @@
         <h4 class="card-title">Daftar Stok Bahan Baku</h4>
 
         <div class="table-responsive">
-            <table class="table table-striped table-bordered align-middle text-center styletable">
+            <table class="table table-striped table-bordered align-middle text-center">
                 <thead class="table-light">
                     <tr>
                         <th>No</th>
