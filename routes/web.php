@@ -331,7 +331,7 @@ Route::middleware(['auth'])->group(function () {
         ->name('angsuran.bayar');
 
     // Hapus angsuran
-    Route::delete('/angsuran-penjualan/{id}/hapus', [AngsuransController::class, 'hapus'])
+    Route::delete('/angsuran-penjualan/hapus/{id}', [AngsuransController::class, 'hapus'])
         ->middleware('permission:delete-angsuranpenjualan')
         ->name('angsuran.hapus');
 

@@ -53,9 +53,9 @@ class AngsuransController extends Controller
 
     public function data(Request $request)
     {
-        $query = MTransaksiPenjualans::with(['pelanggan', 'cabang', 'user']);
+        $query = MTransaksiPenjualans::with(['pelanggan', 'cabang', 'user'])
+            ->latest();
         // ->where('sisa_tagihan', '>', 0);
-
 
         // 🔹 Batasi cabang jika bukan owner/direktur
         if (!Auth::user()->hasRole(['owner', 'direktur'])) {
@@ -91,10 +91,6 @@ class AngsuransController extends Controller
                         data-id="' . $t->id . '"
                         data-sisa="' . $t->sisa_tagihan . '">
                         Bayar
-                    </button>
-                    <button class="btn btn-warning btn-sm deleteBtn"
-                        data-id="' . $t->id . '">
-                        Hapus
                     </button>
                 ';
             })
@@ -156,7 +152,8 @@ class AngsuransController extends Controller
             ]);
 
             // Riwayat angsuran
-            $angsuran = MAngsurans::where('transaksi_penjualan_id', $id)
+            $angsuran = MAngsurans::with('user:id,username')
+                ->where('transaksi_penjualan_id', $id)
                 ->orderBy('created_at')
                 ->get();
 
@@ -280,9 +277,14 @@ class AngsuransController extends Controller
 
         $angsuran = MAngsurans::findOrFail($id);
 
+        // Simpan alasan penghapusan
+        $angsuran->reason_on_delete = $request->alasan;
+        $angsuran->save();
+
+        $transaksi = MTransaksiPenjualans::findOrFail($angsuran->transaksi_penjualan_id);
+
         // Kembalikan sisa tagihan
-        $transaksi = $angsuran->transaksi;
-        $transaksi->sisa_tagihan += $angsuran->nominal;
+        $transaksi->sisa_tagihan += $angsuran->nominal_angsuran;
         $transaksi->save();
 
         // Hapus angsuran

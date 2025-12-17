@@ -278,7 +278,9 @@
                                 <th>Nomor Nota Angsuran</th>
                                 <th>Tanggal</th>
                                 <th>Metode</th>
-                                <th colspan="4">Nominal</th>
+                                <th>Nominal</th>
+                                <th>Pembuat Nota Angsuran</th>
+                                <th>aksi</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -288,12 +290,35 @@
                     html += `<tr><td colspan="6" class="text-center text-muted">Belum ada pembayaran</td></tr>`;
                 } else {
                     angsurans.forEach(a => {
+                        // console.log(a);
                         html += `
                             <tr>
                                 <td>${a.nomor_nota}</td>
                                 <td>${a.tanggal_angsuran}</td>
-                                <td>${a.metode_pembayaran}</td>
-                                <td colspan="4">Rp ${parseFloat(a.nominal_angsuran).toLocaleString('id-ID')}</td>
+                                // <td>${a.metode_pembayaran}</td>
+                                <td>Rp ${parseFloat(a.nominal_angsuran).toLocaleString('id-ID')}</td>
+                                <td>${a.user?.name ?? a.user?.username ?? '-'}</td>
+                                <td class="text-end">
+                                    <div class="btn-group btn-group-sm">
+                                        <button class="btn btn-danger btn-delete-angsuran"
+                                            data-id="${a.id}"
+                                            data-nominal="${a.nominal_angsuran}">
+                                            <i class="fa fa-trash"></i>
+                                        </button>
+
+                                        <button class="btn btn-warning btn-update-angsuran"
+                                            data-id="${a.id}"
+                                            data-nominal="${a.nominal_angsuran}">
+                                            <i class="fa fa-edit"></i>
+                                        </button>
+
+                                        <button class="btn btn-success btn-print-pdf"
+                                            data-id="${a.id}"
+                                            data-nominal="${a.nominal_angsuran}">
+                                            <i class="fa fa-print"></i>
+                                        </button>
+                                    </div>
+                                </td>
                             </tr>
                         `;
                     });
@@ -387,19 +412,37 @@
         });
 
         // ================= DELETE =================
-        $(document).on('click', '.deleteBtn', function() {
+        $(document).on('click', '.btn-delete-angsuran', function() {
             $("#deleteID").val($(this).data('id'));
             $("#modalDelete").modal('show');
         });
 
         $("#btnDelete").click(function() {
-            $.post(`/angsuran-penjualan/hapus/${$("#deleteID").val()}`, {
-                alasan: $("#deleteReason").val(),
-                _token: $('meta[name="csrf-token"]').attr('content')
-            }).done(() => {
-                $("#modalDelete").modal('hide');
-                $('#tabelAngsuran').DataTable().ajax.reload();
-                Swal.fire("Berhasil", "Angsuran berhasil dihapus!", "success");
+            const id = $("#deleteID").val();
+            const alasan = $("#deleteReason").val();
+
+            console.log('[DELETE] ID:', id);
+            console.log('[DELETE] Alasan:', alasan);
+
+            $.ajax({
+                url: `/angsuran-penjualan/hapus/${id}`,
+                type: 'DELETE',
+                data: {
+                    alasan: alasan,
+                    _token: $('meta[name="csrf-token"]').attr('content')
+                },
+                success: function(res) {
+                    console.log('[DELETE] SUCCESS:', res);
+                    $("#modalDelete").modal('hide');
+                    $('#tabelAngsuran').DataTable().ajax.reload(null, false);
+                    Swal.fire("Berhasil", "Angsuran berhasil dihapus!", "success");
+                },
+                error: function(xhr) {
+                    console.error('[DELETE] ERROR STATUS:', xhr.status);
+                    console.error('[DELETE] RESPONSE:', xhr.responseText);
+
+                    Swal.fire("Error", xhr.responseJSON?.message || "Gagal menghapus angsuran!", "error");
+                }
             });
         });
 
