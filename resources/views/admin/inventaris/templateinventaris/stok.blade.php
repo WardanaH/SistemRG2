@@ -123,20 +123,29 @@ MODAL TAMBAH / UPDATE STOK
 
 @push('scripts')
 <script>
-document.addEventListener('DOMContentLoaded', function () {
-    const selectBahan = document.getElementById('selectBahan');
-    const inputSatuan = document.getElementById('inputSatuan');
+$(document).ready(function () {
 
-    if (selectBahan) {
-        selectBahan.addEventListener('change', function () {
-            const selectedOption = this.options[this.selectedIndex];
-            const satuan = selectedOption.getAttribute('data-satuan');
+    // init select2 (kalau belum)
+    $('#selectBahan').select2({
+        dropdownParent: $('#modalTambahStok'),
+        width: '100%'
+    });
 
-            inputSatuan.value = satuan ? satuan : '';
-        });
-    }
+    // ambil satuan saat bahan dipilih
+    $('#selectBahan').on('select2:select', function (e) {
+        const data = e.params.data.element;
+        const satuan = $(data).data('satuan');
 
-    // ✅ SWEETALERT SUCCESS (SAMA PERSIS KAYA GUDANG)
+        $('#inputSatuan').val(satuan ?? '');
+    });
+
+    // reset saat modal ditutup
+    $('#modalTambahStok').on('hidden.bs.modal', function () {
+        $('#selectBahan').val(null).trigger('change');
+        $('#inputSatuan').val('');
+    });
+
+    // sweetalert
     @if(session('success'))
         Swal.fire({
             icon: 'success',
@@ -149,3 +158,5 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 </script>
 @endpush
+
+

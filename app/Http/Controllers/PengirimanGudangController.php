@@ -78,7 +78,7 @@ public function storeBarang(Request $request)
         'satuan'      => $validated['satuan'],
         'batas_stok'  => $validated['batas_stok'] ?? 0,
         'keterangan'  => $validated['keterangan'] ?? '',
-        'hitung_luas' => 0
+        'hitung_luas' => in_array(strtoupper($validated['satuan']),['CENTIMETER', 'METER'])
     ]);
 
     // 2️⃣ BUAT STOK KE SEMUA CABANG
