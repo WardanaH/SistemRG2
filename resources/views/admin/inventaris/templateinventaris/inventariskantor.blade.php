@@ -29,7 +29,7 @@
         </div>
 
         <div class="card-body bg-light">
-            <table class="table table-bordered table-stripped table-hover align-middle text-center shadow-sm styletable">
+            <table class="table table-bordered table-stripped table-hover align-middle text-center shadow-sm">
                 <thead style="background-color:#e9d8fd; color:#4b0082;">
                 <tr>
                     <th>Kode</th>

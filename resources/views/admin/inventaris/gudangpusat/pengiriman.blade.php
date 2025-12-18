@@ -37,7 +37,7 @@
         <h4 class="card-title">Daftar Pengiriman</h4>
 
         <div class="table-responsive mt-3">
-            <table class="table table-striped table-bordered align-middle styletable">
+            <table class="table table-striped table-bordered align-middle">
                 <thead class="table-light">
                     <tr>
                         <th>No</th>
