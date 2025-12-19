@@ -319,11 +319,17 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/angsuran-penjualan', [AngsuransController::class, 'index'])
         ->middleware('permission:manage-angsuranpenjualan')
         ->name('angsuran.index');
+    Route::get('/angsuran-penjualan-deleted', [AngsuransController::class, 'indexdeleted'])
+        ->middleware('permission:manage-angsuranpenjualan')
+        ->name('angsuran.indexdeleted');
 
     // Load datatable AJAX
     Route::get('/angsuran-penjualan/data', [AngsuransController::class, 'data'])
         ->middleware('permission:manage-angsuranpenjualan')
         ->name('angsuran.data');
+    Route::get('/angsuran-penjualan/data-deleted', [AngsuransController::class, 'dataDeleted'])
+        ->middleware('permission:manage-angsuranpenjualan')
+        ->name('angsuran.deleted.data');
 
     // Tambah angsuran
     Route::post('/angsuran-penjualan/bayar/{id}', [AngsuransController::class, 'bayar'])

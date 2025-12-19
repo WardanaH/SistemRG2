@@ -53,7 +53,7 @@
                     <thead class="table-primary">
                         <tr>
                             <th>No</th>
-                            <th>No Nota</th>
+                            <th>No Nota Transaksi</th>
                             <th>Nama</th>
                             <th>Pembayaran</th>
                             <th>Tanggal</th>
@@ -300,17 +300,14 @@
                                 <td>${a.user?.name ?? a.user?.username ?? '-'}</td>
                                 <td class="text-end">
                                     <div class="btn-group btn-group-sm">
+
+                                        @can('delete-angsuranpenjualan')
                                         <button class="btn btn-danger btn-delete-angsuran"
                                             data-id="${a.id}"
                                             data-nominal="${a.nominal_angsuran}">
                                             <i class="fa fa-trash"></i>
                                         </button>
-
-                                        <button class="btn btn-warning btn-update-angsuran"
-                                            data-id="${a.id}"
-                                            data-nominal="${a.nominal_angsuran}">
-                                            <i class="fa fa-edit"></i>
-                                        </button>
+                                        @endcan
 
                                         <button class="btn btn-success btn-print-pdf"
                                             data-id="${a.id}"

@@ -51,6 +51,57 @@ class AngsuransController extends Controller
         return view('admin.transaksis.angsuran.index', compact('datas', 'cabangs'));
     }
 
+    public function indexDeleted(Request $request)
+    {
+        $user = Auth::user();
+
+        $query = MAngsurans::onlyTrashed()
+            ->with([
+                'transaksiPenjualan.pelanggan',
+                'transaksiPenjualan.user',
+                'transaksiPenjualan.cabang'
+            ]);
+
+        if (!$user->hasRole(['owner', 'direktur'])) {
+            $query->whereHas('transaksiPenjualan', function ($q) use ($user) {
+                $q->where('cabang_id', $user->cabang_id);
+            });
+        }
+
+        if ($request->cabang && $request->cabang !== 'semua') {
+            $query->whereHas('transaksiPenjualan', function ($q) use ($request) {
+                $q->where('cabang_id', $request->cabang);
+            });
+        }
+
+        if ($request->no) {
+            $query->whereHas('transaksiPenjualan', function ($q) use ($request) {
+                $q->where('nomor_nota', 'like', "%{$request->no}%");
+            });
+        }
+
+        if ($request->nama) {
+            $query->whereHas('transaksiPenjualan', function ($q) use ($request) {
+                $q->where('nama_pelanggan', 'like', "%{$request->nama}%");
+            });
+        }
+
+        if ($request->pembayaran && $request->pembayaran !== 'semua') {
+            $query->whereHas('transaksiPenjualan', function ($q) use ($request) {
+                $q->where('metode_pembayaran', $request->pembayaran);
+            });
+        }
+
+        $datas = $query
+            ->orderBy('deleted_at', 'desc')
+            ->paginate(50)
+            ->withQueryString();
+
+        $cabangs = Cabang::all();
+
+        return view('admin.transaksis.angsuran.indexdeleted', compact('datas', 'cabangs'));
+    }
+
     public function data(Request $request)
     {
         $query = MTransaksiPenjualans::with(['pelanggan', 'cabang', 'user'])
@@ -68,7 +119,7 @@ class AngsuransController extends Controller
         }
 
         if ($request->nonota) {
-            $query->where('id', 'like', "%{$request->nonota}%");
+            $query->where('nomor_nota', 'like', "%{$request->nonota}%");
         }
 
         if ($request->nama) {
@@ -95,6 +146,86 @@ class AngsuransController extends Controller
                 ';
             })
             ->rawColumns(['aksi'])
+            ->make(true);
+    }
+    public function dataDeleted(Request $request)
+    {
+        $user = Auth::user();
+
+        $query = MAngsurans::onlyTrashed()
+            ->with([
+                'transaksiPenjualan.pelanggan',
+                'transaksiPenjualan.cabang',
+                'transaksiPenjualan.user'
+            ]);
+
+        // 🔒 Batasi cabang jika bukan owner/direktur
+        if (!$user->hasRole(['owner', 'direktur'])) {
+            $query->whereHas('transaksiPenjualan', function ($q) use ($user) {
+                $q->where('cabang_id', $user->cabang_id);
+            });
+        }
+
+        // 🔎 Filter No Nota
+        if ($request->nonota) {
+            $query->whereHas('transaksiPenjualan', function ($q) use ($request) {
+                $q->where('nomor_nota', 'like', "%{$request->nonota}%");
+            });
+        }
+
+        // 🔎 Filter Nama Pelanggan
+        if ($request->nama) {
+            $query->whereHas('transaksiPenjualan', function ($q) use ($request) {
+                $q->where('nama_pelanggan', 'like', "%{$request->nama}%");
+            });
+        }
+
+        // 🔎 Filter Pembayaran
+        if ($request->pembayaran && $request->pembayaran !== 'semua') {
+            $query->whereHas('transaksiPenjualan', function ($q) use ($request) {
+                $q->where('metode_pembayaran', $request->pembayaran);
+            });
+        }
+
+        // 🔎 Filter Cabang (owner/direktur)
+        if ($request->cabang && $request->cabang !== 'semua') {
+            $query->whereHas('transaksiPenjualan', function ($q) use ($request) {
+                $q->where('cabang_id', $request->cabang);
+            });
+        }
+
+        return DataTables::of($query)
+            ->addIndexColumn()
+            ->addColumn(
+                'nomor_nota',
+                fn($a) =>
+                $a->transaksiPenjualan->nomor_nota ?? '-'
+            )
+            ->addColumn(
+                'nama_pelanggan',
+                fn($a) =>
+                $a->transaksiPenjualan->nama_pelanggan ?? '-'
+            )
+            ->addColumn(
+                'metode_pembayaran',
+                fn($a) =>
+                $a->transaksiPenjualan->metode_pembayaran ?? '-'
+            )
+            ->addColumn(
+                'cabang',
+                fn($a) =>
+                $a->transaksiPenjualan->cabang->nama ?? '-'
+            )
+            ->addColumn(
+                'dibuat_oleh',
+                fn($a) =>
+                $a->transaksiPenjualan->user->username ?? '-'
+            )
+            ->editColumn(
+                'deleted_at',
+                fn($a) =>
+                $a->deleted_at->format('d-m-Y H:i')
+            )
             ->make(true);
     }
 
