@@ -68,7 +68,7 @@
             @endforeach
 
             {{-- ===================== GUDANG PUSAT ===================== --}}
-            @if($user->hasRole('Inventory Utama'))
+            @if($user->hasRole('Inventory Utama|owner'))
             <li class="nav-label mt-4">GUDANG PUSAT</li>
 
             <li>
