@@ -143,11 +143,17 @@ class AngsuransController extends Controller
                         data-sisa="' . $t->sisa_tagihan . '">
                         Bayar
                     </button>
+                    <a href="' . route('transaksi.angsuran.print', $t->id) . '"
+                        target="_blank"
+                        class="btn btn-secondary btn-sm">
+                        Print Angsuran
+                    </a>
                 ';
             })
             ->rawColumns(['aksi'])
             ->make(true);
     }
+
     public function dataDeleted(Request $request)
     {
         $user = Auth::user();
@@ -422,5 +428,20 @@ class AngsuransController extends Controller
         $angsuran->delete();
 
         return response()->json(['success' => true]);
+    }
+
+    public function printAngsuran($id)
+    {
+        $transaksi = MTransaksiPenjualans::with([
+            'angsuran',
+            'cabang',
+            'user',
+            'pelanggan'
+        ])->findOrFail($id);
+
+        return view('admin.reports.reporttransangsuranpenjualan', [
+            'transaksi' => $transaksi,
+            'angsurans' => $transaksi->angsuran
+        ]);
     }
 }
