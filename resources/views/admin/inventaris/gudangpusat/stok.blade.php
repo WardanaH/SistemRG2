@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('admin.inventaris.gudangpusat.layout.app')
 
 @section('content')
 
@@ -53,7 +53,7 @@ MODAL TAMBAH / UPDATE STOK
     <div class="modal-dialog">
         <div class="modal-content">
 
-            <form action="{{ route('gudangpusat.stok.tambah') }}" method="POST">
+            <form action="{{ route('stok.pusat.tambah') }}" method="POST">
                 @csrf
 
                 <div class="modal-header">

@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('admin.inventaris.templateinventaris.layout_cabang.app')
 
 @section('content')
 <div class="container-fluid mt-4">
@@ -89,7 +89,7 @@
                             </button>
 
                             {{-- HAPUS (SweetAlert) --}}
-                            <form action="{{ route('cabang.inventaris.destroy', ['slug' => $cabang->slug, 'id' => $item->id]) }}"
+                            <form action="{{ route('cabang.inventaris.cabang.destroy', ['slug' => $cabang->slug, 'id' => $item->id]) }}"
                                   method="POST"
                                   class="formDelete d-inline">
                                 @csrf
@@ -122,7 +122,7 @@
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-0 shadow-lg">
 
-            <form action="{{ route('cabang.inventaris.store', $cabang->slug) }}" method="POST">
+            <form action="{{ route('cabang.inventaris.cabang.store', $cabang->slug) }}" method="POST">
                 @csrf
 
                 <div class="modal-header" style="background-color:#6f42c1;">
@@ -189,7 +189,7 @@
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-0">
 
-            <form action="{{ route('cabang.inventaris.update', ['slug' => $cabang->slug, 'id' => $item->id]) }}"
+            <form action="{{ route('cabang.inventaris.cabang.update', ['slug' => $cabang->slug, 'id' => $item->id]) }}"
                   method="POST">
                 @csrf
                 @method('PUT')

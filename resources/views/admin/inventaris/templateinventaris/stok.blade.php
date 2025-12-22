@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('admin.inventaris.templateinventaris.layout_cabang.app')
 
 @section('content')
 
@@ -55,7 +55,7 @@ MODAL TAMBAH / UPDATE STOK
     <div class="modal-dialog">
         <div class="modal-content">
 
-            <form action="{{ route('cabang.stok.store', ['slug' => $cabang->slug]) }}" method="POST">
+            <form action="{{ route('cabang.stok.cabang.store', ['slug' => $cabang->slug]) }}" method="POST">
                 @csrf
 
                 <div class="modal-header">

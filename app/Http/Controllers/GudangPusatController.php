@@ -8,7 +8,7 @@ use App\Models\MBahanBakus;
 use App\Models\MStokBahanBakus;
 use App\Models\MPengirimanGudang;
 
-class PengirimanGudangController extends Controller
+class GudangPusatController extends Controller
 {
     /**
      * Ambil data gudang pusat (by kode GDG-UTM)

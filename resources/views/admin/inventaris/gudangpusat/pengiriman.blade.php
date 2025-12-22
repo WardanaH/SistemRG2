@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('admin.inventaris.gudangpusat.layout.app')
 
 @section('content')
 
@@ -8,11 +8,6 @@
         <i class="bi bi-plus-circle"></i> Tambah Pengiriman
     </button>
 </div>
-
-{{-- ALERT SUCCESS
-@if(session('success'))
-    <div class="alert alert-success mt-2">{{ session('success') }}</div>
-@endif --}}
 
 {{-- ALERT ERROR --}}
 @if(session('error'))
@@ -70,7 +65,7 @@
                             <span class="badge bg-success">Diterima</span>
                         @else
                             {{-- ✅ JIKA BELUM DITERIMA: BOLEH DROPDOWN --}}
-                            <form action="{{ route('gudangpusat.pengiriman.updateStatus', $item->id) }}"
+                            <form action="{{ route('pengiriman.pusat.updateStatus', $item->id) }}"
                                 method="POST"
                                 class="form-update-status">
                                 @csrf
@@ -105,7 +100,7 @@
 
                     {{-- ✅ AKSI HAPUS SWEETALERT --}}
                     <td class="text-center">
-                        <form action="{{ route('gudangpusat.pengiriman.destroy', $item->id) }}"
+                        <form action="{{ route('pengiriman.pusat.destroy', $item->id) }}"
                             method="POST"
                             class="form-hapus d-inline">
                             @csrf
@@ -139,7 +134,7 @@ MODAL TAMBAH PENGIRIMAN
 <div class="modal-dialog">
 <div class="modal-content">
 
-<form action="{{ route('gudangpusat.pengiriman.store') }}" method="POST">
+<form action="{{ route('pengiriman.pusat.store') }}" method="POST">
 @csrf
 
 <div class="modal-header">

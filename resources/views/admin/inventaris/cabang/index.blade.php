@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('admin.inventaris.gudangpusat.layout.app')
 
 @section('content')
 
@@ -32,13 +32,13 @@
                     <td>{{ $c->email }}</td>
                     <td>{{ $c->jenis }}</td>
                     <td>
-                        
+
                          {{-- Tombol aktif dan nonaktif --}}
                         @php
                         $nonaktif = config('cabang_nonaktif.ids');
                         @endphp
 
-                        <form action="{{ route('inventaris.cabang.toggle', $c->id) }}" method="POST" class="d-inline">
+                        <form action="{{ route('gudangpusat.cabang.toggle', $c->id) }}" method="POST" class="d-inline">
                             @csrf
                             @if(in_array($c->id, $nonaktif))
                                 <button class="btn btn-success btn-sm">Aktifkan</button>

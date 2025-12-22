@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('admin.inventaris.gudangpusat.layout.app')
 
 @section('content')
 
@@ -70,7 +70,7 @@
                             <div class="modal-dialog">
                                 <div class="modal-content">
 
-                                    <form action="{{ route('gudangpusat.barang.update', $stokId) }}" method="POST">
+                                    <form action="{{ route('barang.pusat.update', $stokId) }}" method="POST">
                                         @csrf
                                         @method('PUT')
 
@@ -171,7 +171,7 @@
     <div class="modal-dialog">
         <div class="modal-content">
 
-            <form action="{{ route('gudangpusat.barang.store') }}" method="POST">
+            <form action="{{ route('barang.pusat.store') }}" method="POST">
                 @csrf
 
                 <div class="modal-header">
