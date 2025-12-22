@@ -235,11 +235,17 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/angsuran-penjualan', [AngsuransController::class, 'index'])
         ->middleware('permission:manage-angsuranpenjualan')
         ->name('angsuran.index');
+    Route::get('/angsuran-penjualan-deleted', [AngsuransController::class, 'indexdeleted'])
+        ->middleware('permission:manage-angsuranpenjualan')
+        ->name('angsuran.indexdeleted');
 
     // Load datatable AJAX
     Route::get('/angsuran-penjualan/data', [AngsuransController::class, 'data'])
         ->middleware('permission:manage-angsuranpenjualan')
         ->name('angsuran.data');
+    Route::get('/angsuran-penjualan/data-deleted', [AngsuransController::class, 'dataDeleted'])
+        ->middleware('permission:manage-angsuranpenjualan')
+        ->name('angsuran.deleted.data');
 
     // Tambah angsuran
     Route::post('/angsuran-penjualan/bayar/{id}', [AngsuransController::class, 'bayar'])
@@ -247,7 +253,7 @@ Route::middleware(['auth'])->group(function () {
         ->name('angsuran.bayar');
 
     // Hapus angsuran
-    Route::delete('/angsuran-penjualan/{id}/hapus', [AngsuransController::class, 'hapus'])
+    Route::delete('/angsuran-penjualan/hapus/{id}', [AngsuransController::class, 'hapus'])
         ->middleware('permission:delete-angsuranpenjualan')
         ->name('angsuran.hapus');
 
@@ -262,4 +268,9 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/angsuran-penjualan/show-detail-transaksi', [AngsuransController::class, 'showDetailAngsuranTransaksi'])
         ->middleware('permission:manage-angsuranpenjualan')
         ->name('angsuran.showdetail.transaksi');
+
+    // Print Nota
+    Route::get('/transaksi/{id}/print-angsuran', [AngsuransController::class, 'printAngsuran'])
+        ->middleware('permission:manage-angsuranpenjualan')
+        ->name('transaksi.angsuran.print');
 });

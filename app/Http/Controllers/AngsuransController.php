@@ -51,11 +51,62 @@ class AngsuransController extends Controller
         return view('admin.transaksis.angsuran.index', compact('datas', 'cabangs'));
     }
 
+    public function indexDeleted(Request $request)
+    {
+        $user = Auth::user();
+
+        $query = MAngsurans::onlyTrashed()
+            ->with([
+                'transaksiPenjualan.pelanggan',
+                'transaksiPenjualan.user',
+                'transaksiPenjualan.cabang'
+            ]);
+
+        if (!$user->hasRole(['owner', 'direktur'])) {
+            $query->whereHas('transaksiPenjualan', function ($q) use ($user) {
+                $q->where('cabang_id', $user->cabang_id);
+            });
+        }
+
+        if ($request->cabang && $request->cabang !== 'semua') {
+            $query->whereHas('transaksiPenjualan', function ($q) use ($request) {
+                $q->where('cabang_id', $request->cabang);
+            });
+        }
+
+        if ($request->no) {
+            $query->whereHas('transaksiPenjualan', function ($q) use ($request) {
+                $q->where('nomor_nota', 'like', "%{$request->no}%");
+            });
+        }
+
+        if ($request->nama) {
+            $query->whereHas('transaksiPenjualan', function ($q) use ($request) {
+                $q->where('nama_pelanggan', 'like', "%{$request->nama}%");
+            });
+        }
+
+        if ($request->pembayaran && $request->pembayaran !== 'semua') {
+            $query->whereHas('transaksiPenjualan', function ($q) use ($request) {
+                $q->where('metode_pembayaran', $request->pembayaran);
+            });
+        }
+
+        $datas = $query
+            ->orderBy('deleted_at', 'desc')
+            ->paginate(50)
+            ->withQueryString();
+
+        $cabangs = Cabang::all();
+
+        return view('admin.transaksis.angsuran.indexdeleted', compact('datas', 'cabangs'));
+    }
+
     public function data(Request $request)
     {
-        $query = MTransaksiPenjualans::with(['pelanggan', 'cabang', 'user']);
+        $query = MTransaksiPenjualans::with(['pelanggan', 'cabang', 'user'])
+            ->latest();
         // ->where('sisa_tagihan', '>', 0);
-
 
         // 🔹 Batasi cabang jika bukan owner/direktur
         if (!Auth::user()->hasRole(['owner', 'direktur'])) {
@@ -68,7 +119,7 @@ class AngsuransController extends Controller
         }
 
         if ($request->nonota) {
-            $query->where('id', 'like', "%{$request->nonota}%");
+            $query->where('nomor_nota', 'like', "%{$request->nonota}%");
         }
 
         if ($request->nama) {
@@ -92,13 +143,95 @@ class AngsuransController extends Controller
                         data-sisa="' . $t->sisa_tagihan . '">
                         Bayar
                     </button>
-                    <button class="btn btn-warning btn-sm deleteBtn"
-                        data-id="' . $t->id . '">
-                        Hapus
-                    </button>
+                    <a href="' . route('transaksi.angsuran.print', $t->id) . '"
+                        target="_blank"
+                        class="btn btn-secondary btn-sm">
+                        Print Angsuran
+                    </a>
                 ';
             })
             ->rawColumns(['aksi'])
+            ->make(true);
+    }
+
+    public function dataDeleted(Request $request)
+    {
+        $user = Auth::user();
+
+        $query = MAngsurans::onlyTrashed()
+            ->with([
+                'transaksiPenjualan.pelanggan',
+                'transaksiPenjualan.cabang',
+                'transaksiPenjualan.user'
+            ]);
+
+        // 🔒 Batasi cabang jika bukan owner/direktur
+        if (!$user->hasRole(['owner', 'direktur'])) {
+            $query->whereHas('transaksiPenjualan', function ($q) use ($user) {
+                $q->where('cabang_id', $user->cabang_id);
+            });
+        }
+
+        // 🔎 Filter No Nota
+        if ($request->nonota) {
+            $query->whereHas('transaksiPenjualan', function ($q) use ($request) {
+                $q->where('nomor_nota', 'like', "%{$request->nonota}%");
+            });
+        }
+
+        // 🔎 Filter Nama Pelanggan
+        if ($request->nama) {
+            $query->whereHas('transaksiPenjualan', function ($q) use ($request) {
+                $q->where('nama_pelanggan', 'like', "%{$request->nama}%");
+            });
+        }
+
+        // 🔎 Filter Pembayaran
+        if ($request->pembayaran && $request->pembayaran !== 'semua') {
+            $query->whereHas('transaksiPenjualan', function ($q) use ($request) {
+                $q->where('metode_pembayaran', $request->pembayaran);
+            });
+        }
+
+        // 🔎 Filter Cabang (owner/direktur)
+        if ($request->cabang && $request->cabang !== 'semua') {
+            $query->whereHas('transaksiPenjualan', function ($q) use ($request) {
+                $q->where('cabang_id', $request->cabang);
+            });
+        }
+
+        return DataTables::of($query)
+            ->addIndexColumn()
+            ->addColumn(
+                'nomor_nota',
+                fn($a) =>
+                $a->transaksiPenjualan->nomor_nota ?? '-'
+            )
+            ->addColumn(
+                'nama_pelanggan',
+                fn($a) =>
+                $a->transaksiPenjualan->nama_pelanggan ?? '-'
+            )
+            ->addColumn(
+                'metode_pembayaran',
+                fn($a) =>
+                $a->transaksiPenjualan->metode_pembayaran ?? '-'
+            )
+            ->addColumn(
+                'cabang',
+                fn($a) =>
+                $a->transaksiPenjualan->cabang->nama ?? '-'
+            )
+            ->addColumn(
+                'dibuat_oleh',
+                fn($a) =>
+                $a->transaksiPenjualan->user->username ?? '-'
+            )
+            ->editColumn(
+                'deleted_at',
+                fn($a) =>
+                $a->deleted_at->format('d-m-Y H:i')
+            )
             ->make(true);
     }
 
@@ -156,7 +289,8 @@ class AngsuransController extends Controller
             ]);
 
             // Riwayat angsuran
-            $angsuran = MAngsurans::where('transaksi_penjualan_id', $id)
+            $angsuran = MAngsurans::with('user:id,username')
+                ->where('transaksi_penjualan_id', $id)
                 ->orderBy('created_at')
                 ->get();
 
@@ -280,14 +414,34 @@ class AngsuransController extends Controller
 
         $angsuran = MAngsurans::findOrFail($id);
 
+        // Simpan alasan penghapusan
+        $angsuran->reason_on_delete = $request->alasan;
+        $angsuran->save();
+
+        $transaksi = MTransaksiPenjualans::findOrFail($angsuran->transaksi_penjualan_id);
+
         // Kembalikan sisa tagihan
-        $transaksi = $angsuran->transaksi;
-        $transaksi->sisa_tagihan += $angsuran->nominal;
+        $transaksi->sisa_tagihan += $angsuran->nominal_angsuran;
         $transaksi->save();
 
         // Hapus angsuran
         $angsuran->delete();
 
         return response()->json(['success' => true]);
+    }
+
+    public function printAngsuran($id)
+    {
+        $transaksi = MTransaksiPenjualans::with([
+            'angsuran',
+            'cabang',
+            'user',
+            'pelanggan'
+        ])->findOrFail($id);
+
+        return view('admin.reports.reporttransangsuranpenjualan', [
+            'transaksi' => $transaksi,
+            'angsurans' => $transaksi->angsuran
+        ]);
     }
 }
