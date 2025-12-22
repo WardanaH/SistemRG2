@@ -137,7 +137,16 @@
             </li>
             @endcan
 
-             @can('manage-gudang')
+            @can('manage-proyek')
+            <li>
+                <a href="{{ route('companies.index') }}">
+                    <i class="la la-briefcase"></i>
+                    <span class="nav-text">Manajemen Proyek</span>
+                </a>
+            </li>
+            @endcan
+
+            @can('manage-gudang')
             <li>
                 <a href="{{ route('gudangpusat.dashboard') }}">
                     <i class="icon icon-settings"></i>
@@ -147,7 +156,6 @@
             @endcan
 
         </ul>
-        @endcan
     </div>
 </div>
 <!--**********************************

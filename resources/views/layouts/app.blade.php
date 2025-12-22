@@ -16,9 +16,9 @@
     <link href="{{ asset('vendor/owl-carousel/css/owl.carousel.min.css') }}" rel="stylesheet">
 
     {{-- ============ ICON PACK (commented) ============ --}}
-    <!-- <link href="{{ asset('vendor/themify-icons/themify-icons.css') }}" rel="stylesheet">
-    <link href="{{ asset('vendor/fontawesome/css/all.min.css') }}" rel="stylesheet">
-    <link href="{{ asset('vendor/line-awesome/css/line-awesome.min.css') }}" rel="stylesheet"> -->
+    <!-- <link href="{{ asset('vendor/themify-icons/themify-icons.css') }}" rel="stylesheet"> -->
+    <!-- <link href="{{ asset('vendor/fontawesome/css/all.min.css') }}" rel="stylesheet"> -->
+    <link href="{{ asset('vendor/line-awesome/css/line-awesome.min.css') }}" rel="stylesheet">
 
     {{-- ============ MAIN STYLE ============ --}}
     <link href="{{ asset('css/style.css') }}" rel="stylesheet">
