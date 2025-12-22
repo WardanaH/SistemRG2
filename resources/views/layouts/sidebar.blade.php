@@ -134,71 +134,12 @@
             </li>
             @endcan
 
-            @can('manage-cabang')
-            {{-- ===================== CABANG & INVENTARIS ===================== --}}
-            <li class="nav-label mt-3">CABANG & INVENTARIS</li>
-
+             @can('manage-gudang')
             <li>
-                <a href="{{ route('gudangpusat.cabang.index') }}">
+                <a href="{{ route('gudangpusat.dashboard') }}">
                     <i class="icon icon-settings"></i>
-                    <span class="nav-text">Manajemen Cabang</span>
+                    <span class="nav-text">Manajemen Inventaris</span>
                 </a>
-            </li>
-
-            @php
-                $nonaktif = config('cabang_nonaktif.ids', []);
-                $cabangs  = \App\Models\Cabang::where('jenis', 'cabang')->get();
-            @endphp
-
-            @foreach($cabangs as $c)
-                @if(!in_array($c->id, $nonaktif))
-                    <li>
-                        <a class="has-arrow" href="javascript:void(0)">
-                            <i class="icon icon-home"></i>
-                            <span class="nav-text">{{ $c->nama }}</span>
-                        </a>
-                        <ul>
-                            <li>
-                                <a href="{{ route('cabang.barang.cabang', $c->slug) }}">
-                                    Daftar Barang
-                                </a>
-                            </li>
-                            <li>
-                                <a href="{{ route('cabang.stok.cabang', $c->slug) }}">
-                                    Stok Tersedia
-                                </a>
-                            </li>
-                            <li>
-                                <a href="{{ route('cabang.riwayat.cabang', $c->slug) }}">
-                                    Riwayat Pengiriman
-                                </a>
-                            </li>
-                            <li>
-                                <a href="{{ route('cabang.inventaris.cabang', $c->slug) }}">
-                                    Inventaris Kantor
-                                </a>
-                            </li>
-                        </ul>
-                    </li>
-                @endif
-            @endforeach
-            @endcan
-
-
-            @can('manage-cabang')
-            {{-- ===================== GUDANG PUSAT ===================== --}}
-            <li class="nav-label mt-4">GUDANG PUSAT</li>
-
-            <li>
-                <a class="has-arrow" href="javascript:void(0)">
-                    <i class="icon icon-folder"></i>
-                    <span class="nav-text">Gudang Pusat</span>
-                </a>
-                <ul>
-                    <li><a href="{{ route('barang.pusat') }}">Daftar Barang</a></li>
-                    <li><a href="{{ route('stok.pusat') }}">Stok Tersedia</a></li>
-                    <li><a href="{{ route('pengiriman.pusat.index') }}">Pengiriman Barang</a></li>
-                </ul>
             </li>
             @endcan
 

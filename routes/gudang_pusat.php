@@ -15,7 +15,7 @@ use App\Http\Controllers\GudangCabangController;
 |--------------------------------------------------------------------------
 */
 
-Route::middleware(['auth', 'role:Inventory Utama'])
+Route::middleware(['auth', 'role:Inventory Utama|owner'])
     ->group(function () {
         /*
         |=====================
