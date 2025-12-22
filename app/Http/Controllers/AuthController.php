@@ -29,12 +29,14 @@ class AuthController extends Controller
                 return redirect()->route('operator.dashboard')->with('success', 'Selamat datang kembali!');
             } elseif ($user->hasRole('designer')) {
                 return redirect()->route('designer.dashboard')->with('success', 'Selamat datang kembali!');
-            } elseif ($user->hasRole('inventaris')) {
-                return redirect()->route('inventaris.dashboard')->with('success', 'Selamat datang kembali!');
             } elseif ($user->hasRole('adversting')) {
                 return redirect()->route('adversting.index')->with('success', 'Selamat datang kembali!');
             } elseif ($user->hasRole('documentation')) {
                 return redirect()->route('companies.index')->with('success', 'Selamat datang kembali!');
+            } elseif ($user->hasRole('Inventory Utama')) {
+                return redirect()->route('gudangpusat.dashboard')->with('success', 'Selamat datang kembali!');
+            } elseif ($user->hasRole('Inventory Cabang')) {
+                return redirect()->route('templateinventaris.dashboard')->with('success', 'Selamat datang kembali!');
             }else {
                 return redirect()->route('dashboard')->with('success', 'Selamat datang kembali!');
             }

@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('admin.inventaris.templateinventaris.layout_cabang.app')
 
 @section('content')
 
@@ -72,9 +72,11 @@
 
             {{-- ✅ AKSI TERIMA BARANG --}}
             <td class="text-center">
-              @if($r->status_pengiriman == 'Dikirim')
-
-                <form action="{{ route('cabang.riwayat.terima', [$cabang->slug, $r->id]) }}"
+              @if(
+                    $r->status_pengiriman == 'Dikirim'
+                    && auth()->user()->hasRole('Inventory Cabang')
+                )
+                <form action="{{ route('cabang.riwayat.cabang.terima', [$cabang->slug, $r->id]) }}"
                       method="POST"
                       class="form-terima d-inline">
                   @csrf

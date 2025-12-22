@@ -5,20 +5,31 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Cabang;
 use App\Models\MStokBahanBakus;
+use App\Models\MBahanBakus;
 use App\Models\MInventarisKantor;
 use App\Models\MPengirimanGudang;
 use Illuminate\Support\Facades\Storage;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 
-class CabangDinamisController extends Controller
+class GudangCabangController extends Controller
 {
+    private function authorizeCabang($cabang)
+    {
+        $user = auth()->user();
+
+        if ($user->role === 'Inventory Cabang' && $user->cabang_id !== $cabang->id) {
+            abort(403, 'Akses cabang tidak diizinkan.');
+        }
+    }
+
     /**
      * 🔹 Daftar Barang per Cabang
      */
     public function barang($slug)
     {
         $cabang = Cabang::where('slug', $slug)->firstOrFail();
+        $this->authorizeCabang($cabang);
 
         $datas = \App\Models\MBahanBakus::leftJoin('stok_bahan_bakus', function ($join) use ($cabang) {
                 $join->on('bahanbakus.id', '=', 'stok_bahan_bakus.bahanbaku_id');
@@ -51,6 +62,7 @@ class CabangDinamisController extends Controller
     public function barangStore(Request $request, $slug)
     {
         $cabang = Cabang::where('slug', $slug)->firstOrFail();
+        $this->authorizeCabang($cabang);
 
         $validated = $request->validate([
             'kategori_id' => 'required|integer',
@@ -85,6 +97,7 @@ class CabangDinamisController extends Controller
     public function barangUpdate(Request $request, $slug, $id)
     {
         $cabang = Cabang::where('slug', $slug)->firstOrFail();
+        $this->authorizeCabang($cabang);
 
         $validated = $request->validate([
             'kategori_id' => 'required|integer',
@@ -119,6 +132,7 @@ class CabangDinamisController extends Controller
     public function barangDestroy($slug, $id)
     {
         $cabang = Cabang::where('slug', $slug)->firstOrFail();
+        $this->authorizeCabang($cabang);
 
         \DB::table('stok_bahan_bakus')
             ->where('bahanbaku_id', $id)
@@ -137,28 +151,96 @@ class CabangDinamisController extends Controller
     public function stok($slug)
     {
         $cabang = Cabang::where('slug', $slug)->firstOrFail();
+        $this->authorizeCabang($cabang);
 
-        $datas = \App\Models\MBahanBakus::leftJoin('stok_bahan_bakus', function ($join) use ($cabang) {
+        // 🔹 DATA STOK (YANG SUDAH ADA)
+        $datas = MBahanBakus::leftJoin('stok_bahan_bakus', function ($join) use ($cabang) {
                 $join->on('bahanbakus.id', '=', 'stok_bahan_bakus.bahanbaku_id');
                 $join->where('stok_bahan_bakus.cabang_id', $cabang->id);
             })
             ->select(
-                'bahanbakus.*',
-                'stok_bahan_bakus.id as stok_id',
+                'bahanbakus.id',
+                'bahanbakus.nama_bahan',
                 \DB::raw('COALESCE(stok_bahan_bakus.banyak_stok, 0) as banyak_stok'),
                 'stok_bahan_bakus.satuan as satuan_stok'
             )
-            ->where('banyak_stok', '>', 0)
+            ->where('stok_bahan_bakus.banyak_stok', '>', 0)
             ->orderBy('banyak_stok', 'DESC')
             ->get();
 
+        // 🔹 SEMUA BAHAN BAKU (UNTUK SELECT)
+        $barangs = MBahanBakus::orderBy('nama_bahan')->get();
 
-        return view("admin.inventaris.templateinventaris.stok", [
+        return view('admin.inventaris.templateinventaris.stok', [
             'title'   => 'Stok Barang - ' . $cabang->nama,
             'cabang'  => $cabang,
             'datas'   => $datas,
+            'barangs' => $barangs
+        ]);
+    }
+
+    public function stokStore(Request $request, $slug)
+    {
+        $cabang = Cabang::where('slug', $slug)->firstOrFail();
+        $this->authorizeCabang($cabang);
+
+        $request->validate([
+            'bahanbaku_id' => 'required|integer',
+            'banyak_stok'  => 'required|numeric|min:0',
+            'satuan'       => 'required|string|max:50',
         ]);
 
+        $stok = MStokBahanBakus::firstOrCreate(
+            [
+                'bahanbaku_id' => $request->bahanbaku_id,
+                'cabang_id'    => $cabang->id,
+            ],
+            [
+                'banyak_stok' => 0,
+                'satuan'      => $request->satuan,
+            ]
+        );
+
+        // TAMBAH stok (bukan replace)
+        $stok->banyak_stok += $request->banyak_stok;
+        $stok->satuan = $request->satuan;
+        $stok->save();
+
+        return back()->with('success', 'Stok cabang berhasil ditambahkan.');
+    }
+
+    public function stokUpdate(Request $request, $slug, $id)
+    {
+        $cabang = Cabang::where('slug', $slug)->firstOrFail();
+        $this->authorizeCabang($cabang);
+
+        $request->validate([
+            'banyak_stok' => 'required|numeric|min:0',
+            'satuan'      => 'required|string|max:50',
+        ]);
+
+        $stok = MStokBahanBakus::where('id', $id)
+            ->where('cabang_id', $cabang->id)
+            ->firstOrFail();
+
+        $stok->update([
+            'banyak_stok' => $request->banyak_stok,
+            'satuan'      => $request->satuan,
+        ]);
+
+        return back()->with('success', 'Stok cabang berhasil diperbarui.');
+    }
+
+    public function stokDestroy($slug, $id)
+    {
+        $cabang = Cabang::where('slug', $slug)->firstOrFail();
+        $this->authorizeCabang($cabang);
+
+        MStokBahanBakus::where('id', $id)
+            ->where('cabang_id', $cabang->id)
+            ->delete();
+
+        return back()->with('success', 'Stok cabang berhasil dihapus.');
     }
 
  /* ===========================================================
@@ -173,6 +255,7 @@ private function getCabang($slug)
 public function inventaris($slug)
 {
     $cabang = $this->getCabang($slug);
+    $this->authorizeCabang($cabang);
 
     $data = MInventarisKantor::where('cabang_id', $cabang->id)->get();
 
@@ -189,6 +272,7 @@ public function inventaris($slug)
 public function inventarisStore(Request $req, $slug)
 {
     $cabang = $this->getCabang($slug);
+    $this->authorizeCabang($cabang);
 
     $req->validate([
         'nama_barang' => 'required|string|max:255',
@@ -238,6 +322,7 @@ public function inventarisStore(Request $req, $slug)
 public function inventarisUpdate(Request $req, $slug, $id)
 {
     $cabang = $this->getCabang($slug);
+    $this->authorizeCabang($cabang);
 
     $req->validate([
         'nama_barang' => 'required|string|max:255',
@@ -271,6 +356,7 @@ public function inventarisUpdate(Request $req, $slug, $id)
 public function inventarisDestroy($slug, $id)
 {
     $cabang = $this->getCabang($slug);
+    $this->authorizeCabang($cabang);
 
     // FIX: gunakan kolom "id", bukan id_inventaris
     $inv = MInventarisKantor::where('id', $id)
@@ -294,6 +380,7 @@ public function inventarisDestroy($slug, $id)
 public function riwayat($slug)
 {
     $cabang = Cabang::where('slug', $slug)->firstOrFail();
+    $this->authorizeCabang($cabang);
 
     $riwayat = \App\Models\MPengirimanGudang::with('bahanbaku')
         ->where('cabang_tujuan_id', $cabang->id)
@@ -313,9 +400,19 @@ public function riwayat($slug)
 =========================================================== */
 public function riwayatTerima($slug, $id)
 {
+    // 🔒 CEK ROLE: HANYA INVENTORY CABANG
+    if (!auth()->user()->hasRole('Inventory Cabang')) {
+        abort(403, 'Anda tidak memiliki hak menerima barang.');
+    }
+
     $cabang = Cabang::where('slug', $slug)->firstOrFail();
+    $this->authorizeCabang($cabang);
 
     $pengiriman = \App\Models\MPengirimanGudang::findOrFail($id);
+    // 🔒 CEK PENGIRIMAN MILIK CABANG INI ATAU BUKAN
+    if ($pengiriman->cabang_tujuan_id !== $cabang->id) {
+        abort(403, 'Pengiriman ini bukan untuk cabang Anda.');
+    }
 
     // JIKA SUDAH DITERIMA
     if ($pengiriman->status_pengiriman === 'Diterima') {

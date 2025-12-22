@@ -1,17 +1,13 @@
-@extends('layouts.app')
+@extends('admin.inventaris.gudangpusat.layout.app')
 
 @section('content')
 
 <div class="page-header d-flex justify-content-between align-items-center">
     <h3 class="page-title">Stok Bahan Baku – Cabang {{ ucfirst($gudang->nama) }}</h3>
     <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalTambahStok">
-        <i class="bi bi-plus-circle"></i> Tambah / Update Stok
+        <i class="bi bi-plus-circle"></i> Tambah Stok
     </button>
 </div>
-
-@if(session('success'))
-    <div class="alert alert-success mt-2">{{ session('success') }}</div>
-@endif
 
 <div class="card mt-3">
     <div class="card-body">
@@ -25,7 +21,6 @@
                         <th>Nama Bahan</th>
                         <th>Stok</th>
                         <th>Satuan</th>
-                        {{-- <th>Aksi</th> --}}
                     </tr>
                 </thead>
 
@@ -33,97 +28,15 @@
                 @forelse ($datas as $index => $d)
                 <tr>
                     <td>{{ $index + 1 }}</td>
-
-                    <!-- Nama bahan -->
                     <td>{{ $d->nama_bahan }}</td>
-
-                    <!-- Stok -->
                     <td>{{ $d->banyak_stok }}</td>
-
-                    <!-- Satuan -->
                     <td>{{ $d->satuan_stok ?? '-' }}</td>
-
-                    {{-- <!-- Aksi -->
-                    <td>
-
-                        <!-- EDIT hanya jika stok_id ada -->
-                        @if ($d->stok_id)
-                        <button class="btn btn-warning btn-sm"
-                                data-bs-toggle="modal"
-                                data-bs-target="#modalEditStok{{ $d->stok_id }}">
-                            Edit
-                        </button>
-                        @endif
-
-                        <!-- DELETE hanya jika stok_id ada -->
-                        @if ($d->stok_id)
-                        <form action="{{ route('cabang.stok.destroy', ['slug' => $gudang->slug, 'id' => $d->stok_id]) }}"
-                              method="POST" class="d-inline">
-
-                            @csrf
-                            @method('DELETE')
-
-                            <button class="btn btn-danger btn-sm"
-                                    onclick="return confirm('Yakin ingin menghapus stok ini?')">
-                                Hapus
-                            </button>
-                        </form>
-                        @endif
-
-                    </td> --}}
                 </tr>
-
-                <!-- MODAL EDIT STOK -->
-                @if ($d->stok_id)
-                <div class="modal fade" id="modalEditStok{{ $d->stok_id }}" tabindex="-1">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-
-                            <form action="{{ route('cabang.stok.update', ['slug' => $gudang->slug, 'id' => $d->stok_id]) }}" method="POST">
-                                @csrf
-                                @method('PUT')
-
-                                <div class="modal-header">
-                                    <h5 class="modal-title">Edit Stok</h5>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                                </div>
-
-                                <div class="modal-body">
-
-                                    <div class="mb-3">
-                                        <label class="form-label">Nama Bahan</label>
-                                        <input type="text" class="form-control" value="{{ $d->nama_bahan }}" disabled>
-                                    </div>
-
-                                    <div class="mb-3">
-                                        <label class="form-label">Jumlah Stok</label>
-                                        <input type="number" name="banyak_stok" class="form-control" min="0"
-                                               value="{{ $d->banyak_stok }}" required>
-                                    </div>
-
-                                    <div class="mb-3">
-                                        <label class="form-label">Satuan</label>
-                                        <input type="text" name="satuan" class="form-control"
-                                               value="{{ $d->satuan_stok }}">
-                                    </div>
-
-                                </div>
-
-                                <div class="modal-footer">
-                                    <button class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                                    <button class="btn btn-primary">Simpan Perubahan</button>
-                                </div>
-
-                            </form>
-
-                        </div>
-                    </div>
-                </div>
-                @endif
-
                 @empty
                 <tr>
-                    <td colspan="6" class="text-center text-muted">Belum ada data stok</td>
+                    <td colspan="4" class="text-center text-muted">
+                        Belum ada data stok
+                    </td>
                 </tr>
                 @endforelse
                 </tbody>
@@ -133,42 +46,58 @@
     </div>
 </div>
 
-
-
-<!-- MODAL TAMBAH STOK -->
+<!-- =======================
+MODAL TAMBAH / UPDATE STOK
+======================= -->
 <div class="modal fade" id="modalTambahStok" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
 
-            <form action="{{ route('cabang.stok.store', ['slug' => $gudang->slug]) }}" method="POST">
+            <form action="{{ route('stok.pusat.tambah') }}" method="POST">
                 @csrf
 
                 <div class="modal-header">
-                    <h5 class="modal-title">Tambah / Update Stok</h5>
+                    <h5 class="modal-title">Tambah Stok</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
 
                 <div class="modal-body">
 
+                    {{-- PILIH BAHAN --}}
                     <div class="mb-3">
                         <label class="form-label">Nama Bahan</label>
-                        <select name="bahanbaku_id" class="form-control" required>
+                        <select name="bahanbaku_id"
+                                id="selectBahan"
+                                class="form-control select2"
+                                required>
                             <option value="">-- Pilih Bahan --</option>
                             @foreach ($barangs as $b)
-                                <option value="{{ $b->id }}">{{ $b->nama_bahan }}</option>
+                                <option value="{{ $b->id }}"
+                                        data-satuan="{{ $b->satuan }}">
+                                    {{ $b->nama_bahan }}
+                                </option>
                             @endforeach
-
                         </select>
                     </div>
 
+                    {{-- JUMLAH --}}
                     <div class="mb-3">
                         <label class="form-label">Jumlah Stok</label>
-                        <input type="number" name="banyak_stok" class="form-control" min="0" required>
+                        <input type="number"
+                               name="banyak_stok"
+                               class="form-control"
+                               min="0"
+                               required>
                     </div>
 
+                    {{-- SATUAN OTOMATIS --}}
                     <div class="mb-3">
                         <label class="form-label">Satuan</label>
-                        <input type="text" name="satuan" class="form-control" placeholder="kg, pcs, liter, dll">
+                        <input type="text"
+                               name="satuan"
+                               id="inputSatuan"
+                               class="form-control"
+                               readonly>
                     </div>
 
                 </div>
@@ -185,3 +114,42 @@
 </div>
 
 @endsection
+
+@push('scripts')
+<script>
+$(document).ready(function () {
+
+    // init select2 (kalau belum)
+    $('#selectBahan').select2({
+        dropdownParent: $('#modalTambahStok'),
+        width: '100%'
+    });
+
+    // ambil satuan saat bahan dipilih
+    $('#selectBahan').on('select2:select', function (e) {
+        const data = e.params.data.element;
+        const satuan = $(data).data('satuan');
+
+        $('#inputSatuan').val(satuan ?? '');
+    });
+
+    // reset saat modal ditutup
+    $('#modalTambahStok').on('hidden.bs.modal', function () {
+        $('#selectBahan').val(null).trigger('change');
+        $('#inputSatuan').val('');
+    });
+
+    // sweetalert
+    @if(session('success'))
+        Swal.fire({
+            icon: 'success',
+            title: 'Berhasil',
+            text: '{{ session('success') }}',
+            timer: 2000,
+            showConfirmButton: false
+        });
+    @endif
+});
+</script>
+@endpush
+

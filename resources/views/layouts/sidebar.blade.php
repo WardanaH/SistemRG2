@@ -137,62 +137,15 @@
             </li>
             @endcan
 
-            @can('manage-proyek')
+             @can('manage-gudang')
             <li>
-                <a href="{{ route('companies.index') }}">
+                <a href="{{ route('gudangpusat.dashboard') }}">
                     <i class="icon icon-settings"></i>
-                    <span class="nav-text">Manajemen Proyek</span>
+                    <span class="nav-text">Manajemen Inventaris</span>
                 </a>
             </li>
             @endcan
 
-            @can('manage-gudang')
-            {{-- ===================== CABANG & INVENTARIS ===================== --}}
-            <li class="nav-label mt-3">CABANG & INVENTARIS</li>
-
-            <li>
-                <a href="{{ route('inventaris.cabang.index') }}">
-                    <i class="icon icon-settings"></i>
-                    <span class="nav-text">Manajemen Cabang</span>
-                </a>
-            </li>
-
-            @php
-            $nonaktif = config('cabang_nonaktif.ids');
-            $cabangs = App\Models\Cabang::where('jenis', 'cabang')->get();
-            @endphp
-
-            @foreach($cabangs as $c)
-            @if(!in_array($c->id, $nonaktif))
-            <li>
-                <a class="has-arrow" href="javascript:void(0)">
-                    <i class="icon icon-home"></i>
-                    <span class="nav-text">{{ $c->nama }}</span>
-                </a>
-                <ul>
-                    <li><a href="{{ url('cabang/'.$c->slug.'/barang') }}">Daftar Barang</a></li>
-                    <li><a href="{{ url('cabang/'.$c->slug.'/stok') }}">Stok Tersedia</a></li>
-                    <li><a href="{{ url('cabang/'.$c->slug.'/riwayat') }}">Riwayat Pengiriman</a></li>
-                    <li><a href="{{ url('cabang/'.$c->slug.'/inventaris') }}">Inventaris Kantor</a></li>
-                </ul>
-            </li>
-            @endif
-            @endforeach
-
-            {{-- ===================== GUDANG PUSAT ===================== --}}
-            <li class="nav-label mt-4">GUDANG PUSAT</li>
-
-            <li>
-                <a class="has-arrow" href="javascript:void(0)">
-                    <i class="icon icon-folder"></i>
-                    <span class="nav-text">Gudang Pusat</span>
-                </a>
-                <ul>
-                    <li><a href="{{ route('gudangpusat.barang') }}">Daftar Barang</a></li>
-                    <li><a href="{{ route('gudangpusat.stok') }}">Stok Tersedia</a></li>
-                    <li><a href="{{ route('gudangpusat.pengiriman.index') }}">Pengiriman Barang</a></li>
-                </ul>
-            </li>
         </ul>
         @endcan
     </div>

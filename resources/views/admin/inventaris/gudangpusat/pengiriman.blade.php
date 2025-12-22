@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('admin.inventaris.gudangpusat.layout.app')
 
 @section('content')
 
@@ -8,11 +8,6 @@
         <i class="bi bi-plus-circle"></i> Tambah Pengiriman
     </button>
 </div>
-
-{{-- ALERT SUCCESS --}}
-@if(session('success'))
-    <div class="alert alert-success mt-2">{{ session('success') }}</div>
-@endif
 
 {{-- ALERT ERROR --}}
 @if(session('error'))
@@ -64,37 +59,37 @@
                     <td>{{ \Carbon\Carbon::parse($item->tanggal_pengiriman)->format('d M Y') }}</td>
 
                     {{-- ✅ STATUS DROPDOWN FINAL --}}
-<td>
-    @if($item->status_pengiriman === 'Diterima')
-        {{-- ✅ JIKA SUDAH DITERIMA: TAMPIL TEKS SAJA --}}
-        <span class="badge bg-success">Diterima</span>
-    @else
-        {{-- ✅ JIKA BELUM DITERIMA: BOLEH DROPDOWN --}}
-        <form action="{{ route('gudangpusat.pengiriman.updateStatus', $item->id) }}"
-              method="POST"
-              class="form-update-status">
-            @csrf
-            @method('PUT')
+                    <td>
+                        @if($item->status_pengiriman === 'Diterima')
+                            {{-- ✅ JIKA SUDAH DITERIMA: TAMPIL TEKS SAJA --}}
+                            <span class="badge bg-success">Diterima</span>
+                        @else
+                            {{-- ✅ JIKA BELUM DITERIMA: BOLEH DROPDOWN --}}
+                            <form action="{{ route('pengiriman.pusat.updateStatus', $item->id) }}"
+                                method="POST"
+                                class="form-update-status">
+                                @csrf
+                                @method('PUT')
 
-            <select name="status_pengiriman"
-                    class="select2 form-select-sm status-dropdown"
-                    data-status="{{ $item->status_pengiriman }}">
+                                <select name="status_pengiriman"
+                                        class="select2 form-select-sm status-dropdown"
+                                        data-status="{{ $item->status_pengiriman }}"
+                                        {{ in_array($item->status_pengiriman, ['Dikirim','Diterima']) ? 'disabled' : '' }}>
 
-                <option value="Dikemas"
-                    {{ $item->status_pengiriman == 'Dikemas' ? 'selected' : '' }}>
-                    Dikemas
-                </option>
+                                    <option value="Dikemas"
+                                        {{ $item->status_pengiriman == 'Dikemas' ? 'selected' : '' }}>
+                                        Dikemas
+                                    </option>
 
-                <option value="Dikirim"
-                    {{ $item->status_pengiriman == 'Dikirim' ? 'selected' : '' }}>
-                    Dikirim
-                </option>
+                                    <option value="Dikirim"
+                                        {{ $item->status_pengiriman == 'Dikirim' ? 'selected' : '' }}>
+                                        Dikirim
+                                    </option>
 
-            </select>
-        </form>
-    @endif
-</td>
-
+                                </select>
+                            </form>
+                        @endif
+                    </td>
 
                     {{-- ✅ TANGGAL DITERIMA --}}
                     <td>
@@ -105,7 +100,7 @@
 
                     {{-- ✅ AKSI HAPUS SWEETALERT --}}
                     <td class="text-center">
-                        <form action="{{ route('gudangpusat.pengiriman.destroy', $item->id) }}"
+                        <form action="{{ route('pengiriman.pusat.destroy', $item->id) }}"
                             method="POST"
                             class="form-hapus d-inline">
                             @csrf
@@ -139,7 +134,7 @@ MODAL TAMBAH PENGIRIMAN
 <div class="modal-dialog">
 <div class="modal-content">
 
-<form action="{{ route('gudangpusat.pengiriman.store') }}" method="POST">
+<form action="{{ route('pengiriman.pusat.store') }}" method="POST">
 @csrf
 
 <div class="modal-header">

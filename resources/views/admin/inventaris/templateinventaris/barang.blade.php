@@ -1,12 +1,12 @@
-@extends('layouts.app')
+@extends('admin.inventaris.templateinventaris.layout_cabang.app')
 
 @section('content')
 
 <div class="page-header d-flex justify-content-between align-items-center">
     <h3>Data Bahan Baku - {{ ucfirst($cabang->nama) }}</h3>
-    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalTambahBarang">
+    {{-- <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalTambahBarang">
         <i class="bi bi-plus-circle"></i> Tambah Bahan
-    </button>
+    </button> --}}
 </div>
 
 @if(session('success'))
@@ -64,28 +64,6 @@
                             <td>Rp {{ number_format($item->harga, 0, ',', '.') }}</td>
                             <td>{{ $stok }}</td>
                             <td><span class="badge {{ $badgeClass }}">{{ $status }}</span></td>
-
-                            {{-- <td>
-                                <button class="btn btn-warning btn-sm"
-                                        data-bs-toggle="modal"
-                                        data-bs-target="#modalEditBarang{{ $item->id_bahanbaku }}">
-                                    Edit
-                                </button>
-
-                                <form action="{{ route('cabang.barang.destroy',
-                                    ['slug' => $cabang->slug, 'id' => $item->id_bahanbaku]) }}"
-                                      method="POST"
-                                      class="d-inline">
-
-                                    @csrf
-                                    @method('DELETE')
-
-                                    <button type="submit" class="btn btn-danger btn-sm"
-                                            onclick="return confirm('Hapus bahan ini?')">
-                                        Hapus
-                                    </button>
-                                </form>
-                            </td> --}}
                         </tr>
 
                         <!-- MODAL EDIT -->
@@ -93,7 +71,7 @@
                             <div class="modal-dialog">
                                 <div class="modal-content">
 
-                                    <form action="{{ route('cabang.barang.update', [
+                                    <form action="{{ route('cabang.barang.cabang.update', [
                                         'slug' => $cabang->slug,
                                         'id' => $item->id_bahanbaku
                                     ]) }}" method="POST">
@@ -200,7 +178,7 @@
     <div class="modal-dialog">
         <div class="modal-content">
 
-            <form action="{{ route('cabang.barang.store', ['slug' => $cabang->slug]) }}" method="POST">
+            <form action="{{ route('cabang.barang.cabang.store', ['slug' => $cabang->slug]) }}" method="POST">
                 @csrf
 
                 <div class="modal-header">
