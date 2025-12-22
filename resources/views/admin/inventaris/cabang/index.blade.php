@@ -1,0 +1,166 @@
+@extends('admin.inventaris.gudangpusat.layout.app')
+
+@section('content')
+
+<div class="container">
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+            <h4 class="mb-0">Manajemen Cabang Inventaris</h4>
+            <!-- <button class="btn btn-light btn-sm" onclick="tambahCabang()">+ Tambah Cabang</button> -->
+        </div>
+
+    <div class="card-body">
+    <table class="table table-bordered table-striped align-middle text-center styletable">
+        <thead>
+            <tr>
+                <th>Kode</th>
+                <th>Nama</th>
+                <th>Slug</th>
+                <th>Telepon</th>
+                <th>Email</th>
+                <th>Jenis</th>
+                <th width="150">Aksi</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach ($cabangs as $c)
+                <tr>
+                    <td>{{ $c->kode }}</td>
+                    <td>{{ $c->nama }}</td>
+                    <td>{{ $c->slug }}</td>
+                    <td>{{ $c->telepon }}</td>
+                    <td>{{ $c->email }}</td>
+                    <td>{{ $c->jenis }}</td>
+                    <td>
+
+                         {{-- Tombol aktif dan nonaktif --}}
+                        @php
+                        $nonaktif = config('cabang_nonaktif.ids');
+                        @endphp
+
+                        <form action="{{ route('gudangpusat.cabang.toggle', $c->id) }}" method="POST" class="d-inline">
+                            @csrf
+                            @if(in_array($c->id, $nonaktif))
+                                <button class="btn btn-success btn-sm">Aktifkan</button>
+                            @else
+                                <button class="btn btn-secondary btn-sm">Nonaktif</button>
+                            @endif
+                        </form>
+
+                    </td>
+                </tr>
+            @endforeach
+        </tbody>
+    </table>
+
+</div>
+
+{{-- ============== MODAL TAMBAH / EDIT ============== --}}
+<div class="modal fade" id="modalCabang">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <form id="formCabang" method="POST">
+                @csrf
+
+                <div class="modal-header">
+                    <h5 class="modal-title" id="titleModal"></h5>
+                    <button class="close" data-dismiss="modal">&times;</button>
+                </div>
+
+                <div class="modal-body">
+
+                    <input type="hidden" id="idCabang">
+
+                    <div class="form-group">
+                        <label>Kode</label>
+                        <input type="text" name="kode" id="kode" class="form-control" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Nama</label>
+                        <input type="text" name="nama" id="nama" class="form-control" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Slug</label>
+                        <input type="text" name="slug" id="slug" class="form-control" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Jenis</label>
+                        <select name="jenis" id="jenis" class="form-control" required>
+                            <option value="pusat">Pusat</option>
+                            <option value="cabang">Cabang</option>
+                        </select>
+                    </div>
+
+                </div>
+
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" data-dismiss="modal">Batal</button>
+                    <button class="btn btn-primary" type="submit">Simpan</button>
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+</div>
+
+@endsection
+
+{{-- ====================== SCRIPTS ====================== --}}
+@section('scripts')
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+    // ========== TAMBAH ==========
+    function tambahCabang() {
+        $('#titleModal').text('Tambah Cabang');
+        $('#formCabang').attr('action', '{{ route("cabangs.store") }}');
+
+        $('#idCabang').val('');
+        $('#kode').val('');
+        $('#nama').val('');
+        $('#slug').val('');
+        $('#jenis').val('cabang');
+
+        $('#modalCabang').modal('show');
+    }
+
+    // ========== EDIT ==========
+    function editCabang(data) {
+        $('#titleModal').text('Edit Cabang');
+        $('#formCabang').attr('action', '/cabangs/update/' + data.id);
+
+        $('#idCabang').val(data.id);
+        $('#kode').val(data.kode);
+        $('#nama').val(data.nama);
+        $('#slug').val(data.slug);
+        $('#jenis').val(data.jenis);
+
+        $('#modalCabang').modal('show');
+    }
+
+    // ========== SWEETALERT DELETE ==========
+    function hapusCabang(id) {
+        Swal.fire({
+            title: "Hapus Cabang?",
+            text: "Data yang dihapus tidak dapat dikembalikan.",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#d33",
+            cancelButtonColor: "#3085d6",
+            confirmButtonText: "Ya, hapus!",
+            cancelButtonText: "Batal"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                document.getElementById('form-delete-' + id).submit();
+            }
+        });
+    }
+</script>
+
+@endsection

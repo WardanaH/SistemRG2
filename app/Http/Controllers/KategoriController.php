@@ -43,24 +43,29 @@ class KategoriController extends Controller
 
     public function update(Request $request)
     {
-        $rules = [
-            'edit_nama_kategori' => 'required|string|max:128',
-            'edit_keterangan'    => 'required|string',
-        ];
+        try {
+            $rules = [
+                'edit_nama_kategori' => 'required|string|max:128',
+                'edit_keterangan'    => 'required|string',
+            ];
 
-        $validator = Validator::make($request->all(), $rules);
-        if ($validator->fails()) {
-            return response()->json(['errors' => $validator->getMessageBag()]);
+            $validator = Validator::make($request->all(), $rules);
+            if ($validator->fails()) {
+                return response()->json(['errors' => $validator->getMessageBag()]);
+            }
+
+            // Perbaikan di sini
+            $category = MKategories::findOrFail($request->edit_kategori_id);
+
+            $category->update([
+                'Nama_Kategori' => $request->edit_nama_kategori,
+                'Keterangan'    => $request->edit_keterangan,
+            ]);
+
+            return response()->json("Success");
+        } catch (\Throwable $th) {
+            return response()->json(['errors' => ['Gagal mengupdate kategori: ' . $th->getMessage()]]);
         }
-
-        $kategori = MKategories::findOrFail($request->kategori_id);
-
-        $kategori->update([
-            'Nama_Kategori' => $request->edit_nama_kategori,
-            'Keterangan'    => $request->edit_keterangan,
-        ]);
-
-        return response()->json("Success");
     }
 
     public function destroy(Request $request)

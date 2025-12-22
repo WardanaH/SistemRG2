@@ -2,9 +2,10 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Cabang extends Model
 {
@@ -13,6 +14,7 @@ class Cabang extends Model
     protected $fillable = [
         'kode',
         'nama',
+        'slug',
         'email',
         'telepon',
         'alamat',
@@ -23,4 +25,22 @@ class Cabang extends Model
     {
         return $this->hasMany(User::class, 'cabang_id');
     }
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($cabang) {
+            if (empty($cabang->slug)) {
+                $cabang->slug = Str::slug($cabang->nama);
+            }
+        });
+    }
+
+        public static function findBySlug($slug)
+    {
+        return static::where('slug', $slug)->firstOrFail();
+    }
+
 }
+

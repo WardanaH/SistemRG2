@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers\Controller;
-use App\Http\Requests\StoreCabangRequest;
-use App\Http\Requests\UpdateCabangRequest;
 use App\Models\Cabang;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use App\Http\Controllers\Controller;
 
 class CabangController extends Controller
 {
@@ -20,10 +20,25 @@ class CabangController extends Controller
         return view('admin.cabangs.create');
     }
 
-    public function store(StoreCabangRequest $request)
+    public function store(Request $request)
     {
-        Cabang::create($request->validated());
-        return redirect()->route('cabangs.index')->with('success','Cabang berhasil dibuat.');
+        try {
+            $request->validate([
+                'kode' => 'required|string|max:20|unique:cabangs',
+                'nama' => 'required|string|max:255',
+                'slug' => str_replace(' ', '-', strtolower($request->input('nama'))),
+                'email' => 'nullable|email',
+                'telepon' => 'nullable|string|max:20',
+                'alamat' => 'nullable|string',
+                'jenis' => 'required|in:pusat,cabang',
+            ]);
+
+            Cabang::create($request->all());
+            return redirect()->route('cabangs.index')->with('success', 'Cabang berhasil dibuat.');
+        } catch (\Exception $e) {
+            Log::error('Gagal membuat cabang: ' . $e->getMessage());
+            return redirect()->back()->withInput()->with('error', 'Gagal membuat cabang!');
+        }
     }
 
     public function edit(Cabang $cabang)
@@ -31,15 +46,26 @@ class CabangController extends Controller
         return view('admin.cabangs.edit', compact('cabang'));
     }
 
-    public function update(UpdateCabangRequest $request, Cabang $cabang)
+    public function update(Request $request, Cabang $cabang)
     {
-        $cabang->update($request->validated());
-        return redirect()->route('admin.cabangs.index')->with('success','Cabang diperbarui.');
+        $validated = $request->validate([
+            'kode' => 'required|string|max:20|unique:cabangs,kode,' . $cabang->id,
+            'nama' => 'required|string|max:255',
+            'email' => 'nullable|email',
+            'telepon' => 'nullable|string|max:20',
+            'alamat' => 'nullable|string',
+        ]);
+
+        $cabang->update($validated);
+
+        return redirect()
+            ->route('cabangs.index')
+            ->with('success', 'Cabang berhasil diperbarui.');
     }
 
     public function destroy(Cabang $cabang)
     {
         $cabang->delete();
-        return redirect()->route('cabangs.index')->with('success','Cabang dihapus.');
+        return redirect()->route('cabangs.index')->with('success', 'Cabang dihapus.');
     }
 }

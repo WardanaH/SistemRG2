@@ -84,8 +84,8 @@ class SupplierController extends Controller
     // ✅ Hapus data supplier
     public function destroy(Request $request)
     {
-        $supplier = Suppliers::findOrFail(decrypt($request->hapus_supplier_id));
-        $supplier->delete();
+        $supplier = Suppliers::findOrFail($request->hapus_supplier_id);
+        $supplier->forceDelete();
 
         return response()->json("Success");
     }

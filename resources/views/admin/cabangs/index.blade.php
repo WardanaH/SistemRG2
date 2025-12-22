@@ -1,6 +1,38 @@
 @extends('layouts.app')
 
 @section('content')
+
+{{-- ========================= --}}
+{{-- SWEETALERT SESSION ALERT --}}
+{{-- ========================= --}}
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+@if (session('success'))
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        Swal.fire({
+            icon: "success",
+            title: "Berhasil!",
+            text: "{{ session('success') }}",
+            showConfirmButton: true
+        });
+    });
+</script>
+@endif
+
+@if (session('error'))
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        Swal.fire({
+            icon: "error",
+            title: "Gagal!",
+            text: "{{ session('error') }}",
+            showConfirmButton: true
+        });
+    });
+</script>
+@endif
+
 <div class="container">
     <h3>Manajemen Cabang</h3>
     <hr>
@@ -24,6 +56,7 @@
                 </select>
             </div>
         </div>
+
         <div class="row">
             <div class="col-md-6 mb-2">
                 <input type="text" name="telepon" class="form-control" placeholder="Telepon Cabang">
@@ -32,10 +65,11 @@
                 <input type="text" name="alamat" class="form-control" placeholder="Alamat Cabang">
             </div>
         </div>
+
         <button class="btn btn-primary mt-2">Tambah Cabang</button>
     </form>
 
-    <table class="table table-striped">
+    <table class="table table-bordered table-striped styletable">
         <thead>
             <tr>
                 <th>Kode</th>
@@ -57,15 +91,56 @@
                 <td>{{ $cabang->telepon }}</td>
                 <td>{{ $cabang->alamat }}</td>
                 <td>
+
                     <a href="{{ route('cabangs.edit', $cabang) }}" class="btn btn-warning btn-sm">Edit</a>
-                    <form method="POST" action="{{ route('cabangs.destroy', $cabang) }}" class="d-inline">
-                        @csrf @method('DELETE')
-                        <button class="btn btn-danger btn-sm" onclick="return confirm('Yakin hapus cabang ini?')">Hapus</button>
+
+                    {{-- ============================= --}}
+                    {{-- DELETE FORM + SWEETALERT --}}
+                    {{-- ============================= --}}
+                    <form method="POST" action="{{ route('cabangs.destroy', $cabang) }}" class="d-inline delete-form">
+                        @csrf
+                        @method('DELETE')
+                        <button type="button" class="btn btn-danger btn-sm btn-delete">
+                            Hapus
+                        </button>
                     </form>
+
                 </td>
             </tr>
             @endforeach
         </tbody>
     </table>
 </div>
+
+{{-- ============================= --}}
+{{-- SWEETALERT KONFIRMASI HAPUS --}}
+{{-- ============================= --}}
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const deleteButtons = document.querySelectorAll('.btn-delete');
+
+    deleteButtons.forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            let form = this.closest("form");
+
+            Swal.fire({
+                title: "Yakin hapus cabang ini?",
+                text: "Data cabang yang dihapus tidak bisa dikembalikan.",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#e3342f",
+                cancelButtonColor: "#6c757d",
+                confirmButtonText: "Ya, hapus!",
+                cancelButtonText: "Batal"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    form.submit();
+                }
+            });
+        });
+    });
+});
+</script>
+
 @endsection
