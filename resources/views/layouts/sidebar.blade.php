@@ -37,6 +37,9 @@
                     @can('manage-angsuranpenjualan')
                     <li><a href="{{ route('angsuran.index') }}">Manajemen Angsuran Transaksi</a></li>
                     @endcan
+                    @can('manage-angsuranpenjualan')
+                    <li><a href="{{ route('angsuran.indexdeleted') }}">Manajemen Angsuran Transaksi Terhapus</a></li>
+                    @endcan
                 </ul>
             </li>
             @endcan
