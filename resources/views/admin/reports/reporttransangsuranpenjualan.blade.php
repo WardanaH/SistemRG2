@@ -32,21 +32,17 @@
     </div>
 
     <div class="row mb-3">
-        <div class="col-md-4">
-            <strong style="color: #333;">Dari:</strong><br>
-            {{ $transaksi->user->username ?? '-' }}<br>
-            <small style="color: #777;">{{ $transaksi->display_name ?? '' }}</small>
+        <div class="dari col-md-4 text-left">
+            <strong style="color: #333;">Dari : {{ $transaksi->user->nama ?? '-' }}</strong><br>
+            <small style="color: #777;">{{ $transaksi->user->username ?? '' }}</small>
         </div>
-
-        <div class="col-md-4 text-center">
-            <strong style="color: #333;">Kepada:</strong><br>
-            {{ $transaksi->nama_pelanggan ?? '-' }}<br>
+        <div class="kepada col-md-4 text-center">
+            <strong style="color: #333;">Kepada: {{ $transaksi->nama_pelanggan ?? '-' }}</strong><br>
             <small style="color: #777;">{{ $transaksi->hp_pelanggan ?? '-' }}</small>
         </div>
 
         <div class="col-md-4 text-right">
-            <strong style="color: #333;">Metode Pembayaran:</strong><br>
-            {{ $transaksi->metode_pembayaran ?? '-' }}
+            <strong style="color: #333;">Metode Pembayaran: {{ $transaksi->metode_pembayaran ?? '-' }}</strong>
         </div>
     </div>
 

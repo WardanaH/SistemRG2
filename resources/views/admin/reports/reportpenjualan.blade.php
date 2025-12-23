@@ -37,15 +37,15 @@
 
     <div class="row mb-3">
         <div class="dari col-md-4 text-left">
-            <strong style="color: #333;">Dari:</strong> {{ $transaksi->user->nama ?? '-' }}<br>
+            <strong style="color: #333;">Dari : {{ $transaksi->user->nama ?? '-' }}</strong><br>
             <small style="color: #777;">{{ $transaksi->user->username ?? '' }}</small>
         </div>
         <div class="kepada col-md-4 text-center">
-            <strong style="color: #333;">Kepada:</strong> {{ $transaksi->nama_pelanggan ?? '-' }}<br>
+            <strong style="color: #333;">Kepada: {{ $transaksi->nama_pelanggan ?? '-' }}</strong><br>
             <small style="color: #777;">{{ $transaksi->hp_pelanggan ?? '-' }}</small>
         </div>
         <div class="designer col-md-4 text-right">
-            <strong style="color: #333;">Designer:</strong> {{ $transaksi->designer->nama ?? '-' }}<br>
+            <strong style="color: #333;">Designer: {{ $transaksi->designer->nama ?? '-' }}</strong><br>
         </div>
     </div>
 
@@ -83,14 +83,14 @@
     <div class="row mt-4">
         <div class="col-md-2"></div>
         <div class="col-md-6">
-            <p><strong style="color: #333;">Metode Pembayaran:</strong> {{ $transaksi->metode_pembayaran ?? '-' }}</p>
-            <p><strong style="color: #333;">Pajak:</strong> {{ $transaksi->pajak }}%</p>
-            <p><strong style="color: #333;">Diskon:</strong> {{ $transaksi->diskon }}%</p>
+            <p><strong style="color: #333;">Metode Pembayaran: {{ $transaksi->metode_pembayaran ?? '-' }}</strong></p>
+            <p><strong style="color: #333;">Pajak: {{ $transaksi->pajak }}%</strong></p>
+            <p><strong style="color: #333;">Diskon: {{ $transaksi->diskon }}%</strong></p>
         </div>
         <div class="col-md-4">
-            <p><strong style="color: #333;">Total:</strong> Rp {{ number_format($transaksi->total_harga, 0, ',', '.') }}</p>
-            <p><strong style="color: #333;">Bayar:</strong> Rp {{ number_format($transaksi->jumlah_pembayaran, 0, ',', '.') }}</p>
-            <p><strong style="color: #333;">Sisa:</strong> Rp {{ number_format($transaksi->sisa_tagihan, 0, ',', '.') }}</p>
+            <p><strong style="color: #333;">Total: Rp {{ number_format($transaksi->total_harga, 0, ',', '.') }}</strong></p>
+            <p><strong style="color: #333;">Bayar: Rp {{ number_format($transaksi->jumlah_pembayaran, 0, ',', '.') }}</strong></p>
+            <p><strong style="color: #333;">Sisa: Rp {{ number_format($transaksi->sisa_tagihan, 0, ',', '.') }}</strong></p>
         </div>
     </div>
 

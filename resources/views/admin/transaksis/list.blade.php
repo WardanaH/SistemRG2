@@ -121,6 +121,10 @@
                                             <button type="button" class="btn btn-danger btn-delete" data-id="{{ $data->id }}">
                                                 <i class="fa fa-trash"></i>
                                             </button>
+
+                                            <a href="{{ route('transaksi.report', encrypt($data->id)) }}" class="btn btn-success btn-print" target="_blank">
+                                                <i class="fa fa-print"></i>
+                                            </a>
                                         </div>
 
                                         {{-- form delete disembunyikan --}}
