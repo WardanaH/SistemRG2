@@ -97,6 +97,8 @@
                     @can('manage-pelanggan')
                     <li><a href="{{ route('pelanggan.index') }}">Daftar Pelanggan</a></li>
                     @endcan
+                    <li><a href="{{ route('specialprice.index') }}">Manajemen Harga Khusus</a></li>
+                    <li><a href="{{ route('specialpricegroup.index') }}">Manajemen Harga Khusus Group</a></li>
                 </ul>
             </li>
             @endcan

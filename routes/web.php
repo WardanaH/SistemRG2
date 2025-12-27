@@ -24,6 +24,8 @@ use App\Http\Controllers\InventarisKantorController;
 use App\Http\Controllers\GudangPusatController;
 use App\Http\Controllers\TransaksiBahanBakusController;
 use App\Http\Controllers\TransaksiPenjualansController;
+use App\Http\Controllers\SpecialPriceController;
+use App\Http\Controllers\SpecialPriceGroupController;
 
 require __DIR__ . '/operator.php';
 require __DIR__ . '/designer.php';
@@ -273,4 +275,24 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/transaksi/{id}/print-angsuran', [AngsuransController::class, 'printAngsuran'])
         ->middleware('permission:manage-angsuranpenjualan')
         ->name('transaksi.angsuran.print');
+});
+
+//Special Price
+Route::middleware(['auth'])->group(function () {
+
+    Route::get('/specialprice', [SpecialPriceController::class, 'index'])->name('specialprice.index');
+    Route::get('/specialprice/load', [SpecialPriceController::class, 'loadspecialprice'])->name('loadspecialprice');
+    Route::post('/specialprice/store', [SpecialPriceController::class, 'store'])->name('storespecialprice');
+    Route::post('/specialprice/update', [SpecialPriceController::class, 'update'])->name('updatespecialprice');
+    Route::post('/specialprice/delete', [SpecialPriceController::class, 'destroy'])->name('deletespecialprice');
+});
+
+// special price group
+Route::middleware(['auth'])->group(function () {
+
+    Route::get('/specialpricegroup',[SpecialPriceGroupController::class, 'index'])->name('specialpricegroup.index');
+    Route::get('/specialpricegroup/load',[SpecialPriceGroupController::class, 'load'])->name('specialpricegroup.load');
+    Route::post('/specialpricegroup/store',[SpecialPriceGroupController::class, 'store'])->name('specialpricegroup.store');
+    Route::post('/specialpricegroup/update',[SpecialPriceGroupController::class, 'update'])->name('specialpricegroup.update');
+    Route::post('/specialpricegroup/delete',[SpecialPriceGroupController::class, 'destroy'])->name('specialpricegroup.delete');
 });
