@@ -2,32 +2,33 @@
 
 @push('styles')
 <style>
-        p{
-            color: #333;
-        }
+    p {
+        color: #333;
+    }
 
-        small{
-            color: #333;
-        }
+    small {
+        color: #333;
+    }
 
-        .dari{
-            color: #333;
-        }
+    .dari {
+        color: #333;
+    }
 
-        .kepada{
-            color: #333;
-        }
+    .kepada {
+        color: #333;
+    }
 </style>
 @endpush
 
 @section('content')
-<div class="container my-5" style="max-width: 900px; background: white; padding: 30px; border: 1px solid #ccc;">
+<div class="container my-5" style="max-width: 900px; background: white; padding: 30px; border: 1px solid #ccc; position: relative;">
     <div class="text-center mb-4">
+        <img src="{{asset('/images/rg.png')}}" class="logorg">
         <h3 style="color: #333;"><strong>RESTU GURU PROMOSINDO</strong></h3>
         <p style="color: #555;">Cabang: {{ $transaksi->cabang->nama ?? '-' ?? '-' }}</p>
         <p style="color: #555;">Alamat: {{ $transaksi->cabang->alamat ?? '-' }} | Telp: {{ $transaksi->cabang->telepon ?? '-' }}</p>
         <hr>
-        <h4 style="color: #333;">Nota Angsuran Penjualan No. Nota: #{{ $transaksi->nomor_nota }}</h4>
+        <h4 style="color: #333;">Nota Angsuran Penjualan #{{ $transaksi->nomor_nota }}</h4>
         <small style="color: #333;">Tanggal: {{ \Carbon\Carbon::parse($transaksi->tanggal)->format('d-m-Y') }}</small>
     </div>
 
@@ -71,20 +72,50 @@
 
     <div class="row mt-4">
         <div class="col-md-6">
-            <p><strong>Pajak:</strong> {{ $transaksi->pajak }}%</p>
-            <p><strong>Diskon:</strong> {{ $transaksi->diskon }}%</p>
+            <p>
+                <strong style="color: #333;">
+                    Pajak: {{ $transaksi->pajak }}%
+                </strong>
+            </p>
+            <p>
+                <strong style="color: #333;">
+                    Diskon: {{ $transaksi->diskon }}%
+                </strong>
+            </p>
         </div>
-        <div class="col-md-6 text-right">
-            <p><strong>Total:</strong> Rp {{ number_format($transaksi->total_harga, 0, ',', '.') }}</p>
-            <p><strong>Terbayar:</strong> Rp {{ number_format($transaksi->jumlah_pembayaran, 0, ',', '.') }}</p>
-            <p><strong>Sisa Tagihan:</strong> Rp {{ number_format($transaksi->sisa_tagihan, 0, ',', '.') }}</p>
+        <div class="col-md-6">
+            <p>
+                <strong style="color: #333;">
+                    Total: Rp {{ number_format($transaksi->total_harga, 0, ',', '.') }}
+                </strong>
+            </p>
+            <p>
+                <strong style="color: #333;">
+                    Terbayar: Rp {{ number_format($transaksi->jumlah_pembayaran, 0, ',', '.') }}
+                </strong>
+            </p>
+            <p>
+                <strong style="color: #333;">
+                    Sisa Tagihan: Rp {{ number_format($transaksi->sisa_tagihan, 0, ',', '.') }}
+                </strong>
+            </p>
         </div>
     </div>
 
     @if ($transaksi->sisa_tagihan == 0)
-        <div class="text-center mt-4">
-            <h5 style="color: green;"><strong>LUNAS</strong></h5>
-        </div>
+    <div class="text-center mt-4">
+        <img style="
+        position: absolute;
+        /* top: 270px; */
+        left: 250px;
+        bottom: 65px;
+        width: 300px;
+        height: 70px;
+        z-index: 2;
+        opacity: 0.3;
+        transform: rotate(340deg);
+        " src="{{asset('/images/brush_lunas.png')}}" class="status">
+    </div>
     @endif
 
     <div class="text-center mt-4">

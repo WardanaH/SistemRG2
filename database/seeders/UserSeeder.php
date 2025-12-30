@@ -138,7 +138,7 @@ class UserSeeder extends Seeder
             'username' => 'designer',
             'email' => 'designer@example.com',
             'password' => Hash::make('password'),
-            'cabang_id' => $cabangPlh->id,
+            'cabang_id' => $cabangBjm->id,
         ]);
         $designer->assignRole('designer');
 
@@ -148,7 +148,7 @@ class UserSeeder extends Seeder
             'username' => 'operatorIndoor',
             'email' => 'operatorOutdoor@example.com',
             'password' => Hash::make('password'),
-            'cabang_id' => $cabangPlh->id,
+            'cabang_id' => $cabangBjm->id,
         ]);
         $operatorIndoor->assignRole('operator indoor');
 
@@ -190,7 +190,16 @@ class UserSeeder extends Seeder
             'password' => Hash::make('password'),
             'cabang_id' => $cabangGDGUtama->id,
         ]);
-        $inventory->assignRole('inventory');
+        $inventory->assignRole('inventory utama');
+
+        $inventory = User::create([
+            'nama' => 'Inventory Cabang Banjamasin',
+            'username' => 'inventory cabang bjm',
+            'email' => 'inventorycabangbjm@example.com',
+            'password' => Hash::make('password'),
+            'cabang_id' => $cabangBjm->id,
+        ]);
+        $inventory->assignRole('inventory utama');
 
         // --- Buat user Documentation ---
         $documentation = User::create([

@@ -224,8 +224,8 @@
                 return;
             }
 
-            // Tutup detail row lain
-            document.querySelectorAll('.detail-row').forEach(r => r.remove());
+            // HAPUS SEMUA DETAIL ROW LAIN (JAGA-JAGA)
+            document.querySelectorAll('.detail-row').forEach(el => el.remove());
 
             try {
                 const res = await fetch(`{{ route('angsuran.showdetail') }}?id=${id}`);
@@ -239,7 +239,6 @@
                         <td colspan="${colCount}" class="p-0">
                             <table class="table table-sm mb-0 table-bordered bg-light">
 
-                                <!-- PRODUK DIBELI -->
                                 <thead class="table-success text-center">
                                     <tr><th colspan="6">Produk Dibeli</th></tr>
                                     <tr>
@@ -254,7 +253,6 @@
                                 <tbody>
                 `;
 
-                // Produk
                 transaksi.sub_transaksi.forEach(p => {
                     html += `
                         <tr>
@@ -271,7 +269,6 @@
                 html += `
                         </tbody>
 
-                        <!-- RIWAYAT ANGSURAN -->
                         <thead class="table-primary text-center">
                             <tr><th colspan="6">Riwayat Pembayaran Angsuran</th></tr>
                             <tr>
@@ -279,8 +276,8 @@
                                 <th>Tanggal</th>
                                 <th>Metode</th>
                                 <th>Nominal</th>
-                                <th>Pembuat Nota Angsuran</th>
-                                <th>aksi</th>
+                                <th>Pembuat</th>
+                                <th>Aksi</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -290,17 +287,17 @@
                     html += `<tr><td colspan="6" class="text-center text-muted">Belum ada pembayaran</td></tr>`;
                 } else {
                     angsurans.forEach(a => {
-                        // console.log(a);
+                        const printUrl = `{{ route('transaksi.angsurandetail.print', ':id') }}`.replace(':id', a.id);
+
                         html += `
                             <tr>
                                 <td>${a.nomor_nota}</td>
                                 <td>${a.tanggal_angsuran}</td>
-                                // <td>${a.metode_pembayaran}</td>
+                                <td>${a.metode_pembayaran}</td>
                                 <td>Rp ${parseFloat(a.nominal_angsuran).toLocaleString('id-ID')}</td>
                                 <td>${a.user?.name ?? a.user?.username ?? '-'}</td>
                                 <td class="text-end">
                                     <div class="btn-group btn-group-sm">
-
                                         @can('delete-angsuranpenjualan')
                                         <button class="btn btn-danger btn-delete-angsuran"
                                             data-id="${a.id}"
@@ -308,12 +305,9 @@
                                             <i class="fa fa-trash"></i>
                                         </button>
                                         @endcan
-
-                                        <button class="btn btn-success btn-print-pdf"
-                                            data-id="${a.id}"
-                                            data-nominal="${a.nominal_angsuran}">
+                                        <a href="${printUrl}" target="_blank" class="btn btn-success">
                                             <i class="fa fa-print"></i>
-                                        </button>
+                                        </a>
                                     </div>
                                 </td>
                             </tr>

@@ -1,274 +1,134 @@
 @extends('layouts.app')
-@push('style')
+
+@push('styles')
+<style>
+    p,
+    small {
+        color: #333;
+    }
+
+    .dari,
+    .kepada {
+        color: #333;
+    }
+
+    .logorg {
+        width: 50px;
+        margin-bottom: 10px;
+    }
+
+    .status {
+        position: absolute;
+        left: 250px;
+        bottom: 65px;
+        width: 300px;
+        opacity: 0.3;
+        transform: rotate(-20deg);
+    }
+</style>
+@endpush
+
+@section('content')
+<div class="container my-5"
+    style="max-width: 900px; background: white; padding: 30px; border: 1px solid #ccc; position: relative;">
+
+    {{-- HEADER --}}
+    <div class="text-center mb-4">
+        <img src="{{asset('/images/rg.png')}}" class="logorg">
+        <h3 style="color: #333;"><strong>RESTU GURU PROMOSINDO</strong></h3>
+        <p style="color: #555;">Cabang: {{ $transaksi->cabang->nama ?? '-' ?? '-' }}</p>
+        <p style="color: #555;">Alamat: {{ $transaksi->cabang->alamat ?? '-' }} | Telp: {{ $transaksi->cabang->telepon ?? '-' }}</p>
+        <hr>
+        <h4 style="color: #333;">Nota Angsuran Detail.Penjualan #{{ $transaksi->nomor_nota }}</h4>
+        <small style="color: #333;">Tanggal: {{ \Carbon\Carbon::parse($transaksi->tanggal)->format('d-m-Y') }}</small>
+    </div>
+
+    {{-- INFO --}}
+    <div class="row mb-3">
+        <div class="dari col-md-4 text-left">
+            <strong style="color: #333;">Dari : {{ $transaksi->user->nama ?? '-' }}</strong><br>
+            <small style="color: #777;">{{ $transaksi->user->username ?? '' }}</small>
+        </div>
+        <div class="kepada col-md-4 text-center">
+            <strong style="color: #333;">Kepada: {{ $transaksi->nama_pelanggan ?? '-' }}</strong><br>
+            <small style="color: #777;">{{ $transaksi->hp_pelanggan ?? '-' }}</small>
+        </div>
+
+        <div class="col-md-4 text-right">
+            <strong><strong style="color: #333;">No. Pelunasan: #{{ $angsuran->id }}
+        </div>
+    </div>
+
+    {{-- TABLE ANGSURAN (SATU DATA) --}}
+    <table class="table table-bordered">
+        <thead class="bg-light">
+            <tr>
+                <th>Tanggal</th>
+                <th>Nominal</th>
+                <th>Sisa Tagihan</th>
+                <th>Metode Pembayaran</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>{{ \Carbon\Carbon::parse($angsuran->tanggal_angsuran)->format('d-m-Y') }}</td>
+                <td>Rp {{ number_format($angsuran->nominal_angsuran,0,',','.') }}</td>
+                <td>Rp {{ number_format($angsuran->sisa_angsuran,0,',','.') }}</td>
+                <td>{{ $angsuran->metode_pembayaran }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    {{-- RINGKASAN --}}
+    <div class="row mt-4">
+        <div class="col-md-6">
+            <p>
+                <strong style="color: #333;">
+                    Total: Rp {{ number_format($transaksi->total_harga,0,',','.') }}
+                </strong>
+            </p>
+            <p>
+                <strong style="color: #333;">
+                    Terbayar: Rp {{ number_format($transaksi->jumlah_pembayaran,0,',','.') }}
+                </strong>
+            </p>
+        </div>
+
+        <div class="col-md-6">
+            <p>
+                <strong style="color: #333;">
+                    Sisa Tagihan: Rp {{ number_format($transaksi->sisa_tagihan,0,',','.') }}
+                </strong>
+            </p>
+            <p>
+                <strong style="color: #333;">
+                    Metode: {{ $angsuran->metode_pembayaran }}
+                </strong>
+            </p>
+        </div>
+    </div>
 
 
-  <!-- daterange picker -->
-  <link rel="stylesheet" href="{{asset('bower_components/bootstrap-daterangepicker/daterangepicker.css')}}">
-  <!-- Bootstrap Color Picker -->
-  <link rel="stylesheet" href="{{asset('bower_components/bootstrap-colorpicker/dist/css/bootstrap-colorpicker.min.css')}}">
-
-  <!-- bootstrap datepicker -->
-  <link rel="stylesheet" href="{{asset('bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css')}}">
-  <!-- Bootstrap time Picker -->
-  <link rel="stylesheet" href="{{asset('plugins/timepicker/bootstrap-timepicker.min.css')}}">
-  <link rel="stylesheet" href="{{asset('bower_components/font-awesome/css/font-awesome.min.css')}}">
-
-  <link rel="stylesheet" href="{{asset('bower_components/select2/dist/css/select2.css')}}">
-  <!-- Ionicons -->
-  <link rel="stylesheet" href="{{asset('bower_components/Ionicons/css/ionicons.min.css')}}">
-  <!-- daterange picker -->
-  <!-- <link rel="stylesheet" href="http://code.jquery.com/ui/1.12.1/themes/dark-hive/jquery-ui.css"> -->
-  <!-- <link rel="stylesheet" href="http://code.jquery.com/ui/1.12.1/themes/smoothness/jquery-ui.css"> -->
-
-  <style>
-	.status
-	{
-		position:absolute;
+    {{-- STATUS --}}
+    @if ($transaksi->sisa_tagihan == 0)
+    <div class="text-center mt-4">
+        <img style="
+        position: absolute;
         /* top: 270px; */
-		left: 250px;
+        left: 250px;
         bottom: 65px;
         width: 300px;
         height: 70px;
-		z-index: 2;
+        z-index: 2;
         opacity: 0.3;
         transform: rotate(340deg);
-	}
-
-    .tes{
-        padding-top:0px;
-        padding-left:50px;
-        margin-top:-10px !important;
-    }
-    .garis
-    {
-        border-collapse: collapse;
-        border: 1px solid black;
-    }
-
-
-    .logorg
-	{
-
-        width: 45px;
-        height: 40px;
-		z-index: 2;
-	}
-    .lebarkwitansi
-    {
-        width: 21cm;
-        margin: auto;
-        align: "center";
-    }
-  </style>
-  <!-- bootstrap datepicker -->
-  <link rel="stylesheet" href="{{asset('bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css')}}">
-  <!-- Bootstrap time Picker -->
-  <link rel="stylesheet" href="{{asset('plugins/timepicker/bootstrap-timepicker.min.css')}}">
-  <!-- iCheck for checkboxes and radio inputs -->
-  <link rel="stylesheet" href="{{asset('plugins/iCheck/all.css')}}">
-  <!-- Select2 -->
-  <link rel="stylesheet" href="{{asset('bower_components/select2/dist/css/select2.min.css')}}">
-
-  <link rel="stylesheet" href="{{asset('plugins/iCheck/square/blue.css')}}">
-  <link rel="stylesheet" href="{{asset('dist/css/skins/_all-skins.min.css')}}">
-@endpush
-
-<!-- hagan di detail angsuran nya lah, yang bagian satu persatu -->
-
-@section('body')
-    <body class="lebarkwitansi">
-    <div class="wrapper">
-        <!-- Main content -->
-        <section class="invoice">
-            <!-- title row -->
-            <div class="row">
-            <div class="col-xs-12">
-                <h2 class="page-header">
-                <img src="{{asset('dist/img/rg.png')}}" class="logorg"> <strong>RESTU GURU PROMOSINDO</strong> Cab. {{$transaksi->Nama_Cabang}}
-                <small class="pull-right" style="margin-top:5px !important;"> Pelunasan Transaksi Det. Penjualan</small>
-                <br/>
-                    <small class="tes">Alamat: {{$transaksi->Alamat}}, No. Telp: {{$transaksi->No_Telepon}}</small>
-                </h2>
-            </div>
-            <!-- /.col -->
-            </div>
-            <!-- info row -->
-            <div class="row invoice-info">
-            <div class="col-sm-4 invoice-col">
-                Dari
-                <address>
-                <strong>{{$transaksi->nama}}</strong><br>
-                {{$transaksi->display_name}}<br>
-                </address>
-            </div>
-            <!-- /.col -->
-            <div class="col-sm-4 invoice-col">
-                Kepada
-                <address>
-                <strong>{{$transaksi->nama_pelanggan}}</strong><br>
-                {{$transaksi->hp_pelanggan}}
-                @if ($transaksi->pelanggan_id=="")
-                @else
-                    ({{$transaksi->jenis_pelanggan}})
-                @endif
-
-                </address>
-            </div>
-            <!-- /.col -->
-            <div class="col-sm-4 invoice-col">
-                <b>No. #{{$transaksi->id}}</b><br>
-                <b>Tanggal :</b> {{date("d-m-Y",strtotime($transaksi->created_at))}}<br>
-                <b>Jam :</b> {{date("H:i:s",strtotime($transaksi->created_at))}}
-            </div>
-            <!-- /.col -->
-            </div>
-            <!-- /.row -->
-
-            <!-- Table row -->
-            <div class="row">
-            
-            <div class="col-xs-12 table-responsive">
-                <table class="table garis table-bordered table-striped strong" width="100%">
-                <thead>
-                    <tr>
-                        <th style="word-wrap: break-word;">Produk</th>
-                        <th style="word-wrap: break-word;">Harga</th>
-                        <th style="word-wrap: break-word;">P</th>
-                        <th style="word-wrap: break-word;">L</th>
-                        <th style="word-wrap: break-word;">Kuantitas</th>
-                        <th style="word-wrap: break-word;">Finishing</th>
-                        <th style="word-wrap: break-word;">Keterangan</th>
-                        <th style="word-wrap: break-word;">Subtotal</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach ($subtransaksis as $subtransaksi)
-                    <tr>
-                        <td style="word-break: break-all;">{{$subtransaksi->nama_produk}}</td>
-                        <td style="word-wrap: break-word;">Rp. {{number_format(floatval($subtransaksi->harga_satuan),0,',','.')}}</td>
-                        <td style="word-wrap: break-word;">{{number_format(floatval($subtransaksi->panjang),2,',','.')}}</td>
-                        <td style="word-wrap: break-word;">{{number_format(floatval($subtransaksi->lebar),2,',','.')}}</td>
-                        <td style="word-wrap: break-word;">{{number_format(floatval($subtransaksi->banyak),0,',','.')}}</td>
-                        <td style="word-wrap: break-word;">{{$subtransaksi->finishing}}</td>
-                        <td style="width: 20%;word-break: break-all;">{{$subtransaksi->keterangan}}</td>
-                        <td style="word-wrap: break-word;">Rp. {{number_format(floatval($subtransaksi->subtotal),0,',','.')}}</td>
-                    </tr>
-                    @endforeach
-                </tbody>
-                </table>
-            </div>
-            <!-- /.col -->
-            </div>
-            <!-- /.row -->
-
-            <div class="row">
-
-            <div class="col-xs-4">
-
-                <table class="table no-border">
-                    <thead>
-                        <th><center>Penerima</center></th>
-                        <th><center>Pembuat</center></th>
-                    </thead>
-                    <tbody>
-                        <tr><td></td><td></td></tr>
-                        <tr><td></td><td></td></tr>
-                        <tr><td></td><td></td></tr>
-                        <tr><td></td><td></td></tr>
-                        <tr>
-                            <td><center>{{$transaksi->nama_pelanggan}}</center></td>
-                            <td><center>{{$transaksi->nama}}</center></td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-
-            <!-- accepted payments column -->
-            <div class="col-xs-4">
-                <div class="table-responsive">
-                    <table class="table">
-                        <tr>
-                            <th>No. Pelunasan:</th>
-                            <td>#{{$angsuran->id}}</td>
-                        </tr>
-                        <tr>
-                            <th>Tanggal Pelunasan</th></th>
-                            <td>{{date("d-m-Y",strtotime($angsuran->created_at))}}</td>
-                        </tr>
-                        <tr>
-                            <th>Jam Pelunasan</th></th>
-                            <td>{{date("H:i:s",strtotime($angsuran->created_at))}}</td>
-                        </tr>
-                    </table>
-                </div>
-
-                <p class="text-muted well well-sm no-shadow" style="margin-top: 10px;">
-                "Harap cek kembali orderan anda."
-                </p>
-            </div>
-            <!-- /.col -->
-            <div class="col-xs-4">
-                <div class="table-responsive">
-                    <table class="table">
-                        <tr>
-                            <th style="width:50%">Total :</th>
-                            <td>Rp. {{number_format(floatval($transaksi->total_harga),0,',','.')}}</td>
-                        </tr>
-                        <tr>
-                            <th>Pelunasan:</th>
-                            <td>Rp. {{number_format(floatval($angsuran->nominal_angsuran),0,',','.')}}</td>
-                        </tr>
-                        <tr>
-                            <th>Sisa:</th>
-                            <td>Rp. {{number_format(floatval($transaksi->total_harga - $jumlahangsuran->totalangsuran),0,',','.')}}</td>
-                        </tr>
-                        <tr>
-                            <th>Metode:</th>
-                            <td>{{$angsuran->metode_pembayaran}}</td>
-                        </tr>
-                    </table>
-                </div>
-            </div>
-            @if ($transaksi->sisa_tagihan==0)
-                <img src="{{asset('dist/img/brush_lunas.png')}}" class="status">
-            @endif
-
-            <!-- /.col -->
-            </div>
-            <!-- /.row -->
-        </section>
-        <!-- /.content -->
+        " src="{{asset('/images/brush_lunas.png')}}" class="status">
     </div>
-    <!-- ./wrapper -->
+    @endif
 
-    <!-- jQuery 3 -->
-    <script src="{{asset('bower_components/jquery/dist/jquery.min.js')}}"></script>
-    <!-- Bootstrap 3.3.7 -->
-    <script src="{{asset('bower_components/bootstrap/dist/js/bootstrap.min.js')}}"></script>
-    <!-- Select2 -->
-    <script src="{{asset('bower_components/select2/dist/js/select2.full.min.js')}}"></script>
-    <!-- DataTables -->
-    <script src="{{asset('bower_components/datatables.net/js/jquery.dataTables.min.js')}}"></script>
-    <script src="{{asset('bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js')}}"></script>
-    <!-- FastClick -->
+    <div class="text-center mt-4">
+        <em>"Harap cek kembali angsuran Anda."</em>
+    </div>
 
-    <script src="{{asset('bower_components/jquery-ui/jquery-ui-new.js')}}"></script>
-
-    <!-- iCheck 1.0.1 -->
-    <script src="{{asset('plugins/iCheck/icheck.min.js')}}"></script>
-
-    <!-- bootstrap datepicker -->
-    <script src="{{asset('bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js')}}"></script>
-
-
-    <script src="{{asset('bower_components/jquery-maskmoney/jquery.maskMoney.js')}}"></script>
-    <!-- <script src="{{asset('bower_components/jquery-number/jquery.number.js')}}"></script> -->
-
-    <script src="{{asset('bower_components/fastclick/lib/fastclick.js')}}"></script>
-    <!-- AdminLTE App -->
-    <script src="{{asset('dist/js/adminlte.min.js')}}"></script>
-    <!-- AdminLTE for demo purposes -->
-
-
-    </body>
+</div>
 @endsection

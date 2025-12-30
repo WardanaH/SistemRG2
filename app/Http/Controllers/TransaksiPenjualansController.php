@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use App\Models\Cabang;
+use App\Models\MAngsurans;
 use App\Models\MProduks;
 use App\Models\MBahanBakus;
 use Illuminate\Support\Str;
@@ -328,9 +329,12 @@ class TransaksiPenjualansController extends Controller
 
         $subtransaksis = $transaksi->subTransaksi()->with('produk')->get();
 
+        $angsurans = MAngsurans::where('transaksi_penjualan_id', '=', $id)->get();
+
         return view('admin.reports.reportpenjualan', [
             'transaksi' => $transaksi,
             'subtransaksis' => $subtransaksis,
+            'angsurans' => $angsurans
         ]);
     }
 }

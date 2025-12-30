@@ -270,7 +270,10 @@ Route::middleware(['auth'])->group(function () {
         ->name('angsuran.showdetail.transaksi');
 
     // Print Nota
-    Route::get('/transaksi/{id}/print-angsuran', [AngsuransController::class, 'printAngsuran'])
+    Route::get('/angsuran/{id}/print-angsuran', [AngsuransController::class, 'printAngsuran'])
         ->middleware('permission:manage-angsuranpenjualan')
         ->name('transaksi.angsuran.print');
+    Route::get('/angsuran/{id}/print-angsuran-detail', [AngsuransController::class, 'printAngsuranDetail'])
+        ->middleware('permission:manage-angsuranpenjualan')
+        ->name('transaksi.angsurandetail.print');
 });
