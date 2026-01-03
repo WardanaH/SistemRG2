@@ -144,6 +144,7 @@ class OperatorController extends Controller
                 );
             })
             ->where('status_sub_transaksi', 'selesai')
+            ->orderBy('updated_at', 'desc')
             ->get();
 
         return view('operator.riwayat_pesanan', compact('subTransaksiData'));

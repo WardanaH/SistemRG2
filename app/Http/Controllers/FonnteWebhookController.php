@@ -35,15 +35,15 @@ class FonnteWebhookController extends Controller
                 $pengirim,
                 "*Selamat datang!* 👋
 
-Gunakan perintah berikut:
+                Gunakan perintah berikut:
 
-• CEK NOTA <nomor>
-• CEK STATUS <nomor>
-• CEK PESANAN <nama>
-• CEK ITEM <nomor>
+                • CEK NOTA <nomor>
+                • CEK STATUS <nomor>
+                • CEK PESANAN <nama>
+                • CEK ITEM <nomor>
 
-Contoh:
-CEK NOTA 2401220001"
+                Contoh:
+                CEK NOTA 2401220001"
             );
         }
 
@@ -92,13 +92,13 @@ CEK NOTA 2401220001"
         }
 
         $msg = "
-*Detail Pesanan*
-Nota: *{$trx->nomor_nota}*
-Nama: *{$trx->nama_pelanggan}*
-Total: *{$trx->total_harga_format}*
-Sisa Tagihan: *{$trx->sisa_tagihan_format}*
-Status: *{$trx->status_transaksi}*
-";
+            *Detail Pesanan*
+            Nota: *{$trx->nomor_nota}*
+            Nama: *{$trx->nama_pelanggan}*
+            Total: *{$trx->total_harga_format}*
+            Sisa Tagihan: *{$trx->sisa_tagihan_format}*
+            Status: *{$trx->status_transaksi}*
+            ";
 
         return $this->sendText($target, $msg);
     }
@@ -158,7 +158,7 @@ Status: *{$trx->status_transaksi}*
         }
 
         $msg = "
-*Detail Item — Nota {$trx->nomor_nota}*\n\n";
+            *Detail Item — Nota {$trx->nomor_nota}*\n\n";
 
         foreach ($trx->subTransaksi as $s) {
             $msg .= "- {$s->produk->nama_produk}\n  Qty: {$s->jumlah}\n  Status: *{$s->status_sub_transaksi}*\n\n";

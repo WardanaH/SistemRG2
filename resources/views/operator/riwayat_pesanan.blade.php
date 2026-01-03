@@ -16,6 +16,7 @@
                                 <tr>
                                     <th>No SPK</th>
                                     <th>Produk</th>
+                                    <th>Keterangan</th>
                                     <th>Status</th>
                                     <th>Tanggal</th>
                                 </tr>
@@ -25,8 +26,9 @@
                                 <tr>
                                     <td>{{ $subTransaksi->no_spk }}</td>
                                     <td>{{ $subTransaksi->produk->nama_produk }}</td>
+                                    <td>{{ $subTransaksi->keterangan }}</td>
                                     <td>{{ $subTransaksi->status_sub_transaksi }}</td>
-                                    <td>{{ $subTransaksi->created_at->format('d-m-Y') }}</td>
+                                    <td>{{ $subTransaksi->updated_at->format('d-m-Y') }}</td>
                                 </tr>
                                 @endforeach
                             </tbody>
