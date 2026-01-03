@@ -147,6 +147,8 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/produk/postproduk', [ProdukController::class, 'store'])->middleware('permission:add-produk')->name('storeproduk');
     Route::post('/produk/updateproduk', [ProdukController::class, 'update'])->middleware('permission:edit-produk')->name('updateproduk');
     Route::post('/produk/deleteproduk', [ProdukController::class, 'destroy'])->middleware('permission:delete-produk')->name('deleteproduk');
+    Route::get('/produk/hargaproduk', [ProdukController::class, 'produkHarga'])->middleware('permission:manage-produk')->name('produk.hargaproduk');
+    Route::get('/produk/hargaprodukkhusus', [ProdukController::class, 'priceprodukkhusus'])->middleware('permission:manage-produk')->name('produk.hargaprodukkhusus');
 });
 
 // Pelanggan

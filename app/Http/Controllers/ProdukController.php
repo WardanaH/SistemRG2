@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\MProduks;
 use App\Models\MKategories;
 use Illuminate\Http\Request;
+use App\Models\MSpecialPrices;
 use Illuminate\Support\Facades\Validator;
 
 class ProdukController extends Controller
@@ -84,5 +85,48 @@ class ProdukController extends Controller
         $produk = MProduks::findOrFail($request->hapus_produk_id);
         $produk->delete();
         return response()->json("Success");
+    }
+
+    public function produkHarga(Request $request)
+    {
+        $produk = MProduks::findOrFail($request->produk_id);
+        return $produk;
+    }
+
+    public function priceprodukkhusus(Request $request)
+    {
+        $produkId    = $request->produkid;
+        $pelangganId = $request->pelanggan;
+
+        // ambil produk (WAJIB)
+        $produk = MProduks::findOrFail($produkId);
+
+        // default harga normal
+        $harga = $produk->harga_jual;
+
+        // cek special price pelanggan
+        if ($pelangganId) {
+            $special = MSpecialPrices::where('pelanggan_id', $pelangganId)
+                ->where('produk_id', $produkId)
+                ->first();
+
+            if ($special) {
+                $harga = $special->harga_khusus;
+            }
+        }
+
+        // range price (jika ada)
+        $rangePrices = [];
+        if (!empty($produk->range_prices)) {
+            $rangePrices = json_decode($produk->range_prices, true);
+        }
+
+        return response()->json([
+            'produk_id'    => $produk->id,
+            'harga_jual'   => $harga,
+            'hitung_luas'  => $produk->hitung_luas,
+            'satuan'       => $produk->satuan, // ⬅️ INI KUNCI MASALAH ANDA
+            'range_prices' => $rangePrices
+        ]);
     }
 }

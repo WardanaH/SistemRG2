@@ -2,20 +2,20 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Support\Str;
+use Illuminate\Http\Request;
+use App\Models\StokBahanBaku;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
 use App\Models\User;
 use App\Models\Cabang;
 use App\Models\MAngsurans;
 use App\Models\MProduks;
 use App\Models\MBahanBakus;
-use Illuminate\Support\Str;
-use Illuminate\Http\Request;
-use App\Models\StokBahanBaku;
 use App\Models\MStokBahanBakus;
 use App\Models\MRelasiBahanBaku;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 use App\Models\MTransaksiPenjualans;
-use Illuminate\Support\Facades\Auth;
 use App\Models\MSubTransaksiPenjualans;
 
 class TransaksiPenjualansController extends Controller

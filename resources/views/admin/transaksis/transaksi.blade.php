@@ -520,6 +520,10 @@
 
         let total = 0;
         let subtotalNumeric = 0;
+        let hargaAktif = 0;
+        let hitungLuasAktif = 0;
+        let satuanAktif = '-';
+        let rangePrices = [];
 
         const storeUrl = "{{ route('storetransaksipenjualan') }}";
         const form = $(`form[action='${storeUrl}']`);
@@ -567,67 +571,115 @@
         });
 
         // ================== HITUNG SUBTOTAL ITEM ==================
-        $('#add_produk').on('change', function() {
-            const option = $('option:selected', this);
-            const harga = option.data('harga') || 0;
-            const hitungLuas = option.data('hitung_luas'); // <= PENTING
-            const satuan = option.data('satuan') || '-';
+        $('#add_produk').on('select2:select', function(e) {
+        const produkId = e.params.data.id;
+        const pelangganId = $('#pelanggan').val();
 
-            $('#add_harga').val(harga);
-            $('#add_satuan').val(satuan);
+        // reset input
+        $('#add_harga').val(0);
+        $('#add_diskon').val(0);
+        $('#add_subtotal').val(0);
+        $('#add_kuantitas').val(1);
+        $('#add_panjang').val(0);
+        $('#add_lebar').val(0);
 
-            if (hitungLuas == 0) {
-                // Matikan input
-                $('#add_panjang, #add_lebar').val('').prop('disabled', true);
-            } else {
-                // Hidupkan kembali
-                $('#add_panjang, #add_lebar').prop('disabled', false);
-            }
+        // ================== TANPA PELANGGAN (HARGA NORMAL) ==================
+        if (!pelangganId) {
+            $.get("{{ route('produk.hargaproduk') }}", {
+                id: produkId
+            }, function(res) {
+                hargaAktif = parseFloat(res.harga_jual);
+                hitungLuasAktif = res.hitung_luas;
+                satuanAktif = res.satuan;
+                rangePrices = [];
 
-            hitungSubtotal();
-        });
+                $('#add_satuan').val(satuanAktif);
 
-        $('#add_panjang, #add_lebar, #add_kuantitas, #add_diskon').on('input', hitungSubtotal);
+                applyHitungLuas(hitungLuasAktif);
+                $('#add_harga').val(hargaAktif);
 
-        function hitungSubtotal() {
-            const harga = parseFloat($('#add_harga').val()) || 0;
-            const panjang = parseFloat($('#add_panjang').val()) || 0;
-            const lebar = parseFloat($('#add_lebar').val()) || 0;
-            const qty = parseFloat($('#add_kuantitas').val()) || 1;
-            const diskon = parseFloat($('#add_diskon').val()) || 0;
-
-            const option = $('#add_produk option:selected');
-            const hitungLuas = option.data('hitung_luas');
-            const satuan = (option.data('satuan') || '').toLowerCase();
-
-            let p = panjang;
-            let l = lebar;
-
-            let subtotal = 0;
-
-            if (hitungLuas == 1) {
-                if (satuan === 'cm' || satuan === 'centimeter') {
-                    p /= 100;
-                    l /= 100;
-                }
-                subtotal = harga * (p * l) * qty;
-            } else {
-                subtotal = harga * qty;
-            }
-            console.log(subtotal);
-
-            subtotal -= subtotal * diskon / 100;
-
-            subtotalNumeric = subtotal; // ⬅ SIMPAN ANGKA ASLI
-            console.log('Numerik = ', subtotalNumeric);
-
-            $('#add_subtotal').val(
-                'Rp ' + subtotal.toLocaleString('id-ID', {
-                    minimumFractionDigits: 0,
-                    maximumFractionDigits: 2
-                })
-            );
+                hitungSubtotal();
+            });
         }
+        // ================== DENGAN PELANGGAN (SPECIAL PRICE) ==================
+        else {
+            $.get("{{ route('produk.hargaprodukkhusus') }}", {
+                produkid: produkId,
+                pelanggan: pelangganId
+            }, function(res) {
+
+                console.log(res);
+                hargaAktif = parseFloat(res.harga_jual);
+                hitungLuasAktif = res.hitung_luas;
+                satuanAktif = res.satuan;
+                rangePrices = res.range_prices || [];
+
+                $('#add_satuan').val(satuanAktif);
+
+                // default fallback price
+                rangePrices.push({
+                    nilai_awal: 0,
+                    nilai_akhir: 0,
+                    harga_khusus: hargaAktif
+                });
+
+                applyHitungLuas(hitungLuasAktif);
+                $('#add_harga').val(hargaAktif);
+
+                hitungSubtotal();
+            });
+        }
+    });
+
+    function applyHitungLuas(hitungLuas) {
+        if (hitungLuas == 1) {
+            $('#add_panjang, #add_lebar').prop('disabled', false);
+        } else {
+            $('#add_panjang, #add_lebar').val(0).prop('disabled', true);
+        }
+    }
+
+    $('#add_panjang, #add_lebar, #add_kuantitas, #add_diskon').on('input', hitungSubtotal);
+
+    function hitungSubtotal() {
+        let harga = hargaAktif;
+        let panjang = parseFloat($('#add_panjang').val()) || 0;
+        let lebar = parseFloat($('#add_lebar').val()) || 0;
+        let qty = parseFloat($('#add_kuantitas').val()) || 1;
+        let diskon = parseFloat($('#add_diskon').val()) || 0;
+
+        let luas = 1;
+
+        if (hitungLuasAktif == 1) {
+            if (satuanAktif === 'cm' || satuanAktif === 'centimeter') {
+                panjang /= 100;
+                lebar /= 100;
+            }
+            luas = panjang * lebar;
+        }
+
+        // ================== SPECIAL PRICE BY RANGE ==================
+        if (rangePrices.length > 0) {
+            rangePrices.forEach(r => {
+                if (
+                    luas >= r.nilai_awal &&
+                    (r.nilai_akhir == 0 || luas <= r.nilai_akhir)
+                ) {
+                    harga = parseFloat(r.harga_khusus);
+                }
+            });
+        }
+
+        let subtotal = harga * luas * qty;
+        subtotal -= subtotal * (diskon / 100);
+
+        subtotalNumeric = subtotal;
+
+        $('#add_harga').val(harga);
+        $('#add_subtotal').val(
+            'Rp ' + subtotal.toLocaleString('id-ID')
+        );
+    }
 
         // ================== FIX SELECT2 DI MODAL ==================
         $('#modal_add').on('shown.bs.modal', function() {

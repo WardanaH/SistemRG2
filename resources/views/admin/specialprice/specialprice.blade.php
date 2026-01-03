@@ -12,7 +12,7 @@
         </div>
 
         <div class="card-body">
-            <table class="table table-bordered table-striped text-center align-middle " id="tabel_spcprice">
+            <table class="table table-bordered table-striped " id="tabel_spcprice">
                 <thead class="table-primary">
                     <tr>
                         <th>Pelanggan</th>
@@ -43,7 +43,7 @@
                         <select class="form-control select2" name="pilih_pelanggan" style="width:100%">
                             <option disabled selected>Pilih Pelanggan</option>
                             @foreach ($pelanggans as $p)
-                                <option value="{{ encrypt($p->id) }}">{{ $p->nama_perusahaan }}</option>
+                                <option value="{{ encrypt($p->id) }}">{{ $p->nama_pemilik }}</option>
                             @endforeach
                         </select>
                     </div>
@@ -52,7 +52,7 @@
                         <select class="form-control select2" name="pilih_produk" style="width:100%">
                             <option disabled selected>Pilih Produk</option>
                             @foreach ($produks as $pr)
-                                <option value="{{ encrypt($pr->id) }}">{{ $pr->nama_produk }}</option>
+                                <option value="{{ encrypt($pr->id) }}">{{ $pr->nama_produk }} - {{ $pr->harga_jual }}</option>
                             @endforeach
                         </select>
                     </div>
