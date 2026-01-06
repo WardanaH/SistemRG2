@@ -31,4 +31,14 @@ class MSpecialPrices extends Model
     {
         return $this->belongsTo(MProduks::class, 'produk_id');
     }
+
+    // relasi ke range price pelanggan
+    public function rangePrices()
+    {
+        return $this->hasMany(
+            MRangePricePelanggan::class,
+            'specialprice_id'
+        );
+    }
+
 }
