@@ -122,7 +122,29 @@
 <script>
 $(function () {
 
-    $('.select2').select2();
+$('.select2').each(function () {
+    let title = $(this).data('title');
+
+    $(this).select2({
+        placeholder: title,
+        allowClear: true,
+        dropdownCssClass: "select2-with-title",
+        templateResult: function (data) {
+            if (!data.id) return data.text;
+            return data.text;
+        }
+    });
+
+    // Tambahin judul pas dropdown dibuka
+    $(this).on('select2:open', function () {
+        if (!$('.select2-dropdown .select2-title').length) {
+            $('.select2-dropdown').prepend(
+                `<div class="select2-title">${title}</div>`
+            );
+        }
+    });
+});
+
 
     const table = $('#tabel_spcprice').DataTable({
         processing: true,
