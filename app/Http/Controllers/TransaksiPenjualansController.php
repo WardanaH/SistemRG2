@@ -204,7 +204,6 @@ class TransaksiPenjualansController extends Controller
         return view('admin.transaksis.list', compact('datas', 'cabangs'));
     }
 
-
     public function indexdeleted(Request $request)
     {
         $user = Auth::user();
@@ -341,5 +340,10 @@ class TransaksiPenjualansController extends Controller
             'subtransaksis' => $subtransaksis,
             'angsurans' => $angsurans
         ]);
+    }
+
+    public function show(Request $request)
+    {
+        $transaksi = MTransaksiPenjualans::findOrFail($request->id);
     }
 }

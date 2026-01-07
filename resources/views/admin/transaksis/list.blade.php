@@ -116,7 +116,7 @@
                                                 <i class="fa fa-money"></i>
                                             </button>
 
-                                            <a href="" class="btn btn-success">
+                                            <a href="{{ route }}" class="btn btn-success">
                                                 <i class="fa fa-edit"></i>
                                             </a>
 

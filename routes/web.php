@@ -209,7 +209,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/transaksi/penjualan', [TransaksiPenjualansController::class, 'transaksi'])->middleware('permission:deleted-transaksipenjualan')->name('addtransaksiindex');
     Route::get('/transaksi/penjualan/load', [TransaksiPenjualansController::class, 'load'])->middleware('permission:manage-transaksipenjualan')->name('loadtransaksipenjualan');
     Route::post('/transaksi/penjualan/store', [TransaksiPenjualansController::class, 'store'])->middleware('permission:add-transaksipenjualan')->name('storetransaksipenjualan');
-    Route::post('/transaksi/penjualan/update', [TransaksiPenjualansController::class, 'update'])->middleware('permission:edit-transaksipenjualan')->name('updatetransaksipenjualan');
+    Route::get('/transaksi/penjualan/update', [TransaksiPenjualansController::class, 'show'])->middleware('permission:edit-transaksipenjualan')->name('updatetransaksipenjualan');
+    Route::put('/transaksi/penjualan/update/{id}', [TransaksiPenjualansController::class, 'update'])->middleware('permission:delete-transaksipenjualan')->name('destroytransaksipenjualan');
     Route::delete('/transaksi/penjualan/delete/{id}', [TransaksiPenjualansController::class, 'destroy'])->middleware('permission:delete-transaksipenjualan')->name('destroytransaksipenjualan');
     Route::get('/transaksi-penjualan/show-sub', [TransaksiPenjualansController::class, 'showSubTransaksi'])->middleware('permission:manage-transaksipenjualan')->name('showsubtransaksi');
     Route::get('/transaksi/report/{id}', [TransaksiPenjualansController::class, 'report'])->middleware('permission:manage-transaksipenjualan')->name('transaksi.report');
