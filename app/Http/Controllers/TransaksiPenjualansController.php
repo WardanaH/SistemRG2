@@ -137,6 +137,8 @@ class TransaksiPenjualansController extends Controller
                     $stok->save();
                 }
             }
+            $isi = Auth::user()->username . " telah menambahkan transaksi penjualan dicabang " . Auth::user()->cabang->nama . " dengan nomor transaksi " . $transaksi->nomor_nota . ".";
+            $save = $this->log($isi, "Penambahan");
 
             DB::commit();
             return response()->json([
@@ -261,6 +263,9 @@ class TransaksiPenjualansController extends Controller
 
             // Soft delete transaksi utama
             $transaksi->delete();
+
+            $isi = auth()->user()->username . " telah menghapus transaksi nomor " . $transaksi->nomor_nota . " dengan alasan " . $transaksi->reason_on_delete . ".";
+            $this->log($isi, "Penghapusan");
 
             DB::commit();
 

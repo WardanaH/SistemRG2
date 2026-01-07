@@ -47,6 +47,9 @@ class BahanBakuController extends Controller
             'keterangan' => $request->tambah_keterangan,
         ]);
 
+        $isi = auth()->user()->username . " telah menambahkan bahan baku " . $bb->nama_bahan . ".";
+        $this->log($isi, "Penambahan");
+
         return response()->json($bb ? "Success" : "Failed");
     }
 
@@ -77,6 +80,9 @@ class BahanBakuController extends Controller
             'keterangan' => $request->edit_keterangan,
         ]);
 
+        $isi = auth()->user()->username . " telah mengubah bahan baku " . $bb->nama_bahan . ".";
+        $this->log($isi, "Pengubahan");
+
         return response()->json("Success");
     }
 
@@ -84,6 +90,10 @@ class BahanBakuController extends Controller
     {
         $bb = MBahanBakus::findOrFail($request->hapus_bahan_baku_id);
         $bb->delete();
+
+        $isi = auth()->user()->username . " telah menghapus bahan baku " . $bb->nama_bahan . ".";
+        $this->log($isi, "Penghapusan");
+
         return response()->json("Success");
     }
 }

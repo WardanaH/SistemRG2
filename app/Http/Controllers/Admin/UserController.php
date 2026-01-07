@@ -16,7 +16,7 @@ class UserController extends Controller
     public function index()
     {
         // ambil data yang diperlukan untuk tabel + form tambah user di halaman index
-        $users = User::with('cabang', 'roles')->paginate(15);
+        $users = User::with('cabang', 'roles')->paginate(1000);
         $roles = Role::all();         // <-- pastikan ini ada
         $cabangs = Cabang::all();    // <-- dan ini juga
 
@@ -58,6 +58,9 @@ class UserController extends Controller
 
         $user->assignRole($validated['role']);
 
+        $isi = auth()->user()->username . " telah menambahkan user " . $user->nama . ".";
+        $this->log($isi, "Penambahan");
+
         return redirect()->route('users.index')->with('success', 'User berhasil dibuat.');
     }
 
@@ -65,6 +68,7 @@ class UserController extends Controller
     {
         $roles = Role::pluck('name', 'name');
         $cabangs = \App\Models\Cabang::pluck('nama', 'id');
+
         return view('admin.users.edit', compact('user', 'roles', 'cabangs'));
     }
 
@@ -83,12 +87,19 @@ class UserController extends Controller
             $user->syncRoles($data['roles']);
         }
 
+        $isi = auth()->user()->username . " telah mengedit user " . $user->nama . ".";
+        $this->log($isi, "Pengubahan");
+
         return redirect()->route('users.index')->with('success', 'User diperbarui.');
     }
 
     public function destroy(User $user)
     {
         $user->delete();
+
+        $isi = auth()->user()->username . " telah menghapus user " . $user->nama . ".";
+        $this->log($isi, "Penghapusan");
+
         return redirect()->route('users.index')->with('success', 'User dihapus.');
     }
 }

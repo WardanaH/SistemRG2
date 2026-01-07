@@ -51,6 +51,9 @@ class ProdukController extends Controller
             'keterangan' => $request->keterangan,
         ]);
 
+        $isi = auth()->user()->username . " telah menambahkan produk " . $produk->nama_produk . ".";
+        $this->log($isi, "Penambahan");
+
         return response()->json($produk ? "Success" : "Failed");
     }
 
@@ -80,6 +83,9 @@ class ProdukController extends Controller
             'keterangan' => $request->edit_keterangan,
         ]);
 
+        $isi = auth()->user()->username . " telah mengubah produk " . $produk->nama_produk . ".";
+        $this->log($isi, "Pengubahan");
+
         return response()->json("Success");
     }
 
@@ -87,6 +93,10 @@ class ProdukController extends Controller
     {
         $produk = MProduks::findOrFail($request->hapus_produk_id);
         $produk->delete();
+
+        $isi = auth()->user()->username . " telah menghapus produk " . $produk->nama_produk . ".";
+        $this->log($isi, "Penghapusan");
+
         return response()->json("Success");
     }
 

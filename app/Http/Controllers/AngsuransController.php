@@ -385,6 +385,10 @@ class AngsuransController extends Controller
         $sisa = $transaksi->sisa_tagihan - $nominal;
         $totalPembayaran = $transaksi->jumlah_pembayaran + $nominal;
 
+        $isi = auth()->user()->username . " telah melakukan pembayaran sebesar Rp " . number_format($nominal, 0, ',', '.') . " pada nota angsuran nomor " . $request->nomor_nota . ".";
+
+        $this->log($isi, "Pembayaran");
+
         // Buat record angsuran baru
         $angsuran = MAngsurans::create([
             'tanggal_angsuran' => $date,
@@ -435,6 +439,10 @@ class AngsuransController extends Controller
 
             // Soft delete angsuran
             $angsuran->delete();
+
+            $isi = auth()->user()->username . " telah menghapus angsuran sebesar Rp " . number_format($angsuran->nominal_angsuran, 0, ',', '.') . " pada nota angsuran nomor " . $angsuran->nomor_nota ." dengan alasan ". $request->alasan . ".";
+
+            $this->log($isi, "Penghapusan");
         });
 
         return response()->json(['success' => true]);

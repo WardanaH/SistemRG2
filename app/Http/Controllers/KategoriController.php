@@ -38,6 +38,9 @@ class KategoriController extends Controller
             'user_id'       => Auth::id(),
         ]);
 
+        $isi = auth()->user()->username . " telah menambahkan kategori " . $kategori->Nama_Kategori . ".";
+        $this->log($isi, "Penambahan");
+
         return $kategori ? response()->json("Success") : response()->json("Failed");
     }
 
@@ -62,6 +65,9 @@ class KategoriController extends Controller
                 'Keterangan'    => $request->edit_keterangan,
             ]);
 
+            $isi = auth()->user()->username . " telah mengubah kategori " . $category->Nama_Kategori . ".";
+            $this->log($isi, "Pengubahan");
+
             return response()->json("Success");
         } catch (\Throwable $th) {
             return response()->json(['errors' => ['Gagal mengupdate kategori: ' . $th->getMessage()]]);
@@ -72,6 +78,9 @@ class KategoriController extends Controller
     {
         $kategori = MKategories::findOrFail($request->hapus_kategori_id);
         $kategori->delete();
+
+        $isi = auth()->user()->username . " telah menghapus kategori " . $kategori->Nama_Kategori . ".";
+        $this->log($isi, "Penghapusan");
 
         return response()->json("Success");
     }

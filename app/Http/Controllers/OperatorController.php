@@ -119,7 +119,12 @@ class OperatorController extends Controller
                     }
                 }
             }
+
+            $isi = "Operator " . auth()->user()->username . " telah memperbarui status pesanan " . $sub->id . " menjadi " . $statusBaru . " pada pesanan " . $sub->no_spk . ".";
+            $this->log($isi, "Perbaruan");
         });
+
+
 
         return redirect()
             ->route('operator.pesanan')
