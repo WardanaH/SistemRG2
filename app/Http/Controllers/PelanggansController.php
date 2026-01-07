@@ -36,7 +36,8 @@ class PelanggansController extends Controller
     public function getData()
     {
         $pelanggans = MPelanggans::with('jenisPelanggan')
-            ->select('pelanggans.*');
+            ->select('pelanggans.*')
+            ->orderBy('created_at', 'desc');
 
         return DataTables::of($pelanggans)
             ->addColumn('jenis_pelanggan', fn($p) => $p->jenisPelanggan->jenis_pelanggan ?? '-')
@@ -96,6 +97,9 @@ class PelanggansController extends Controller
             'user_id' => Auth::id(),
         ]);
 
+        $isi = auth()->user()->username . " telah menambahkan pelanggan " . $pelanggan->nama_pemilik . ".";
+        $this->log($isi, "Penambahan");
+
         if ($pelanggan) {
             return response()->json("Success");
         }
@@ -136,6 +140,9 @@ class PelanggansController extends Controller
                 'status_pelanggan' => $request->edit_statuspelanggan,
             ]);
 
+            $isi = auth()->user()->username . " telah mengubah pelanggan " . $pelanggan->nama_pemilik . ".";
+            $this->log($isi, "Pengubahan");
+
             return response()->json("Success");
         } catch (\Exception $e) {
             // Kamu bisa log error untuk debugging
@@ -149,6 +156,9 @@ class PelanggansController extends Controller
     {
         $pelanggan = MPelanggans::findOrFail(decrypt($request->hapus_pelanggan_id));
         $pelanggan->delete();
+
+        $isi = auth()->user()->username . " telah menghapus pelanggan " . $pelanggan->nama_pemilik . ".";
+        $this->log($isi, "Penghapusan");
 
         return response()->json("Success");
     }

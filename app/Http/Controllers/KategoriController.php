@@ -38,35 +38,49 @@ class KategoriController extends Controller
             'user_id'       => Auth::id(),
         ]);
 
+        $isi = auth()->user()->username . " telah menambahkan kategori " . $kategori->Nama_Kategori . ".";
+        $this->log($isi, "Penambahan");
+
         return $kategori ? response()->json("Success") : response()->json("Failed");
     }
 
     public function update(Request $request)
     {
-        $rules = [
-            'edit_nama_kategori' => 'required|string|max:128',
-            'edit_keterangan'    => 'required|string',
-        ];
+        try {
+            $rules = [
+                'edit_nama_kategori' => 'required|string|max:128',
+                'edit_keterangan'    => 'required|string',
+            ];
 
-        $validator = Validator::make($request->all(), $rules);
-        if ($validator->fails()) {
-            return response()->json(['errors' => $validator->getMessageBag()]);
+            $validator = Validator::make($request->all(), $rules);
+            if ($validator->fails()) {
+                return response()->json(['errors' => $validator->getMessageBag()]);
+            }
+
+            // Perbaikan di sini
+            $category = MKategories::findOrFail($request->edit_kategori_id);
+
+            $category->update([
+                'Nama_Kategori' => $request->edit_nama_kategori,
+                'Keterangan'    => $request->edit_keterangan,
+            ]);
+
+            $isi = auth()->user()->username . " telah mengubah kategori " . $category->Nama_Kategori . ".";
+            $this->log($isi, "Pengubahan");
+
+            return response()->json("Success");
+        } catch (\Throwable $th) {
+            return response()->json(['errors' => ['Gagal mengupdate kategori: ' . $th->getMessage()]]);
         }
-
-        $kategori = MKategories::findOrFail($request->kategori_id);
-
-        $kategori->update([
-            'Nama_Kategori' => $request->edit_nama_kategori,
-            'Keterangan'    => $request->edit_keterangan,
-        ]);
-
-        return response()->json("Success");
     }
 
     public function destroy(Request $request)
     {
         $kategori = MKategories::findOrFail($request->hapus_kategori_id);
         $kategori->delete();
+
+        $isi = auth()->user()->username . " telah menghapus kategori " . $kategori->Nama_Kategori . ".";
+        $this->log($isi, "Penghapusan");
 
         return response()->json("Success");
     }
