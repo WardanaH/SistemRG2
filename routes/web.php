@@ -216,6 +216,20 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/transaksi/report/{id}', [TransaksiPenjualansController::class, 'report'])->middleware('permission:manage-transaksipenjualan')->name('transaksi.report');
 });
 
+// Bantuan Transaksi Penjualan
+Route::middleware(['auth'])->group(function () {
+    Route::get('/bantuan-transaksi-penjualan', [TransaksiPenjualansController::class, 'index'])->middleware('permission:manage-transaksipenjualan')->name('bantuantransaksipenjualan.index');
+    Route::get('/bantuan-transaksi-penjualan/deleted', [TransaksiPenjualansController::class, 'indexdeleted'])->middleware('permission:deleted-transaksipenjualan')->name('bantuantransaksipenjualan.indexdeleted');
+    Route::get('/bantuan-transaksi-penjualan/transaksi', [TransaksiPenjualansController::class, 'transaksi'])->middleware('permission:deleted-transaksipenjualan')->name('bantuantransaksipenjualan.addtransaksi');
+    Route::get('/bantuan-transaksi-penjualan/load', [TransaksiPenjualansController::class, 'load'])->middleware('permission:manage-transaksipenjualan')->name('bantuantransaksipenjualan.loadtransaksipenjualan');
+    Route::post('/bantuan-transaksi-penjualan/store', [TransaksiPenjualansController::class, 'store'])->middleware('permission:add-transaksipenjualan')->name('bantuantransaksipenjualan.storetransaksipenjualan');
+    Route::get('/bantuan-transaksi-penjualan/update', [TransaksiPenjualansController::class, 'show'])->middleware('permission:edit-transaksipenjualan')->name('bantuantransaksipenjualan.updatetransaksipenjualan');
+    Route::put('/bantuan-transaksi-penjualan/update/{id}', [TransaksiPenjualansController::class, 'update'])->middleware('permission:delete-transaksipenjualan')->name('bantuantransaksipenjualan.destroytransaksipenjualan');
+    Route::delete('/bantuan-transaksi-penjualan/delete/{id}', [TransaksiPenjualansController::class, 'destroy'])->middleware('permission:delete-transaksipenjualan')->name('bantuantransaksipenjualan.destroytransaksipenjualan');
+    Route::get('/bantuan-transaksi-penjualan/show-sub', [TransaksiPenjualansController::class, 'showSubTransaksi'])->middleware('permission:manage-transaksipenjualan')->name('bantuantransaksipenjualan.showsubtransaksi');
+    Route::get('/bantuan-transaksi-penjualan/report/{id}', [TransaksiPenjualansController::class, 'report'])->middleware('permission:manage-transaksipenjualan')->name('bantuantransaksipenjualan.reporttransaksipenjualan');
+});
+
 // Manajemen Designer
 Route::middleware(['auth'])->group(function () {
     Route::get('/designer', [DesignerController::class, 'index'])->name('designerindex');
