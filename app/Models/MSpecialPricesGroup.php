@@ -32,4 +32,12 @@ class MSpecialPricesGroup extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+        public function rangePrices()
+    {
+        return $this->hasMany(
+            MRangePriceGroup::class,
+            'special_price_group_id'
+        );
+    }
 }

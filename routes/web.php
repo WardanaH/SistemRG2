@@ -27,6 +27,7 @@ use App\Http\Controllers\TransaksiPenjualansController;
 use App\Http\Controllers\SpecialPriceController;
 use App\Http\Controllers\SpecialPriceGroupController;
 use App\Http\Controllers\RangePricePelangganController;
+use App\Http\Controllers\RangePriceGroupController;
 
 require __DIR__ . '/operator.php';
 require __DIR__ . '/designer.php';
@@ -278,15 +279,6 @@ Route::middleware(['auth'])->group(function () {
         ->name('transaksi.angsuran.print');
 });
 
-// special price group
-Route::middleware(['auth'])->group(function () {
-
-    Route::get('/specialpricegroup',[SpecialPriceGroupController::class, 'index'])->name('specialpricegroup.index');
-    Route::get('/specialpricegroup/load',[SpecialPriceGroupController::class, 'load'])->name('specialpricegroup.load');
-    Route::post('/specialpricegroup/store',[SpecialPriceGroupController::class, 'store'])->name('specialpricegroup.store');
-    Route::post('/specialpricegroup/update',[SpecialPriceGroupController::class, 'update'])->name('specialpricegroup.update');
-    Route::post('/specialpricegroup/delete',[SpecialPriceGroupController::class, 'destroy'])->name('specialpricegroup.delete');
-});
 
 //Special Price
 Route::middleware(['auth'])->group(function () {
@@ -300,71 +292,31 @@ Route::middleware(['auth'])->group(function () {
 
 // range price
 Route::middleware(['auth'])->group(function () {
-
-    Route::get(
-        '/rangepricepelanggan',
-        [RangePricePelangganController::class, 'page']
-    )->name('rangepricepelanggan.page');
-
-    Route::get(
-        '/specialprice/{id}/ranges',
-        [RangePricePelangganController::class, 'index']
-    )->name('rangespecialprices');
-
-    Route::post(
-        '/specialprice/{id}/ranges',
-        [RangePricePelangganController::class, 'store']
-    )->name('createrangespecialprices');
-
-    Route::delete(
-        '/specialprice/{specialprice_id}/ranges/{range_id}',
-        [RangePricePelangganController::class, 'destroy']
-    )->name('deleterangespecialprices');
-
-    Route::post(
-        '/admin/rangepricepelanggan/store-specialprice',
-        [RangePricePelangganController::class, 'storeSpecialPrice']
-    )->name('rangepricepelanggan.storeSpecial');
-
-    Route::get(
-        '/rangepricepelanggan/load/{produk}',
-        [RangePricePelangganController::class, 'loadByProduk']
-    );
-
-    Route::get(
-        '/rangepricepelanggan/load-special/{produk}',
-        [RangePricePelangganController::class, 'loadSpecialPriceByProduk']
-    );
-
+    Route::get('/rangepricepelanggan',[RangePricePelangganController::class, 'page'])->name('rangepricepelanggan.page');
+    Route::get('/specialprice/{id}/ranges',[RangePricePelangganController::class, 'index'])->name('rangespecialprices');
+    Route::post('/specialprice/{id}/ranges',[RangePricePelangganController::class, 'store'])->name('createrangespecialprices');
+    Route::delete('/specialprice/{specialprice_id}/ranges/{range_id}',[RangePricePelangganController::class, 'destroy'])->name('deleterangespecialprices');
+    Route::post('/admin/rangepricepelanggan/store-specialprice',[RangePricePelangganController::class, 'storeSpecialPrice'])->name('rangepricepelanggan.storeSpecial');
+    Route::get('/rangepricepelanggan/load/{produk}',[RangePricePelangganController::class, 'loadByProduk']);
+    Route::get('/rangepricepelanggan/load-special/{produk}',[RangePricePelangganController::class, 'loadSpecialPriceByProduk']);
 });
 
-// Route::middleware(['auth'])->group(function () {
+// special price group
+Route::middleware(['auth'])->group(function () {
 
-//     Route::get(
-//         '/specialprice/{id}/ranges',
-//         [RangePricePelangganController::class, 'index']
-//     )->name('rangespecialprices');
+    Route::get('/specialpricegroup',[SpecialPriceGroupController::class, 'index'])->name('specialpricegroup.index');
+    Route::get('/specialpricegroup/load',[SpecialPriceGroupController::class, 'load'])->name('specialpricegroup.load');
+    Route::post('/specialpricegroup/store',[SpecialPriceGroupController::class, 'store'])->name('specialpricegroup.store');
+    Route::post('/specialpricegroup/update',[SpecialPriceGroupController::class, 'update'])->name('specialpricegroup.update');
+    Route::post('/specialpricegroup/delete',[SpecialPriceGroupController::class, 'destroy'])->name('specialpricegroup.delete');
+});
 
-//     Route::post(
-//         '/specialprice/{id}/ranges',
-//         [RangePricePelangganController::class, 'store']
-//     )->name('createrangespecialprices');
-
-//     Route::delete(
-//         '/specialprice/{id}/ranges/{range_id}',
-//         [RangePricePelangganController::class, 'destroy']
-//     )->name('deleterangespecialprices');
-// });
-
-
-// range price pelanggan
-// Route::middleware(['auth'])->group(function () {
-//     Route::get('/rangepricepelanggan',[RangePricePelangganController::class, 'indexPage'])->name('rangepricepelanggan.index');
-//     Route::post('/rangepricepelanggan/load',[RangePricePelangganController::class, 'load'])->name('rangepricepelanggan.load');
-//     Route::post('/rangepricepelanggan/store',[RangePricePelangganController::class, 'store'])->name('rangepricepelanggan.store');
-//     Route::delete('/rangepricepelanggan/{id}',[RangePricePelangganController::class, 'destroy'])->name('rangepricepelanggan.delete');
-// });
-
-
-
+// range price group
+Route::middleware(['auth'])->group(function () {
+    Route::get('/range-price-group',[RangePriceGroupController::class, 'index'])->name('rangepricegroup.index');
+    Route::get('/range-price-group/{id}',[RangePriceGroupController::class, 'page'])->name('rangepricegroup.page');
+    Route::get('/range-price-group/{id}/data',[RangePriceGroupController::class, 'data'])->name('rangepricegroup.data');
+    Route::post('/range-price-group/{id}',[RangePriceGroupController::class, 'store'])->name('rangepricegroup.store');
+    Route::delete('/range-price-group/{id}/{range_id}',[RangePriceGroupController::class, 'destroy'])->name('rangepricegroup.destroy');
+});
 
