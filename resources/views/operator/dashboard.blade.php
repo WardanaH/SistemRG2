@@ -32,6 +32,8 @@
 
     <h3 class="fw-bold mb-1">Dashboard Operator</h3>
     <p class="text-muted mb-4">Ringkasan tugas Anda.</p>
+    <p>Selamat datang, {{ Auth::user()->name }}</p>
+    <p>Anda login sebagai operator di cabang {{ Auth::user()->cabang->nama }}</p>
 
     <div class="row g-4">
 

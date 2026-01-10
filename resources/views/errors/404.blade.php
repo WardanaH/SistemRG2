@@ -10,16 +10,16 @@
 </head>
 
 <body>
-    <div class="container text-center py-5">
-        <h1 class="display-3 text-danger">404</h1>
-        <h3 class="mb-3">Halaman Tidak Ditemukan</h3>
-        <p class="text-muted">
-            Maaf, halaman yang kamu cari tidak tersedia atau sudah dipindahkan.
-        </p>
+    <div class="d-flex flex-column align-items-center justify-content-center mt-5">
+        <img
+            src="{{ asset('images/errors/Error page 404.png') }}"
+            class="img-fluid rounded-top"
+            alt="error-403"
+            style="max-width: 1000px" />
 
-        <a href="{{ route('dashboard') }}" class="btn btn-primary mt-3">
-            ⬅️ Kembali ke Dashboard
-        </a>
+        <div class="mt-3">
+            <a href="{{ route('home') }}" class="btn btn-primary">Kembali ke Beranda</a>
+        </div>
     </div>
 </body>
 
