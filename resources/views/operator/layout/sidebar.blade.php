@@ -26,6 +26,12 @@
                     <li>
                         <a href="{{ route('operator.riwayat') }}">Riwayat Pesanan</a>
                     </li>
+                    <li>
+                        <a href="{{ route('operator.pesanan.bantuan') }}">Status Item Bantuan</a>
+                    </li>
+                    <li>
+                        <a href="{{ route('operator.riwayat.bantuan') }}">Riwayat Bantuan</a>
+                    </li>
                 </ul>
             </li>
             <!-- <li class="nav-label">SYSTEM</li>

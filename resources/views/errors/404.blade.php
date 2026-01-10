@@ -17,7 +17,7 @@
             Maaf, halaman yang kamu cari tidak tersedia atau sudah dipindahkan.
         </p>
 
-        <a href="{{ route('dashboard') }}" class="btn btn-primary mt-3">
+        <a href="{{ route('home') }}" class="btn btn-primary mt-3">
             ⬅️ Kembali ke Dashboard
         </a>
     </div>

@@ -15,18 +15,20 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\PelanggansController;
+use App\Http\Controllers\GudangPusatController;
 use App\Http\Controllers\Admin\CabangController;
 use App\Http\Controllers\GudangCabangController;
+use App\Http\Controllers\SpecialPriceController;
 use App\Http\Controllers\StokBahanBakusController;
 use App\Http\Controllers\JenisPelanggansController;
 use App\Http\Controllers\RelasiBahanBakuController;
 use App\Http\Controllers\InventarisKantorController;
-use App\Http\Controllers\GudangPusatController;
-use App\Http\Controllers\TransaksiBahanBakusController;
-use App\Http\Controllers\TransaksiPenjualansController;
-use App\Http\Controllers\SpecialPriceController;
 use App\Http\Controllers\SpecialPriceGroupController;
 use App\Http\Controllers\RangePricePelangganController;
+use App\Http\Controllers\TransaksiBahanBakusController;
+use App\Http\Controllers\TransaksiPenjualansController;
+use App\Http\Controllers\MBantuanTransaksiPenjualansController;
+use Faker\Guesser\Name;
 
 require __DIR__ . '/operator.php';
 require __DIR__ . '/designer.php';
@@ -50,7 +52,7 @@ Route::get('/', function () {
     } else {
         return redirect()->route('dashboard');
     }
-})->middleware('auth');
+})->middleware('auth')->name('home');
 
 // Guest (belum login)
 Route::middleware('guest')->group(function () {
@@ -216,18 +218,18 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/transaksi/report/{id}', [TransaksiPenjualansController::class, 'report'])->middleware('permission:manage-transaksipenjualan')->name('transaksi.report');
 });
 
-// Bantuan Transaksi Penjualan
+// Manajemen Bantuan
 Route::middleware(['auth'])->group(function () {
-    Route::get('/bantuan-transaksi-penjualan', [TransaksiPenjualansController::class, 'index'])->middleware('permission:manage-transaksipenjualan')->name('bantuantransaksipenjualan.index');
-    Route::get('/bantuan-transaksi-penjualan/deleted', [TransaksiPenjualansController::class, 'indexdeleted'])->middleware('permission:deleted-transaksipenjualan')->name('bantuantransaksipenjualan.indexdeleted');
-    Route::get('/bantuan-transaksi-penjualan/transaksi', [TransaksiPenjualansController::class, 'transaksi'])->middleware('permission:deleted-transaksipenjualan')->name('bantuantransaksipenjualan.addtransaksi');
-    Route::get('/bantuan-transaksi-penjualan/load', [TransaksiPenjualansController::class, 'load'])->middleware('permission:manage-transaksipenjualan')->name('bantuantransaksipenjualan.loadtransaksipenjualan');
-    Route::post('/bantuan-transaksi-penjualan/store', [TransaksiPenjualansController::class, 'store'])->middleware('permission:add-transaksipenjualan')->name('bantuantransaksipenjualan.storetransaksipenjualan');
-    Route::get('/bantuan-transaksi-penjualan/update', [TransaksiPenjualansController::class, 'show'])->middleware('permission:edit-transaksipenjualan')->name('bantuantransaksipenjualan.updatetransaksipenjualan');
-    Route::put('/bantuan-transaksi-penjualan/update/{id}', [TransaksiPenjualansController::class, 'update'])->middleware('permission:delete-transaksipenjualan')->name('bantuantransaksipenjualan.destroytransaksipenjualan');
-    Route::delete('/bantuan-transaksi-penjualan/delete/{id}', [TransaksiPenjualansController::class, 'destroy'])->middleware('permission:delete-transaksipenjualan')->name('bantuantransaksipenjualan.destroytransaksipenjualan');
-    Route::get('/bantuan-transaksi-penjualan/show-sub', [TransaksiPenjualansController::class, 'showSubTransaksi'])->middleware('permission:manage-transaksipenjualan')->name('bantuantransaksipenjualan.showsubtransaksi');
-    Route::get('/bantuan-transaksi-penjualan/report/{id}', [TransaksiPenjualansController::class, 'report'])->middleware('permission:manage-transaksipenjualan')->name('bantuantransaksipenjualan.reporttransaksipenjualan');
+    Route::get('/bantuan-produksi', [MBantuanTransaksiPenjualansController::class, 'create'])->middleware('permission:manage-transaksipenjualan')->name('bantuan');
+    Route::post('/bantuan-produksi', [MBantuanTransaksiPenjualansController::class, 'storeBantuan'])->middleware('permission:manage-transaksipenjualan')->name('bantuan.store');
+    Route::get('/bantuan-produksi/permintaan-masuk', [MBantuanTransaksiPenjualansController::class, 'indexPermintaanMasuk'])->middleware('permission:manage-transaksipenjualan')->name('bantuan.index');
+    Route::post('/bantuan-produksi/acc/{id}', [MBantuanTransaksiPenjualansController::class, 'accBantuan'])->middleware('permission:manage-transaksipenjualan')->name('bantuan.acc');
+    Route::get('/monitor-keluar', [MBantuanTransaksiPenjualansController::class, 'monitorKeluar'])->middleware('permission:manage-transaksipenjualan')->name('bantuan.riwayat_bantuan_keluar');
+    Route::get('/riwayat-masuk', [MBantuanTransaksiPenjualansController::class, 'riwayatMasuk'])->middleware('permission:manage-transaksipenjualan')->name('bantuan.riwayat_bantuan_masuk');
+    Route::get('/cetak-nota/{id}', [MBantuanTransaksiPenjualansController::class, 'cetakNotaInternal'])->middleware('permission:manage-transaksipenjualan')->name('bantuan.cetak_nota');
+    Route::get('/bantuan-produksi/list', [MBantuanTransaksiPenjualansController::class, 'index'])->middleware('permission:manage-transaksipenjualan')->name('bantuan.list');
+    Route::get('/bantuan-produksi/detail-ajax', [MBantuanTransaksiPenjualansController::class, 'showDetailBantuan'])->middleware('permission:manage-transaksipenjualan')->name('bantuan.detail_ajax');
+    Route::delete('/bantuan-produksi/destroy/{id}', [MBantuanTransaksiPenjualansController::class, 'destroy'])->middleware('permission:manage-transaksipenjualan')->name('bantuan.destroy');
 });
 
 // Manajemen Designer
@@ -301,11 +303,11 @@ Route::middleware(['auth'])->group(function () {
 // special price group
 Route::middleware(['auth'])->group(function () {
 
-    Route::get('/specialpricegroup',[SpecialPriceGroupController::class, 'index'])->name('specialpricegroup.index');
-    Route::get('/specialpricegroup/load',[SpecialPriceGroupController::class, 'load'])->name('specialpricegroup.load');
-    Route::post('/specialpricegroup/store',[SpecialPriceGroupController::class, 'store'])->name('specialpricegroup.store');
-    Route::post('/specialpricegroup/update',[SpecialPriceGroupController::class, 'update'])->name('specialpricegroup.update');
-    Route::post('/specialpricegroup/delete',[SpecialPriceGroupController::class, 'destroy'])->name('specialpricegroup.delete');
+    Route::get('/specialpricegroup', [SpecialPriceGroupController::class, 'index'])->name('specialpricegroup.index');
+    Route::get('/specialpricegroup/load', [SpecialPriceGroupController::class, 'load'])->name('specialpricegroup.load');
+    Route::post('/specialpricegroup/store', [SpecialPriceGroupController::class, 'store'])->name('specialpricegroup.store');
+    Route::post('/specialpricegroup/update', [SpecialPriceGroupController::class, 'update'])->name('specialpricegroup.update');
+    Route::post('/specialpricegroup/delete', [SpecialPriceGroupController::class, 'destroy'])->name('specialpricegroup.delete');
 });
 
 //Special Price
@@ -355,7 +357,6 @@ Route::middleware(['auth'])->group(function () {
         '/rangepricepelanggan/load-special/{produk}',
         [RangePricePelangganController::class, 'loadSpecialPriceByProduk']
     );
-
 });
 
 // Route::middleware(['auth'])->group(function () {
@@ -384,7 +385,3 @@ Route::middleware(['auth'])->group(function () {
 //     Route::post('/rangepricepelanggan/store',[RangePricePelangganController::class, 'store'])->name('rangepricepelanggan.store');
 //     Route::delete('/rangepricepelanggan/{id}',[RangePricePelangganController::class, 'destroy'])->name('rangepricepelanggan.delete');
 // });
-
-
-
-
