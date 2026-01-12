@@ -35,7 +35,7 @@
     }
 
     .select2-results__option {
-    color: #000 !important;
+        color: #000 !important;
     }
 </style>
 @endpush
@@ -49,20 +49,22 @@
         </div>
 
         <div class="card-body">
-            <table class="table table-bordered table-striped align-middle text-center w-100" id="tabel_pelanggan">
-                <thead class="table-primary">
-                    <tr>
-                        <th>Nama Perusahaan</th>
-                        <th>Nama Pemilik</th>
-                        <th>Jenis Pelanggan</th>
-                        <th>Telepon</th>
-                        <th>Email</th>
-                        <th>Limit</th>
-                        <th>Status</th>
-                        <th>Aksi</th>
-                    </tr>
-                </thead>
-            </table>
+            <div style="overflow-y: scroll; height: 450px;">
+                <table class="table table-bordered table-striped align-middle text-center w-100" id="tabel_pelanggan">
+                    <thead class="table-primary">
+                        <tr>
+                            <th>Nama Perusahaan</th>
+                            <th>Nama Pemilik</th>
+                            <th>Jenis Pelanggan</th>
+                            <th>Telepon</th>
+                            <th>Email</th>
+                            <th>Limit</th>
+                            <th>Status</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
         </div>
     </div>
 </div>
@@ -212,196 +214,204 @@
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
 <script>
-$(function() {
+    $(function() {
 
-    const addModal = new bootstrap.Modal('#addModal');
-    const editModal = new bootstrap.Modal('#editModal');
+        const addModal = new bootstrap.Modal('#addModal');
+        const editModal = new bootstrap.Modal('#editModal');
 
-    // Datatable
-    const table = $('#tabel_pelanggan').DataTable({
-        processing: true,
-        serverSide: true,
-        searching: false,
-        ajax: "{{ route('pelanggan.data') }}",
-        columns: [
-            { data: 'nama_perusahaan' },
-            { data: 'nama_pemilik' },
-            { data: 'jenis_pelanggan' },
-            { data: 'telpon_pelanggan' },
-            { data: 'email_pelanggan' },
-            { data: 'limit_pelanggan' },
-            { data: 'status_pelanggan', orderable:false, searchable:false },
-            { data: 'action', orderable:false, searchable:false },
-        ],
-            columnDefs: [
-        {
-            targets: 7, // kolom 'action'
-            render: function(data, type, row){
-                return `
-                    <button class="btn btn-warning btn-sm editBtn" data-id="${row.id}">Edit</button>
-                    <button class="btn btn-danger btn-sm deleteBtn" data-id="${row.id}">Hapus</button>
-                `;
-            }
-        }
-    ]
-    });
-
-    // Buka modal tambah
-    $('#openAddModal').click(() => addModal.show());
-
-    // Submit Tambah
-    $('#formAdd').submit(function(e){
-        e.preventDefault();
-        $.post("{{ route('pelanggan.store') }}", $(this).serialize(), res=>{
-            if(res==="Success"){
-                addModal.hide();
-                table.ajax.reload();
-                Swal.fire({
-                    icon:'success',
-                    title:'Berhasil!',
-                    text:'Pelanggan berhasil ditambahkan.',
-                    confirmButtonColor:'#0d6efd'
-                });
-                this.reset();
-            } else {
-                Swal.fire({
-                    icon:'error',
-                    title:'Gagal!',
-                    text:'Tidak dapat menambah pelanggan.',
-                    confirmButtonColor:'#d33'
-                });
-            }
-        }).fail(()=>{
-            Swal.fire({
-                icon:'error',
-                title:'Kesalahan Server!',
-                text:'Terjadi kesalahan pada server.',
-                confirmButtonColor:'#d33'
-            });
+        // Datatable
+        const table = $('#tabel_pelanggan').DataTable({
+            processing: true,
+            serverSide: true,
+            searching: false,
+            ajax: "{{ route('pelanggan.data') }}",
+            columns: [{
+                    data: 'nama_perusahaan'
+                },
+                {
+                    data: 'nama_pemilik'
+                },
+                {
+                    data: 'jenis_pelanggan'
+                },
+                {
+                    data: 'telpon_pelanggan'
+                },
+                {
+                    data: 'email_pelanggan'
+                },
+                {
+                    data: 'limit_pelanggan'
+                },
+                {
+                    data: 'status_pelanggan',
+                    orderable: false,
+                    searchable: false
+                },
+                {
+                    data: 'action',
+                    orderable: false,
+                    searchable: false
+                },
+            ],
         });
-    });
 
-    // Klik Edit
-    $(document).on('click','.editBtn',function(){
-        const id=$(this).data('id');
-        $.get(`/pelanggan/${id}/detail`,p=>{
-            $('#edit_pelanggan_id').val(id);
-            $('#edit_namaperusahaan').val(p.nama_perusahaan);
-            $('#edit_namapemilik').val(p.nama_pemilik);
-            $('#edit_teleponpelanggan').val(p.telpon_pelanggan);
-            $('#edit_emailpelanggan').val(p.email_pelanggan);
-            $('#edit_limittagihan').val(p.limit_pelanggan);
-            $('#edit_statuspelanggan').val(p.status_pelanggan?1:0);
-            $('#edit_keterangan').val(p.keterangan_pelanggan);
-            editModal.show();
-        }).fail(()=>{
-            Swal.fire({
-                icon:'error',
-                title:'Gagal!',
-                text:'Tidak dapat mengambil data pelanggan.',
-                confirmButtonColor:'#d33'
-            });
-        });
-    });
+        // Buka modal tambah
+        $('#openAddModal').click(() => addModal.show());
 
-    // Submit Edit
-    $('#formEdit').submit(function(e){
-        e.preventDefault();
-        $.post("{{ route('pelanggan.update') }}", $(this).serialize(), res=>{
-            if(res==="Success"){
-                editModal.hide();
-                table.ajax.reload();
-                Swal.fire({
-                    icon:'success',
-                    title:'Berhasil!',
-                    text:'Data pelanggan berhasil diperbarui.',
-                    confirmButtonColor:'#198754'
-                });
-            } else {
-                Swal.fire({
-                    icon:'error',
-                    title:'Gagal!',
-                    text:'Update pelanggan gagal.',
-                    confirmButtonColor:'#d33'
-                });
-            }
-        }).fail(xhr=>{
-            Swal.fire({
-                icon:'error',
-                title:'Kesalahan!',
-                text: 'Error '+xhr.status,
-                confirmButtonColor:'#d33'
-            });
-        });
-    });
-
-    // Delete SweetAlert
-    $(document).on('click','.deleteBtn',function(){
-        const id = $(this).data('id');
-
-        Swal.fire({
-            title: "Yakin hapus pelanggan ini?",
-            text: "Data yang dihapus tidak dapat dikembalikan!",
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonColor: "#d33",
-            cancelButtonColor: "#6c757d",
-            confirmButtonText: "Ya, hapus!",
-            cancelButtonText: "Batal"
-        }).then((result)=>{
-            if(result.isConfirmed){
-                $.post("{{ route('pelanggan.destroy') }}", {
-                    _token:"{{ csrf_token() }}",
-                    hapus_pelanggan_id:id
-                },res=>{
-                    if(res==="Success"){
-                        Swal.fire({
-                            icon:'success',
-                            title:'Terhapus!',
-                            text:'Pelanggan berhasil dihapus.',
-                            confirmButtonColor:'#0d6efd'
-                        });
-                        table.ajax.reload();
-                    } else {
-                        Swal.fire({
-                            icon:'error',
-                            title:'Gagal!',
-                            text:'Tidak dapat menghapus pelanggan.',
-                            confirmButtonColor:'#d33'
-                        });
-                    }
-                }).fail(xhr=>{
+        // Submit Tambah
+        $('#formAdd').submit(function(e) {
+            e.preventDefault();
+            $.post("{{ route('pelanggan.store') }}", $(this).serialize(), res => {
+                if (res === "Success") {
+                    addModal.hide();
+                    table.ajax.reload();
                     Swal.fire({
-                        icon:'error',
-                        title:'Kesalahan!',
-                        text:'Error '+xhr.status,
-                        confirmButtonColor:'#d33'
+                        icon: 'success',
+                        title: 'Berhasil!',
+                        text: 'Pelanggan berhasil ditambahkan.',
+                        confirmButtonColor: '#0d6efd'
                     });
+                    this.reset();
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Gagal!',
+                        text: 'Tidak dapat menambah pelanggan.',
+                        confirmButtonColor: '#d33'
+                    });
+                }
+            }).fail(() => {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Kesalahan Server!',
+                    text: 'Terjadi kesalahan pada server.',
+                    confirmButtonColor: '#d33'
                 });
-            }
+            });
         });
 
-    });
-    // INITIAL SELECT2 GLOBAL
-    $('.select2').select2({
-        dropdownParent: $('#addModal')
-        
-    });
+        // Klik Edit
+        $(document).on('click', '.editBtn', function() {
+            const id = $(this).data('id');
+            $.get(`/pelanggan/${id}/detail`, p => {
+                $('#edit_pelanggan_id').val(id);
+                $('#edit_namaperusahaan').val(p.nama_perusahaan);
+                $('#edit_namapemilik').val(p.nama_pemilik);
+                $('#edit_teleponpelanggan').val(p.telpon_pelanggan);
+                $('#edit_emailpelanggan').val(p.email_pelanggan);
+                $('#edit_limittagihan').val(p.limit_pelanggan);
+                $('#edit_statuspelanggan').val(p.status_pelanggan ? 1 : 0);
+                $('#edit_keterangan').val(p.keterangan_pelanggan);
+                editModal.show();
+            }).fail(() => {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Gagal!',
+                    text: 'Tidak dapat mengambil data pelanggan.',
+                    confirmButtonColor: '#d33'
+                });
+            });
+        });
 
-    // KETIKA MODAL TAMBAH DIBUKA
-    $('#addModal').on('shown.bs.modal', function () {
+        // Submit Edit
+        $('#formEdit').submit(function(e) {
+            e.preventDefault();
+            $.post("{{ route('pelanggan.update') }}", $(this).serialize(), res => {
+                if (res === "Success") {
+                    editModal.hide();
+                    table.ajax.reload();
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Berhasil!',
+                        text: 'Data pelanggan berhasil diperbarui.',
+                        confirmButtonColor: '#198754'
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Gagal!',
+                        text: 'Update pelanggan gagal.',
+                        confirmButtonColor: '#d33'
+                    });
+                }
+            }).fail(xhr => {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Kesalahan!',
+                    text: 'Error ' + xhr.status,
+                    confirmButtonColor: '#d33'
+                });
+            });
+        });
+
+        // Delete SweetAlert
+        $(document).on('click', '.deleteBtn', function() {
+            const id = $(this).data('id');
+
+            Swal.fire({
+                title: "Yakin hapus pelanggan ini?",
+                text: "Data yang dihapus tidak dapat dikembalikan!",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#d33",
+                cancelButtonColor: "#6c757d",
+                confirmButtonText: "Ya, hapus!",
+                cancelButtonText: "Batal"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.post("{{ route('pelanggan.destroy') }}", {
+                        _token: "{{ csrf_token() }}",
+                        hapus_pelanggan_id: id
+                    }, res => {
+                        if (res === "Success") {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Terhapus!',
+                                text: 'Pelanggan berhasil dihapus.',
+                                confirmButtonColor: '#0d6efd'
+                            });
+                            table.ajax.reload();
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Gagal!',
+                                text: 'Tidak dapat menghapus pelanggan.',
+                                confirmButtonColor: '#d33'
+                            });
+                        }
+                    }).fail(xhr => {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Kesalahan!',
+                            text: 'Error ' + xhr.status,
+                            confirmButtonColor: '#d33'
+                        });
+                    });
+                }
+            });
+
+        });
+        // INITIAL SELECT2 GLOBAL
         $('.select2').select2({
             dropdownParent: $('#addModal')
-        });
-    });
 
-    // KETIKA MODAL EDIT DIBUKA
-    $('#editModal').on('shown.bs.modal', function () {
-        $('#edit_statuspelanggan').select2({
-            dropdownParent: $('#editModal')
+        });
+
+        // KETIKA MODAL TAMBAH DIBUKA
+        $('#addModal').on('shown.bs.modal', function() {
+            $('.select2').select2({
+                dropdownParent: $('#addModal')
+            });
+        });
+
+        // KETIKA MODAL EDIT DIBUKA
+        $('#editModal').on('shown.bs.modal', function() {
+            $('#edit_statuspelanggan').select2({
+                dropdownParent: $('#editModal')
+            });
         });
     });
-});
 </script>
 @endpush
 @endsection

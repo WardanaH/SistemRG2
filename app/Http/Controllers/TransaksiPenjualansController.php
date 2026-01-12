@@ -2,19 +2,20 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
-use App\Models\Cabang;
-use App\Models\MProduks;
-use App\Models\MBahanBakus;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Models\StokBahanBaku;
-use App\Models\MStokBahanBakus;
-use App\Models\MRelasiBahanBaku;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use App\Models\MTransaksiPenjualans;
 use Illuminate\Support\Facades\Auth;
+use App\Models\User;
+use App\Models\Cabang;
+use App\Models\MAngsurans;
+use App\Models\MProduks;
+use App\Models\MBahanBakus;
+use App\Models\MStokBahanBakus;
+use App\Models\MRelasiBahanBaku;
+use App\Models\MTransaksiPenjualans;
 use App\Models\MSubTransaksiPenjualans;
 
 class TransaksiPenjualansController extends Controller
@@ -136,6 +137,8 @@ class TransaksiPenjualansController extends Controller
                     $stok->save();
                 }
             }
+            $isi = Auth::user()->username . " telah menambahkan transaksi penjualan dicabang " . Auth::user()->cabang->nama . " dengan nomor transaksi " . $transaksi->nomor_nota . ".";
+            $save = $this->log($isi, "Penambahan");
 
             DB::commit();
             return response()->json([
@@ -201,7 +204,6 @@ class TransaksiPenjualansController extends Controller
         return view('admin.transaksis.list', compact('datas', 'cabangs'));
     }
 
-
     public function indexdeleted(Request $request)
     {
         $user = Auth::user();
@@ -260,6 +262,9 @@ class TransaksiPenjualansController extends Controller
 
             // Soft delete transaksi utama
             $transaksi->delete();
+
+            $isi = auth()->user()->username . " telah menghapus transaksi nomor " . $transaksi->nomor_nota . " dengan alasan " . $transaksi->reason_on_delete . ".";
+            $this->log($isi, "Penghapusan");
 
             DB::commit();
 
@@ -328,9 +333,17 @@ class TransaksiPenjualansController extends Controller
 
         $subtransaksis = $transaksi->subTransaksi()->with('produk')->get();
 
+        $angsurans = MAngsurans::where('transaksi_penjualan_id', '=', $id)->get();
+
         return view('admin.reports.reportpenjualan', [
             'transaksi' => $transaksi,
             'subtransaksis' => $subtransaksis,
+            'angsurans' => $angsurans
         ]);
+    }
+
+    public function show(Request $request)
+    {
+        $transaksi = MTransaksiPenjualans::findOrFail($request->id);
     }
 }

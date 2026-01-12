@@ -6,6 +6,7 @@ use App\Models\Cabang;
 use App\Models\MAngsurans;
 use Illuminate\Http\Request;
 use Yajra\DataTables\DataTables;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Models\MTransaksiPenjualans;
 use Illuminate\Support\Facades\Auth;
@@ -134,20 +135,22 @@ class AngsuransController extends Controller
             ->addIndexColumn()
             ->addColumn('aksi', function ($t) {
                 return '
-                    <button class="btn btn-info btn-sm btn-detail"
-                        data-id="' . $t->id . '">
-                        Detail
-                    </button>
-                    <button class="btn btn-success btn-sm bayarBtn"
-                        data-id="' . $t->id . '"
-                        data-sisa="' . $t->sisa_tagihan . '">
-                        Bayar
-                    </button>
-                    <a href="' . route('transaksi.angsuran.print', $t->id) . '"
-                        target="_blank"
-                        class="btn btn-secondary btn-sm">
-                        Print Angsuran
+                <div class="btn-group">
+                    <a href="#" class="btn btn-primary btn-sm btn-detail"
+                        data-id="'.$t->id.'">
+                        <i class="fa fa-eye"></i>
                     </a>
+                    <a href="' . route('transaksi.angsuran.print', encrypt($t->id)) . '"
+                    target="_blank"
+                    class="btn btn-danger btn-sm">
+                        <i class="fa fa-print"></i>
+                    </a>
+                    <button class="btn btn-success btn-sm bayarBtn"
+                        data-id="' . $t->id .'"
+                        data-sisa="' . $t->sisa_tagihan .  '">
+                        <i class="fa fa-plus"> Bayar</i>
+                    </button>
+                </div>
                 ';
             })
             ->rawColumns(['aksi'])
@@ -382,6 +385,10 @@ class AngsuransController extends Controller
         $sisa = $transaksi->sisa_tagihan - $nominal;
         $totalPembayaran = $transaksi->jumlah_pembayaran + $nominal;
 
+        $isi = auth()->user()->username . " telah melakukan pembayaran sebesar Rp " . number_format($nominal, 0, ',', '.') . " pada nota angsuran nomor " . $request->nomor_nota . ".";
+
+        $this->log($isi, "Pembayaran");
+
         // Buat record angsuran baru
         $angsuran = MAngsurans::create([
             'tanggal_angsuran' => $date,
@@ -412,26 +419,39 @@ class AngsuransController extends Controller
             'alasan' => 'required'
         ]);
 
-        $angsuran = MAngsurans::findOrFail($id);
+        DB::transaction(function () use ($request, $id) {
 
-        // Simpan alasan penghapusan
-        $angsuran->reason_on_delete = $request->alasan;
-        $angsuran->save();
+            $angsuran = MAngsurans::findOrFail($id);
 
-        $transaksi = MTransaksiPenjualans::findOrFail($angsuran->transaksi_penjualan_id);
+            // Simpan alasan penghapusan
+            $angsuran->reason_on_delete = $request->alasan;
+            $angsuran->save();
 
-        // Kembalikan sisa tagihan
-        $transaksi->sisa_tagihan += $angsuran->nominal_angsuran;
-        $transaksi->save();
+            $transaksi = MTransaksiPenjualans::findOrFail(
+                $angsuran->transaksi_penjualan_id
+            );
 
-        // Hapus angsuran
-        $angsuran->delete();
+            // Kembalikan sisa & kurangi total pembayaran
+            $transaksi->update([
+                'sisa_tagihan'       => $transaksi->sisa_tagihan + $angsuran->nominal_angsuran,
+                'jumlah_pembayaran'  => $transaksi->jumlah_pembayaran - $angsuran->nominal_angsuran,
+            ]);
+
+            // Soft delete angsuran
+            $angsuran->delete();
+
+            $isi = auth()->user()->username . " telah menghapus angsuran sebesar Rp " . number_format($angsuran->nominal_angsuran, 0, ',', '.') . " pada nota angsuran nomor " . $angsuran->nomor_nota ." dengan alasan ". $request->alasan . ".";
+
+            $this->log($isi, "Penghapusan");
+        });
 
         return response()->json(['success' => true]);
     }
 
     public function printAngsuran($id)
     {
+        $id = decrypt($id);
+
         $transaksi = MTransaksiPenjualans::with([
             'angsuran',
             'cabang',
@@ -443,5 +463,20 @@ class AngsuransController extends Controller
             'transaksi' => $transaksi,
             'angsurans' => $transaksi->angsuran
         ]);
+    }
+
+    public function printAngsuranDetail($id)
+    {
+        // $id = decrypt($id);
+        $angsuran = MAngsurans::with([
+            'transaksiPenjualan',
+            'transaksiPenjualan.cabang',
+            'transaksiPenjualan.user',
+            'transaksiPenjualan.pelanggan'
+        ])->findOrFail($id);
+
+        $transaksi = $angsuran->transaksiPenjualan;
+
+        return view('admin.reports.reporttransangsuranpenjualandetail', compact('angsuran', 'transaksi' ));
     }
 }

@@ -69,6 +69,7 @@
                                     <th>Cabang</th>
                                     <th>Pembuat</th>
                                     <th>Desainer</th>
+                                    <th>Status</th>
                                     <th>Tool</th>
                                 </tr>
                             </thead>
@@ -97,6 +98,7 @@
                                     <td>{{ $data->cabang->nama ?? '-' }}</td>
                                     <td>{{ $data->user->nama ?? '-' }}</td>
                                     <td>{{ $data->designer->nama ?? '-'}}</td>
+                                    <td>{{ $data->status_transaksi ?? '-' }}</td>
                                     <td>
                                         <div class="btn-group btn-group-sm" role="group">
                                             <button type="button" class="btn btn-primary btn-detail"
@@ -114,13 +116,17 @@
                                                 <i class="fa fa-money"></i>
                                             </button>
 
-                                            <a href="" class="btn btn-success">
+                                            <a href="#" class="btn btn-success">
                                                 <i class="fa fa-edit"></i>
                                             </a>
 
                                             <button type="button" class="btn btn-danger btn-delete" data-id="{{ $data->id }}">
                                                 <i class="fa fa-trash"></i>
                                             </button>
+
+                                            <a href="{{ route('transaksi.report', encrypt($data->id)) }}" class="btn btn-success btn-print" target="_blank">
+                                                <i class="fa fa-print"></i>
+                                            </a>
                                         </div>
 
                                         {{-- form delete disembunyikan --}}
@@ -204,9 +210,10 @@
                                 <th>Keterangan</th>
                                 <th>Diskon (%)</th>
                                 <th>Subtotal</th>
+                                <th>Status</th>
                             </tr>
                         </thead>
-                        <tbody>`;
+                        <tbody class="text-center">`;
 
             if (current.length === 0) {
                 html += `<tr><td colspan="9" class="text-center text-muted">Tidak ada data produk</td></tr>`;
@@ -223,6 +230,7 @@
                             <td>${item.keterangan || '-'}</td>
                             <td>${item.diskon}%</td>
                             <td>Rp ${parseFloat(item.subtotal).toLocaleString('id-ID')}</td>
+                            <td>${item.status_sub_transaksi}</td>
                         </tr>`;
                 });
             }

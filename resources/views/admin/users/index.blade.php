@@ -76,47 +76,49 @@
         <button class="btn btn-primary mt-2">Tambah User</button>
     </form>
 
-    <table class="table table-bordered table-striped styletable">
-        <thead>
-            <tr>
-                <th>Nama</th>
-                <th>Username</th>
-                <th>Email</th>
-                <th>Role</th>
-                <th>Cabang</th>
-                <th>Telepon</th>
-                <th>Gaji</th>
-                <th>Alamat</th>
-                <th>Aksi</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach($users as $user)
-            <tr>
-                <td>{{ $user->nama }}</td>
-                <td>{{ $user->username }}</td>
-                <td>{{ $user->email }}</td>
-                <td>{{ $user->getRoleNames()->implode(', ') }}</td>
-                <td>{{ $user->cabang->nama ?? '-' }}</td>
-                <td>{{ $user->telepon ?? '-' }}</td>
-                <td>{{ $user->gaji ?? '-' }}</td>
-                <td>{{ $user->alamat ?? '-' }}</td>
+    <div style="overflow-x:auto;">
+        <table class="table table-bordered table-striped styletable">
+            <thead>
+                <tr>
+                    <th>Nama</th>
+                    <th>Username</th>
+                    <th>Email</th>
+                    <th>Role</th>
+                    <th>Cabang</th>
+                    <th>Telepon</th>
+                    <th>Gaji</th>
+                    <th>Alamat</th>
+                    <th>Aksi</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach($users as $user)
+                <tr>
+                    <td>{{ $user->nama }}</td>
+                    <td>{{ $user->username }}</td>
+                    <td>{{ $user->email }}</td>
+                    <td>{{ $user->getRoleNames()->implode(', ') }}</td>
+                    <td>{{ $user->cabang->nama ?? '-' }}</td>
+                    <td>{{ $user->telepon ?? '-' }}</td>
+                    <td>{{ $user->gaji ?? '-' }}</td>
+                    <td>{{ $user->alamat ?? '-' }}</td>
 
-                {{-- A K S I --}}
-                <td>
-                    <div class="aksi-group">
-                        <a href="{{ route('users.edit', $user) }}" class="btn btn-warning btn-sm">Edit</a>
+                    {{-- A K S I --}}
+                    <td>
+                        <div class="aksi-group">
+                            <a href="{{ route('users.edit', $user) }}" class="btn btn-warning btn-sm">Edit</a>
 
-                        <form method="POST" action="{{ route('users.destroy', $user) }}" class="delete-form">
-                            @csrf @method('DELETE')
-                            <button type="button" class="btn btn-danger btn-sm btn-delete">Hapus</button>
-                        </form>
-                    </div>
-                </td>
-            </tr>
-            @endforeach
-        </tbody>
-    </table>
+                            <form method="POST" action="{{ route('users.destroy', $user) }}" class="delete-form">
+                                @csrf @method('DELETE')
+                                <button type="button" class="btn btn-danger btn-sm btn-delete">Hapus</button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                @endforeach
+            </tbody>
+        </table>
+    </div>
 </div>
 
 

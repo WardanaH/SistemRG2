@@ -2,10 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\MSubTransaksiPenjualans;
-use App\Models\MTransaksiPenjualans;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use App\Models\MTransaksiPenjualans;
+use App\Models\MSubTransaksiPenjualans;
 
 class OperatorController extends Controller
 {
@@ -79,14 +80,55 @@ class OperatorController extends Controller
 
     public function updateStatus(Request $request, $id)
     {
-        $sub = MSubTransaksiPenjualans::findOrFail($id);
-        // dd($sub);
+        DB::transaction(function () use ($request, $id) {
 
-        $sub->update([
-            'status_sub_transaksi' => $request->status_sub_transaksi
-        ]);
+            // Ambil sub transaksi + relasi penjualan
+            $sub = MSubTransaksiPenjualans::with('penjualan')
+                ->findOrFail($id);
 
-        return redirect()->route('operator.pesanan')->with('success', 'Status berhasil diperbarui');
+            $statusLama = $sub->status_sub_transaksi;
+            $statusBaru = $request->status_sub_transaksi;
+
+            // Update status sub transaksi
+            $sub->update([
+                'status_sub_transaksi' => $statusBaru
+            ]);
+
+            /**
+             * HANYA lakukan pengecekan jika:
+             * - status BERUBAH
+             * - berubah menjadi 'selesai'
+             */
+            if ($statusLama !== 'selesai' && $statusBaru === 'selesai') {
+
+                $penjualan = $sub->penjualan;
+
+                // Pastikan penjualan ADA dan punya sub transaksi
+                if ($penjualan && $penjualan->subTransaksi()->exists()) {
+
+                    // Cek apakah masih ada sub transaksi yang BELUM selesai
+                    $masihAda = $penjualan->subTransaksi()
+                        ->where('status_sub_transaksi', '!=', 'selesai')
+                        ->exists();
+
+                    // Jika SEMUA sudah selesai → update status penjualan
+                    if (! $masihAda) {
+                        $penjualan->update([
+                            'status_transaksi' => 'selesai'
+                        ]);
+                    }
+                }
+            }
+
+            $isi = "Operator " . auth()->user()->username . " telah memperbarui status pesanan " . $sub->id . " menjadi " . $statusBaru . " pada pesanan " . $sub->no_spk . ".";
+            $this->log($isi, "Perbaruan");
+        });
+
+
+
+        return redirect()
+            ->route('operator.pesanan')
+            ->with('success', 'Status berhasil diperbarui');
     }
 
     public function riwayat()
@@ -107,6 +149,7 @@ class OperatorController extends Controller
                 );
             })
             ->where('status_sub_transaksi', 'selesai')
+            ->orderBy('updated_at', 'desc')
             ->get();
 
         return view('operator.riwayat_pesanan', compact('subTransaksiData'));

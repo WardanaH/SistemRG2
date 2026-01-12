@@ -4,7 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Models\MProduks;
 use App\Models\MKategories;
+use App\Models\MPelanggans;
+use App\Models\MRangePricePelanggan;
 use Illuminate\Http\Request;
+use App\Models\MSpecialPrices;
+use App\Models\MSpecialPricesGroup;
 use Illuminate\Support\Facades\Validator;
 
 class ProdukController extends Controller
@@ -47,6 +51,9 @@ class ProdukController extends Controller
             'keterangan' => $request->keterangan,
         ]);
 
+        $isi = auth()->user()->username . " telah menambahkan produk " . $produk->nama_produk . ".";
+        $this->log($isi, "Penambahan");
+
         return response()->json($produk ? "Success" : "Failed");
     }
 
@@ -76,6 +83,9 @@ class ProdukController extends Controller
             'keterangan' => $request->edit_keterangan,
         ]);
 
+        $isi = auth()->user()->username . " telah mengubah produk " . $produk->nama_produk . ".";
+        $this->log($isi, "Pengubahan");
+
         return response()->json("Success");
     }
 
@@ -83,6 +93,71 @@ class ProdukController extends Controller
     {
         $produk = MProduks::findOrFail($request->hapus_produk_id);
         $produk->delete();
+
+        $isi = auth()->user()->username . " telah menghapus produk " . $produk->nama_produk . ".";
+        $this->log($isi, "Penghapusan");
+
         return response()->json("Success");
+    }
+
+    public function produkHarga(Request $request)
+    {
+        $produk = MProduks::findOrFail($request->produk_id);
+        return $produk;
+    }
+
+    public function priceprodukkhusus(Request $request)
+    {
+        $produkId    = $request->produkid;
+        $pelangganId = $request->pelanggan;
+
+        // 1. Ambil data Produk (Default)
+        $produk = MProduks::findOrFail($produkId);
+
+        // Inisialisasi nilai default dari tabel Produk
+        $hargaFinal  = $produk->harga_jual;
+        $rangePrices = [];
+        $userId      = $produk->user_id;
+
+        // 2. Jika ada Pelanggan, jalankan logika Hierarki
+        if ($pelangganId) {
+            $pelanggan = MPelanggans::find($pelangganId);
+
+            if ($pelanggan) {
+                // PRIORITAS 1: Cek Harga Khusus Individu
+                $specialIndividu = MSpecialPrices::where('pelanggan_id', $pelangganId)
+                    ->where('produk_id', $produkId)
+                    ->first();
+
+                if ($specialIndividu) {
+                    $hargaFinal  = $specialIndividu->harga_khusus;
+                    $userId      = $specialIndividu->user_id;
+                    // Ambil range price khusus pelanggan
+                    $rangePrices = MRangePricePelanggan::where('specialprice_id', $specialIndividu->id)->get();
+                } else {
+                    // PRIORITAS 2: Cek Harga Khusus Grup (berdasarkan jenispelanggan_id)
+                    $specialGroup = MSpecialPricesGroup::where('jenispelanggan_id', $pelanggan->jenispelanggan_id)
+                        ->where('produk_id', $produkId)
+                        ->first();
+
+                    if ($specialGroup) {
+                        $hargaFinal  = $specialGroup->harga_khusus;
+                        $userId      = $specialGroup->user_id;
+                        // Ambil range price khusus grup
+                        $rangePrices = MSpecialPricesGroup::where('id', $specialGroup->id)->get();
+                    }
+                }
+            }
+        }
+
+        // 3. Kembalikan Response
+        return response()->json([
+            'user_id'      => $userId,
+            'produk_id'    => $produk->id,
+            'harga_jual'   => $hargaFinal,
+            'hitung_luas'  => $produk->hitung_luas,
+            'satuan'       => $produk->satuan,
+            'range_prices' => $rangePrices
+        ]);
     }
 }

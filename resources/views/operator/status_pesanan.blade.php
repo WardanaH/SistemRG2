@@ -17,7 +17,9 @@
                                     <th class="text-center">No</th>
                                     <th class="text-center">No SPK</th>
                                     <th class="text-center">Nama Produk</th>
+                                    <th class="text-center">Keterangan</th>
                                     <th class="text-center">Status</th>
+                                    <th class="text-center">Tanggal Pesanan</th>
                                     <th class="text-center">Aksi</th>
                                 </tr>
                             </thead>
@@ -26,18 +28,18 @@
                                 <tr>
                                     <td class="text-center">{{ $loop->iteration }}</td>
                                     <td class="text-center">{{ $subTransaksi->no_spk }}</td>
+                                    <td class="text-center">{{ $subTransaksi->keterangan }}</td>
                                     <td class="text-center">{{ $subTransaksi->produk->nama_produk }}</td>
                                     <td class="text-center">{{ $subTransaksi->status_sub_transaksi }}</td>
+                                    <td class="text-center">{{ $subTransaksi->created_at->format('d-m-Y') }}</td>
                                     <td class="text-center">
                                         <button
-                                            class="btn btn-primary btn-detail"
+                                            class="btn btn-primary btn-ubah-status"
                                             data-id="{{ $subTransaksi->id }}"
                                             data-no="{{ $subTransaksi->no_spk }}"
                                             data-produk="{{ $subTransaksi->produk->nama_produk }}"
-                                            data-status="{{ $subTransaksi->status_sub_transaksi }}"
-                                            data-bs-toggle="modal"
-                                            data-bs-target="#detailModal">
-                                            Detail
+                                            data-status="{{ $subTransaksi->status_sub_transaksi }}">
+                                            <i class="fa fa-pencil"></i>
                                         </button>
                                     </td>
                                 </tr>
@@ -50,66 +52,58 @@
         </div>
     </div>
 </div>
-
-<!-- Modal Detail -->
-<div class="modal fade" id="detailModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-
-            <div class="modal-header">
-                <h5 class="modal-title">Detail Sub Transaksi</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-
-            <form id="updateStatusForm" method="POST">
-                @csrf
-                @method('PUT')
-
-                <div class="modal-body">
-                    <p><strong>No SPK:</strong> <span id="modalNoSpk"></span></p>
-                    <p><strong>Produk:</strong> <span id="modalProduk"></span></p>
-
-                    <div class="mt-3">
-                        <label>Status Pesanan</label>
-                        <select class="form-control" name="status_sub_transaksi" id="modalStatus">
-                            <option value="proses">Proses</option>
-                            <option value="selesai">Selesai</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="modal-footer">
-                    <button class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
-                    <button class="btn btn-success" type="submit">Simpan Perubahan</button>
-                </div>
-
-            </form>
-
-        </div>
-    </div>
-</div>
-
-
 @endsection
 
 @push('scripts')
 <script>
-    $(document).on('click', '.btn-detail', function() {
+    $(document).on('click', '.btn-ubah-status', function() {
 
-        let id = $(this).data('id');
-        let no = $(this).data('no');
-        let produk = $(this).data('produk');
-        let status = $(this).data('status');
+        const id = $(this).data('id');
+        const noSpk = $(this).data('no');
+        const produk = $(this).data('produk');
+        const status = $(this).data('status');
 
-        // Isi data ke modal
-        $('#modalNoSpk').text(no);
-        $('#modalProduk').text(produk);
-        $('#modalStatus').val(status);
+        Swal.fire({
+            title: 'Ubah Status Pesanan',
+            html: `
+                <p><strong>No SPK:</strong> ${noSpk}</p>
+                <p><strong>Produk:</strong> ${produk}</p>
+            `,
+            input: 'select',
+            inputOptions: {
+                proses: 'Proses',
+                selesai: 'Selesai'
+            },
+            inputValue: status,
+            showCancelButton: true,
+            confirmButtonText: 'Simpan',
+            cancelButtonText: 'Batal',
+            confirmButtonColor: '#28a745',
+            cancelButtonColor: '#dc3545',
+            preConfirm: (value) => {
+                if (!value) {
+                    Swal.showValidationMessage('Status wajib dipilih');
+                }
+                return value;
+            }
+        }).then((result) => {
 
-        // Update action form
-        $('#updateStatusForm').attr('action', '/operator/sub-transaksi/' + id);
+            if (!result.isConfirmed) return;
 
+            // SUBMIT VIA FORM DINAMIS (PUT)
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = `/operator/sub-transaksi/${id}`;
+
+            form.innerHTML = `
+                @csrf
+                @method('PUT')
+                <input type="hidden" name="status_sub_transaksi" value="${result.value}">
+            `;
+
+            document.body.appendChild(form);
+            form.submit();
+        });
     });
 </script>
-
 @endpush
