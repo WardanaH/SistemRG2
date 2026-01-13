@@ -39,10 +39,10 @@ require __DIR__ . '/gudang_cabang.php';
 Route::get('/', function () {
     $user = auth()->user();
 
-    if ($user->hasRole('Inventory Utama')) {
+    if ($user->hasRole('inventory utama')) {
         return redirect()->route('gudangpusat.dashboard');
     }
-    if ($user->hasRole('Inventory Cabang')) {
+    if ($user->hasRole('inventory cabang')) {
         return redirect()->route('templateinventaris.dashboard');
     }
     if ($user->hasRole('designer')) {

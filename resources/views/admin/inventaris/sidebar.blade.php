@@ -13,7 +13,7 @@
             @endphp
 
             <li>
-                <a href="{{ $user->hasRole('Inventory Utama')
+                <a href="{{ $user->hasRole('inventory utama')
                     ? route('gudangpusat.dashboard')
                     : route('templateinventaris.dashboard') }}">
                     <i class="icon icon-single-04"></i>
@@ -28,7 +28,7 @@
                 $nonaktif = config('cabang_nonaktif.ids', []);
 
                 // Inventory Cabang → hanya cabangnya
-                if ($user->hasRole('Inventory Cabang')) {
+                if ($user->hasRole('inventory cabang')) {
                     $cabangs = \App\Models\Cabang::where('id', $user->cabang_id)
                         ->where('jenis', 'cabang')
                         ->get();
@@ -40,7 +40,7 @@
             @endphp
 
             {{-- Manajemen Cabang (Inventory Utama saja) --}}
-            @if($user->hasRole('Inventory Utama'))
+            @if($user->hasRole('inventory utama'))
             <li>
                 <a href="{{ route('gudangpusat.cabang.index') }}">
                     <i class="icon icon-settings"></i>
@@ -68,7 +68,7 @@
             @endforeach
 
             {{-- ===================== GUDANG PUSAT ===================== --}}
-            @if($user->hasRole('Inventory Utama|owner'))
+            @if($user->hasRole('inventory utama|owner'))
             <li class="nav-label mt-4">GUDANG PUSAT</li>
 
             <li>

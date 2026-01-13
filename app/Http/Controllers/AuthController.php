@@ -41,11 +41,11 @@ class AuthController extends Controller
                 $isi = Auth::user()->username . " telah login dicabang " . Auth::user()->cabang->nama . ".";
                 $save = $this->log($isi, "Login");
                 return redirect()->route('companies.index')->with('success', 'Selamat datang kembali!');
-            } elseif ($user->hasRole('Inventory Utama')) {
+            } elseif ($user->hasRole('inventory utama')) {
                 $isi = Auth::user()->username . " telah login dicabang " . Auth::user()->cabang->nama . ".";
                 $save = $this->log($isi, "Login");
                 return redirect()->route('gudangpusat.dashboard')->with('success', 'Selamat datang kembali!');
-            } elseif ($user->hasRole('Inventory Cabang')) {
+            } elseif ($user->hasRole('inventory cabang')) {
                 $isi = Auth::user()->username . " telah login dicabang " . Auth::user()->cabang->nama . ".";
                 $save = $this->log($isi, "Login");
                 return redirect()->route('templateinventaris.dashboard')->with('success', 'Selamat datang kembali!');
