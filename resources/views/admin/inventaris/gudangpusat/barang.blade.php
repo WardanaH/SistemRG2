@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('admin.inventaris.gudangpusat.layout.app')
 
 @section('content')
 
@@ -9,9 +9,6 @@
     </button>
 </div>
 
-@if(session('success'))
-    <div class="alert alert-success mt-2">{{ session('success') }}</div>
-@endif
 @if(session('error'))
     <div class="alert alert-danger mt-2">{{ session('error') }}</div>
 @endif
@@ -30,7 +27,7 @@
                         <th>Harga</th>
                         <th>Stok</th>
                         <th>Status</th>
-                        <th>Aksi</th>
+                        {{-- <th>Aksi</th> --}}
                     </tr>
                 </thead>
 
@@ -65,30 +62,6 @@
                             <td>Rp {{ number_format($item->harga ?? 0, 0, ',', '.') }}</td>
                             <td>{{ $stok }}</td>
                             <td><span class="badge {{ $badgeClass }}">{{ $status }}</span></td>
-
-                            <td>
-                                <button class="btn btn-warning btn-sm"
-                                    data-bs-toggle="modal"
-                                    data-bs-target="#modalEditBarang{{ $stokId }}"
-                                    {{ $stokId ? '' : 'disabled' }}>
-                                    Edit
-                                </button>
-
-                                @if ($stokId)
-                                    <form action="{{ route('gudangpusat.barang.destroy', $stokId) }}"
-                                          method="POST"
-                                          class="d-inline">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button class="btn btn-danger btn-sm"
-                                            onclick="return confirm('Hapus stok ini?')">
-                                            Hapus
-                                        </button>
-                                    </form>
-                                @else
-                                    <button class="btn btn-secondary btn-sm" disabled>Hapus</button>
-                                @endif
-                            </td>
                         </tr>
 
                         @if ($stokId)
@@ -97,7 +70,7 @@
                             <div class="modal-dialog">
                                 <div class="modal-content">
 
-                                    <form action="{{ route('gudangpusat.barang.update', $stokId) }}" method="POST">
+                                    <form action="{{ route('barang.pusat.update', $stokId) }}" method="POST">
                                         @csrf
                                         @method('PUT')
 
@@ -198,7 +171,7 @@
     <div class="modal-dialog">
         <div class="modal-content">
 
-            <form action="{{ route('gudangpusat.barang.store') }}" method="POST">
+            <form action="{{ route('barang.pusat.store') }}" method="POST">
                 @csrf
 
                 <div class="modal-header">
@@ -267,5 +240,20 @@
         </div>
     </div>
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+@if(session('success'))
+<script>
+    Swal.fire({
+        icon: 'success',
+        title: 'Berhasil!',
+        text: '{{ session('success') }}',
+        showConfirmButton: false,
+        timer: 2000
+    });
+</script>
+@endif
+
 
 @endsection

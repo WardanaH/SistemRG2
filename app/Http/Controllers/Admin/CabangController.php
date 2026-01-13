@@ -26,6 +26,7 @@ class CabangController extends Controller
             $request->validate([
                 'kode' => 'required|string|max:20|unique:cabangs',
                 'nama' => 'required|string|max:255',
+                'slug' => str_replace(' ', '-', strtolower($request->input('nama'))),
                 'email' => 'nullable|email',
                 'telepon' => 'nullable|string|max:20',
                 'alamat' => 'nullable|string',
@@ -33,6 +34,10 @@ class CabangController extends Controller
             ]);
 
             Cabang::create($request->all());
+
+            $isi = auth()->user()->username . " telah menambahkan cabang baru." . $request->input('nama');
+            $this->log($isi, "Penambahan");
+
             return redirect()->route('cabangs.index')->with('success', 'Cabang berhasil dibuat.');
         } catch (\Exception $e) {
             Log::error('Gagal membuat cabang: ' . $e->getMessage());
@@ -57,6 +62,9 @@ class CabangController extends Controller
 
         $cabang->update($validated);
 
+        $isi = auth()->user()->username . " telah mengedit cabang " . $cabang->nama . ".";
+        $this->log($isi, "Pengubahan");
+
         return redirect()
             ->route('cabangs.index')
             ->with('success', 'Cabang berhasil diperbarui.');
@@ -64,7 +72,11 @@ class CabangController extends Controller
 
     public function destroy(Cabang $cabang)
     {
+        $isi = auth()->user()->username . " telah menghapus cabang " . $cabang->nama . ".";
+        $this->log($isi, "Penghapusan");
+
         $cabang->delete();
+
         return redirect()->route('cabangs.index')->with('success', 'Cabang dihapus.');
     }
 }

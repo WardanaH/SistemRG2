@@ -48,6 +48,9 @@ class SupplierController extends Controller
             'user_id' => Auth::id(),
         ]);
 
+        $isi = auth()->user()->username . " telah menambahkan supplier " . $supplier->nama_supplier . ".";
+        $this->log($isi, "Penambahan");
+
         return $supplier ? response()->json("Success") : response()->json("Failed");
     }
 
@@ -78,6 +81,9 @@ class SupplierController extends Controller
             'keterangan_suppliers' => $request->edit_keterangan_suppliers,
         ]);
 
+        $isi = auth()->user()->username . " telah mengubah supplier " . $supplier->nama_supplier . ".";
+        $this->log($isi, "Pengubahan");
+
         return response()->json("Success");
     }
 
@@ -86,6 +92,9 @@ class SupplierController extends Controller
     {
         $supplier = Suppliers::findOrFail($request->hapus_supplier_id);
         $supplier->forceDelete();
+
+        $isi = auth()->user()->username . " telah menghapus supplier " . $supplier->nama_supplier . ".";
+        $this->log($isi, "Penghapusan");
 
         return response()->json("Success");
     }

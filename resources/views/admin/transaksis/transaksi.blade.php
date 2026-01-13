@@ -433,16 +433,19 @@
                             <select id="add_produk" class="form-select select2" style="width:100%;">
                                 <option value="">-- Pilih Produk --</option>
                                 @foreach ($produks as $produk)
-                                <option value="{{ $produk->id }}" data-harga="{{ $produk->harga_jual }}" data-hitung_luas="{{ $produk->hitung_luas }}">
+                                <option value="{{ $produk->id }}"
+                                    data-harga="{{ $produk->harga_jual }}"
+                                    data-hitung_luas="{{ $produk->hitung_luas }}"
+                                    data-satuan="{{ $produk->satuan }}">
                                     {{ $produk->nama_produk }}
                                 </option>
                                 @endforeach
                             </select>
                         </div>
                         <div class="row">
-                            <div class="col-md-6 mb-2">
+                            <div class="col-md-3 mb-2">
                                 <label>Harga</label>
-                                <input id="add_harga" class="form-control" type="number" readonly>
+                                <input id="add_harga" class="form-control" type="number">
                             </div>
                             <div class="col-md-3 mb-2">
                                 <label>P</label>
@@ -451,6 +454,10 @@
                             <div class="col-md-3 mb-2">
                                 <label>L</label>
                                 <input id="add_lebar" class="form-control" type="number" value="0">
+                            </div>
+                            <div class="col-md-3 mb-2">
+                                <label>Satuan</label>
+                                <input type="text" id="add_satuan" class="form-control" readonly>
                             </div>
                         </div>
                         <div class="mb-2">
@@ -512,6 +519,12 @@
         });
 
         let total = 0;
+        let subtotalNumeric = 0;
+        let hargaAktif = 0;
+        let hitungLuasAktif = 0;
+        let satuanAktif = '-';
+        let rangePrices = [];
+
         const storeUrl = "{{ route('storetransaksipenjualan') }}";
         const form = $(`form[action='${storeUrl}']`);
         let items = [];
@@ -558,46 +571,111 @@
         });
 
         // ================== HITUNG SUBTOTAL ITEM ==================
-        $('#add_produk').on('change', function() {
-            const option = $('option:selected', this);
-            const harga = option.data('harga') || 0;
-            const hitungLuas = option.data('hitung_luas'); // <= PENTING
+        $('#add_produk').on('select2:select', function(e) {
+            const produkId = e.params.data.id;
+            const pelangganId = $('#pelanggan').val();
 
-            $('#add_harga').val(harga);
+            // reset input
+            $('#add_harga').val(0);
+            $('#add_diskon').val(0);
+            $('#add_subtotal').val(0);
+            $('#add_kuantitas').val(1);
+            $('#add_panjang').val(0);
+            $('#add_lebar').val(0);
 
-            if (hitungLuas == 0) {
-                // Matikan input
-                $('#add_panjang, #add_lebar').val('').prop('disabled', true);
-            } else {
-                // Hidupkan kembali
+            let url = pelangganId ? "{{ route('produk.hargaprodukkhusus') }}" : "{{ route('produk.hargaproduk') }}";
+            let params = pelangganId ? {
+                produkid: produkId,
+                pelanggan: pelangganId
+            } : {
+                id: produkId
+            };
+
+            $.get(url, params, function(res) {
+                console.log("Data Produk:", res);
+
+                // Simpan ke variabel global untuk referensi
+                hargaAktif = parseFloat(res.harga_jual || res.harga_khusus);
+                hitungLuasAktif = res.hitung_luas;
+                satuanAktif = res.satuan.toLowerCase();
+                rangePrices = res.range_prices || [];
+
+                $('#add_satuan').val(res.satuan);
+                $('#add_harga').val(hargaAktif); // Set harga awal
+
+                applyHitungLuas(hitungLuasAktif);
+                hitungSubtotal();
+            });
+        });
+
+        function applyHitungLuas(hitungLuas) {
+            if (hitungLuas == 1) {
                 $('#add_panjang, #add_lebar').prop('disabled', false);
+            } else {
+                $('#add_panjang, #add_lebar').val(0).prop('disabled', true);
+            }
+        }
+
+        // Listener: Jika harga, qty, atau diskon diubah manual
+        $('#add_harga, #add_kuantitas, #add_diskon').on('input', function() {
+            hitungSubtotal();
+        });
+
+        // Listener Khusus: Jika panjang/lebar diubah, cek Range Price dulu baru hitung subtotal
+        $('#add_panjang, #add_lebar').on('input', function() {
+            let p = parseFloat($('#add_panjang').val()) || 0;
+            let l = parseFloat($('#add_lebar').val()) || 0;
+
+            // Hitung luas sementara untuk cek range
+            let luasCek = 1;
+            if (hitungLuasAktif == 1) {
+                if (satuanAktif === 'cm' || satuanAktif === 'centimeter') {
+                    luasCek = (p / 100) * (l / 100);
+                } else {
+                    luasCek = p * l;
+                }
+            }
+
+            // UPDATE HARGA OTOMATIS BERDASARKAN RANGE (Hanya jika ada data range)
+            if (rangePrices.length > 0) {
+                rangePrices.forEach(r => {
+                    if (luasCek >= r.nilai_awal && (r.nilai_akhir == 0 || luasCek <= r.nilai_akhir)) {
+                        $('#add_harga').val(parseFloat(r.harga_khusus));
+                    }
+                });
             }
 
             hitungSubtotal();
         });
 
-        $('#add_panjang, #add_lebar, #add_kuantitas, #add_diskon').on('input', hitungSubtotal);
-
         function hitungSubtotal() {
-            const harga = parseFloat($('#add_harga').val()) || 0;
-            const panjang = parseFloat($('#add_panjang').val()) || 0;
-            const lebar = parseFloat($('#add_lebar').val()) || 0;
-            const qty = parseFloat($('#add_kuantitas').val()) || 1;
-            const diskon = parseFloat($('#add_diskon').val()) || 0;
-            const option = $('#add_produk option:selected');
-            const hitungLuas = option.data('hitung_luas');
+            // KUNCI: Ambil harga dari INPUT, bukan dari variabel hargaAktif
+            let harga = parseFloat($('#add_harga').val()) || 0;
+            let panjang = parseFloat($('#add_panjang').val()) || 0;
+            let lebar = parseFloat($('#add_lebar').val()) || 0;
+            let qty = parseFloat($('#add_kuantitas').val()) || 1;
+            let diskon = parseFloat($('#add_diskon').val()) || 0;
 
-            let subtotal = 0;
-
-            if (hitungLuas == 1) {
-                subtotal = harga * (panjang * lebar) * qty;
-            } else {
-                subtotal = harga * qty;
+            let luas = 1;
+            if (hitungLuasAktif == 1) {
+                if (satuanAktif === 'cm' || satuanAktif === 'centimeter') {
+                    panjang /= 100;
+                    lebar /= 100;
+                }
+                luas = panjang * lebar;
+                // Opsional: Berikan minimal luas 1 jika hasil 0 agar tidak merusak subtotal
+                if (luas === 0 && (panjang > 0 || lebar > 0)) luas = panjang * lebar;
             }
 
-            subtotal = subtotal - (subtotal * diskon / 100);
+            let subtotal = harga * (luas || 1) * qty;
+            subtotal -= subtotal * (diskon / 100);
 
-            $('#add_subtotal').val('Rp ' + subtotal.toLocaleString('id-ID'));
+            subtotalNumeric = subtotal;
+
+            // Tampilkan subtotal tanpa menimpa input harga
+            $('#add_subtotal').val(
+                'Rp ' + subtotal.toLocaleString('id-ID')
+            );
         }
 
         // ================== FIX SELECT2 DI MODAL ==================
@@ -619,7 +697,7 @@
             const qty = parseFloat($('#add_kuantitas').val()) || 1;
             const finishing = $('#add_finishing').val();
             const diskon = parseFloat($('#add_diskon').val()) || 0;
-            const subtotal = harga * (panjang && lebar ? panjang * lebar : 1) * qty * (1 - diskon / 100);
+            const subtotal = subtotalNumeric;
             const no_spk = $('#add_nospk').val() || '-';
             const keterangan = $('#add_keterangan').val() || '-';
 
@@ -659,9 +737,24 @@
 
             total += subtotal;
             updateTotal();
+            resetAddModal();
             $('#modal_add').modal('hide');
-            $('#modal_add input, #add_keterangan').val('');
         });
+
+        function resetAddModal() {
+            $('#add_produk').val('').trigger('change'); // Reset select2
+            $('#add_finishing').val('Tanpa Finishing').trigger('change');
+
+            $('#add_harga').val('');
+            $('#add_panjang').val('0');
+            $('#add_lebar').val('0');
+            $('#add_kuantitas').val('1');
+            $('#add_diskon').val('0');
+            $('#add_subtotal').val('');
+            $('#add_nospk').val('');
+            $('#add_keterangan').val('');
+        }
+
 
         // ================== REFRESH INPUT ITEMS (Biar Laravel baca array) ==================
         function refreshHiddenInputs() {

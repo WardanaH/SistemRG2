@@ -1,87 +1,103 @@
-@extends('layouts.app')
+@extends('admin.inventaris.templateinventaris.layout_cabang.app')
 
 @section('content')
 
-<div class="page-header">
-  <h3 class="page-title">Riwayat Pengiriman ke Cabang {{ ucfirst($cabang->nama) }}</h3>
+<div class="page-header d-flex justify-content-between align-items-center">
+  <h3 class="page-title">
+    📦 Riwayat Pengiriman ke {{ ucfirst($cabang->nama) }}
+  </h3>
 </div>
 
-@if(session('success'))
-  <div class="alert alert-success mt-2">{{ session('success') }}</div>
-@endif
-@if(session('error'))
-  <div class="alert alert-danger mt-2">{{ session('error') }}</div>
-@endif
-
-<div class="card">
+<div class="card mt-3">
   <div class="card-body">
 
+    <h4 class="card-title">Daftar Riwayat Pengiriman</h4>
+
     @if($riwayat->isEmpty())
-      <p class="text-muted">Tidak ada data pengiriman dari Gudang Pusat.</p>
+      <p class="text-muted mt-3">Tidak ada data pengiriman dari Gudang Pusat.</p>
     @else
 
-      <div class="table-responsive">
-        <table class="table table-stripped table-bordered align-middle styletable">
+    <div class="table-responsive mt-3">
+      <table class="table table-striped table-bordered align-middle styletable">
 
-          <thead>
-            <tr>
-              <th>No</th>
-              <th>Nama Barang</th>
-              <th>Jumlah</th>
-              <th>Tanggal Pengiriman</th>
-              <th>Status Pengiriman</th>
-              <th>Status Penerimaan</th>
-              <th>Aksi</th>
-            </tr>
-          </thead>
+        <thead class="table-light">
+          <tr>
+            <th width="5%">No</th>
+            <th>Nama Barang</th>
+            <th width="10%">Jumlah</th>
+            <th width="10%">Satuan</th> {{-- ✅ KOLOM BARU --}}
+            <th width="15%">Tanggal Kirim</th>
+            <th width="15%">Status Pengiriman</th>
+            <th width="15%">Tanggal Diterima</th>
+            <th width="10%">Aksi</th>
+          </tr>
+        </thead>
 
-          <tbody>
-            @foreach($riwayat as $r)
-            <tr>
-              <td>{{ $loop->iteration }}</td>
+        <tbody>
+        @foreach($riwayat as $r)
+          <tr>
+            <td>{{ $loop->iteration }}</td>
 
-              {{-- Nama barang --}}
-              <td>{{ $r->nama_bahan ?? '-' }}</td>
+            {{-- ✅ NAMA BARANG --}}
+            <td>{{ $r->bahanbaku->nama_bahan ?? '-' }}</td>
 
-              {{-- Jumlah --}}
-              <td>{{ $r->jumlah }}</td>
+            {{-- ✅ JUMLAH --}}
+            <td>{{ $r->jumlah }}</td>
 
-              {{-- Tanggal --}}
-              <td>{{ \Carbon\Carbon::parse($r->tanggal_pengiriman)->format('d M Y') }}</td>
+            {{-- ✅ SATUAN (DIPISAH) --}}
+            <td>{{ $r->satuan }}</td>
 
-              {{-- STATUS PENGIRIMAN (Plain text) --}}
-              <td>{{ ucfirst($r->status_pengiriman) }}</td>
+            {{-- ✅ TANGGAL KIRIM --}}
+            <td>
+              {{ \Carbon\Carbon::parse($r->tanggal_pengiriman)->format('d M Y') }}
+            </td>
 
-              {{-- STATUS PENERIMAAN (Plain text) --}}
-              <td>
-                {{ $r->status_penerimaan ? ucfirst($r->status_penerimaan) : 'Belum diterima' }}
-              </td>
+            {{-- ✅ STATUS --}}
+            <td>
+              @if($r->status_pengiriman == 'Dikemas')
+                <span class="badge bg-secondary">Dikemas</span>
+              @elseif($r->status_pengiriman == 'Dikirim')
+                <span class="badge bg-warning text-dark">Dikirim</span>
+              @else
+                <span class="badge bg-success">Diterima</span>
+              @endif
+            </td>
 
-              {{-- Aksi terima --}}
-              <td>
-                @if($r->status_pengiriman == 'Dikirim' && $r->status_penerimaan == null)
+            {{-- ✅ TANGGAL DITERIMA --}}
+            <td>
+              {{ $r->tanggal_diterima
+                  ? \Carbon\Carbon::parse($r->tanggal_diterima)->format('d M Y')
+                  : '-' }}
+            </td>
 
-                  <form action="{{ route('cabang.riwayat.terima', [$cabang->slug, $r->id_pengiriman]) }}"
-                        method="POST">
-                    @csrf
-                    @method('PUT')
+            {{-- ✅ AKSI TERIMA BARANG --}}
+            <td class="text-center">
+              @if(
+                    $r->status_pengiriman == 'Dikirim'
+                    && auth()->user()->hasRole('Inventory Cabang')
+                )
+                <form action="{{ route('cabang.riwayat.cabang.terima', [$cabang->slug, $r->id]) }}"
+                      method="POST"
+                      class="form-terima d-inline">
+                  @csrf
+                  @method('PUT')
 
-                    <button type="submit" class="btn btn-success btn-sm">
-                      Terima Barang
-                    </button>
-                  </form>
+                  <button type="button" class="btn btn-success btn-sm btn-terima">
+                    Terima
+                  </button>
+                </form>
 
-                @else
-                  <span class="text-muted">-</span>
-                @endif
-              </td>
+              @else
+                <span class="text-muted">-</span>
+              @endif
+            </td>
 
-            </tr>
-            @endforeach
-          </tbody>
+          </tr>
+        @endforeach
+        </tbody>
 
-        </table>
-      </div>
+      </table>
+    </div>
 
     @endif
 
@@ -89,3 +105,52 @@
 </div>
 
 @endsection
+
+
+@push('scripts')
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+// ✅ KONFIRMASI SEBELUM TERIMA BARANG
+$(document).on('click', '.btn-terima', function(e) {
+    e.preventDefault();
+
+    let form = $(this).closest('form');
+
+    Swal.fire({
+        title: 'Terima Barang?',
+        text: 'Pastikan barang sudah benar-benar diterima!',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonText: 'Ya, Terima',
+        cancelButtonText: 'Batal'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            form.submit();
+        }
+    });
+});
+
+// ✅ SWEETALERT BERHASIL
+@if(session('success'))
+Swal.fire({
+    icon: 'success',
+    title: 'Berhasil!',
+    text: "{{ session('success') }}",
+    timer: 2000,
+    showConfirmButton: false
+});
+@endif
+
+// ✅ SWEETALERT ERROR
+@if(session('error'))
+Swal.fire({
+    icon: 'error',
+    title: 'Gagal!',
+    text: "{{ session('error') }}",
+});
+@endif
+</script>
+
+@endpush

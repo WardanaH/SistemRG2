@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('admin.inventaris.gudangpusat.layout.app')
 
 @section('content')
 
@@ -33,23 +33,18 @@
                     <td>{{ $c->jenis }}</td>
                     <td>
 
-                        {{-- BUTTON EDIT --}}
-                        <button class="btn btn-warning btn-sm"
-                            onclick="editCabang({{ $c }})">
-                            Edit
-                        </button>
+                         {{-- Tombol aktif dan nonaktif --}}
+                        @php
+                        $nonaktif = config('cabang_nonaktif.ids');
+                        @endphp
 
-                        {{-- FORM DELETE (PAKE ID AGAR DIPANGGIL SWEETALERT) --}}
-                        <form id="form-delete-{{ $c->id }}"
-                              action="{{ route('cabangs.destroy', $c->id) }}"
-                              method="POST" class="d-inline">
+                        <form action="{{ route('gudangpusat.cabang.toggle', $c->id) }}" method="POST" class="d-inline">
                             @csrf
-                            @method('DELETE')
-
-                            <button type="button" class="btn btn-danger btn-sm"
-                                onclick="hapusCabang({{ $c->id }})">
-                                Hapus
-                            </button>
+                            @if(in_array($c->id, $nonaktif))
+                                <button class="btn btn-success btn-sm">Aktifkan</button>
+                            @else
+                                <button class="btn btn-secondary btn-sm">Nonaktif</button>
+                            @endif
                         </form>
 
                     </td>

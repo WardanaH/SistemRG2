@@ -34,8 +34,38 @@
                     @can('deleted-transaksipenjualan')
                     <li><a href="{{ route('transaksiindexdeleted') }}">Manajemen Transaksi Penjualan Terhapus</a></li>
                     @endcan
+
                     @can('manage-angsuranpenjualan')
                     <li><a href="{{ route('angsuran.index') }}">Manajemen Angsuran Transaksi</a></li>
+                    @endcan
+                    @can('manage-angsuranpenjualan')
+                    <li><a href="{{ route('angsuran.indexdeleted') }}">Manajemen Angsuran Transaksi Terhapus</a></li>
+                    @endcan
+                </ul>
+            </li>
+            @endcan
+
+            @can('manage-transaksipenjualan')
+            <li>
+                <a class="has-arrow" href="javascript:void(0)" aria-expanded="false">
+                    <i class="fa fa-handshake-o"></i>
+                    <span class="nav-text">Bantuan</span>
+                </a>
+                <ul aria-expanded="false">
+                    @can('manage-transaksipenjualan')
+                    <li><a href="{{ route('bantuan') }}">Minta Bantuan Transaksi Penjualan</a></li>
+                    @endcan
+                    @can('manage-transaksipenjualan')
+                    <li><a href="{{ route('bantuan.list') }}">Manajemen Bantuan Transaksi Penjualan</a></li>
+                    @endcan
+                    @can('manage-transaksipenjualan')
+                    <li><a href="{{ route('bantuan.index') }}">Permintaan Bantuan Transaksi Penjualan</a></li>
+                    @endcan
+                    @can('manage-transaksipenjualan')
+                    <li><a href="{{ route('bantuan.riwayat_bantuan_masuk') }}">Riwayat Bantuan Transaksi Penjualan Masuk</a></li>
+                    @endcan
+                    @can('manage-transaksipenjualan')
+                    <li><a href="{{ route('bantuan.riwayat_bantuan_keluar') }}">Riwayat Bantuan Transaksi Penjualan Keluar</a></li>
                     @endcan
                 </ul>
             </li>
@@ -94,6 +124,9 @@
                     @can('manage-pelanggan')
                     <li><a href="{{ route('pelanggan.index') }}">Daftar Pelanggan</a></li>
                     @endcan
+                    <li><a href="{{ route('specialprice.index') }}">Manajemen Harga Khusus</a></li>
+                    <li><a href="{{ route('specialpricegroup.index') }}">Manajemen Harga Khusus Group</a></li>
+                    <li><a href="{{ route('rangepricepelanggan.page') }}">Harga Khusus Customer</a></li>
                 </ul>
             </li>
             @endcan
@@ -134,50 +167,24 @@
             </li>
             @endcan
 
-            {{-- ===================== CABANG & INVENTARIS ===================== --}}
-            <li class="nav-label mt-3">CABANG & INVENTARIS</li>
-
+            @can('manage-proyek')
             <li>
-                <a href="{{ route('inventaris.cabang.index') }}">
+                <a href="{{ route('companies.index') }}">
+                    <i class="la la-briefcase"></i>
+                    <span class="nav-text">Manajemen Proyek</span>
+                </a>
+            </li>
+            @endcan
+
+            @can('manage-gudang')
+            <li>
+                <a href="{{ route('gudangpusat.dashboard') }}">
                     <i class="icon icon-settings"></i>
-                    <span class="nav-text">Manajemen Cabang</span>
+                    <span class="nav-text">Manajemen Inventaris</span>
                 </a>
             </li>
+            @endcan
 
-            @php
-            // CABANG BENERAN (bukan gudang)
-            $cabangs = App\Models\Cabang::where('jenis', 'cabang')->get();
-            @endphp
-
-            @foreach($cabangs as $c)
-            <li>
-                <a class="has-arrow" href="javascript:void(0)">
-                    <i class="icon icon-home"></i>
-                    <span class="nav-text">{{ $c->nama }}</span>
-                </a>
-                <ul>
-                    <li><a href="{{ url('cabang/'.$c->slug.'/barang') }}">Daftar Barang</a></li>
-                    <li><a href="{{ url('cabang/'.$c->slug.'/stok') }}">Stok Tersedia</a></li>
-                    <li><a href="{{ url('cabang/'.$c->slug.'/riwayat') }}">Riwayat Pengiriman</a></li>
-                    <li><a href="{{ url('cabang/'.$c->slug.'/inventaris') }}">Inventaris Kantor</a></li>
-                </ul>
-            </li>
-            @endforeach
-
-            {{-- ===================== GUDANG PUSAT ===================== --}}
-            <li class="nav-label mt-4">GUDANG PUSAT</li>
-
-            <li>
-                <a class="has-arrow" href="javascript:void(0)">
-                    <i class="icon icon-folder"></i>
-                    <span class="nav-text">Gudang Pusat</span>
-                </a>
-                <ul>
-                    <li><a href="{{ route('gudangpusat.barang') }}">Daftar Barang</a></li>
-                    <li><a href="{{ route('gudangpusat.stok') }}">Stok Tersedia</a></li>
-                    <li><a href="{{ route('gudangpusat.pengiriman.index') }}">Pengiriman Barang</a></li>
-                </ul>
-            </li>
         </ul>
     </div>
 </div>

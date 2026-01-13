@@ -53,7 +53,7 @@
                     <thead class="table-primary">
                         <tr>
                             <th>No</th>
-                            <th>No Nota</th>
+                            <th>No Nota Transaksi</th>
                             <th>Nama</th>
                             <th>Pembayaran</th>
                             <th>Tanggal</th>
@@ -82,6 +82,12 @@
             </div>
 
             <div class="modal-body">
+
+                <p>
+                    Nomor Nota:
+                    <strong id="nomorNotaText">RG-{{ now()->timestamp }}</strong>
+                    <input type="hidden" id="nomorNotaInput">
+                </p>
 
                 <p>
                     Sisa Tagihan:
@@ -218,8 +224,8 @@
                 return;
             }
 
-            // Tutup detail row lain
-            document.querySelectorAll('.detail-row').forEach(r => r.remove());
+            // HAPUS SEMUA DETAIL ROW LAIN (JAGA-JAGA)
+            document.querySelectorAll('.detail-row').forEach(el => el.remove());
 
             try {
                 const res = await fetch(`{{ route('angsuran.showdetail') }}?id=${id}`);
@@ -233,7 +239,6 @@
                         <td colspan="${colCount}" class="p-0">
                             <table class="table table-sm mb-0 table-bordered bg-light">
 
-                                <!-- PRODUK DIBELI -->
                                 <thead class="table-success text-center">
                                     <tr><th colspan="6">Produk Dibeli</th></tr>
                                     <tr>
@@ -248,7 +253,6 @@
                                 <tbody>
                 `;
 
-                // Produk
                 transaksi.sub_transaksi.forEach(p => {
                     html += `
                         <tr>
@@ -265,13 +269,15 @@
                 html += `
                         </tbody>
 
-                        <!-- RIWAYAT ANGSURAN -->
                         <thead class="table-primary text-center">
                             <tr><th colspan="6">Riwayat Pembayaran Angsuran</th></tr>
                             <tr>
+                                <th>Nomor Nota Angsuran</th>
                                 <th>Tanggal</th>
                                 <th>Metode</th>
-                                <th colspan="4">Nominal</th>
+                                <th>Nominal</th>
+                                <th>Pembuat</th>
+                                <th>Aksi</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -281,11 +287,29 @@
                     html += `<tr><td colspan="6" class="text-center text-muted">Belum ada pembayaran</td></tr>`;
                 } else {
                     angsurans.forEach(a => {
+                        const printUrl = `{{ route('transaksi.angsurandetail.print', ':id') }}`.replace(':id', a.id);
+
                         html += `
                             <tr>
+                                <td>${a.nomor_nota}</td>
                                 <td>${a.tanggal_angsuran}</td>
                                 <td>${a.metode_pembayaran}</td>
-                                <td colspan="4">Rp ${parseFloat(a.nominal_angsuran).toLocaleString('id-ID')}</td>
+                                <td>Rp ${parseFloat(a.nominal_angsuran).toLocaleString('id-ID')}</td>
+                                <td>${a.user?.name ?? a.user?.username ?? '-'}</td>
+                                <td class="text-end">
+                                    <div class="btn-group btn-group-sm">
+                                        @can('delete-angsuranpenjualan')
+                                        <button class="btn btn-danger btn-delete-angsuran"
+                                            data-id="${a.id}"
+                                            data-nominal="${a.nominal_angsuran}">
+                                            <i class="fa fa-trash"></i>
+                                        </button>
+                                        @endcan
+                                        <a href="${printUrl}" target="_blank" class="btn btn-success">
+                                            <i class="fa fa-print"></i>
+                                        </a>
+                                    </div>
+                                </td>
                             </tr>
                         `;
                     });
@@ -314,7 +338,11 @@
             let id = $(this).data('id');
             let rawSisa = $(this).data('sisa');
 
-            // Pastikan nilai sisa bukan NaN
+            // Generate nomor nota baru
+            let nomorNota = "RG-" + Math.floor(Date.now() / 1000);
+            $("#nomorNotaText").text(nomorNota);
+            $("#nomorNotaInput").val(nomorNota);
+
             if (typeof rawSisa === "string") {
                 rawSisa = rawSisa.replace(/[^\d.-]/g, "");
             }
@@ -331,7 +359,6 @@
 
             $("#modalBayar").modal('show');
         });
-
 
         // 2. SIMPAN PEMBAYARAN ANGSURAN
         $("#btnSimpanBayar").click(function() {
@@ -357,10 +384,10 @@
                 data: {
                     nominal: nominal,
                     metode: metode,
+                    nomor_nota: $("#nomorNotaInput").val(),
                     _token: $('meta[name="csrf-token"]').attr('content')
                 },
                 success: function(res) {
-
                     if (res.msg === "success") {
                         Swal.fire("Berhasil!", "Pembayaran angsuran berhasil!", "success");
                         $("#modalBayar").modal('hide');
@@ -373,23 +400,40 @@
                     Swal.fire("Error!", "Terjadi kesalahan server!", "error");
                 }
             });
-
         });
 
         // ================= DELETE =================
-        $(document).on('click', '.deleteBtn', function() {
+        $(document).on('click', '.btn-delete-angsuran', function() {
             $("#deleteID").val($(this).data('id'));
             $("#modalDelete").modal('show');
         });
 
         $("#btnDelete").click(function() {
-            $.post(`/angsuran-penjualan/hapus/${$("#deleteID").val()}`, {
-                alasan: $("#deleteReason").val(),
-                _token: $('meta[name="csrf-token"]').attr('content')
-            }).done(() => {
-                $("#modalDelete").modal('hide');
-                $('#tabelAngsuran').DataTable().ajax.reload();
-                Swal.fire("Berhasil", "Angsuran berhasil dihapus!", "success");
+            const id = $("#deleteID").val();
+            const alasan = $("#deleteReason").val();
+
+            console.log('[DELETE] ID:', id);
+            console.log('[DELETE] Alasan:', alasan);
+
+            $.ajax({
+                url: `/angsuran-penjualan/hapus/${id}`,
+                type: 'DELETE',
+                data: {
+                    alasan: alasan,
+                    _token: $('meta[name="csrf-token"]').attr('content')
+                },
+                success: function(res) {
+                    console.log('[DELETE] SUCCESS:', res);
+                    $("#modalDelete").modal('hide');
+                    $('#tabelAngsuran').DataTable().ajax.reload(null, false);
+                    Swal.fire("Berhasil", "Angsuran berhasil dihapus!", "success");
+                },
+                error: function(xhr) {
+                    console.error('[DELETE] ERROR STATUS:', xhr.status);
+                    console.error('[DELETE] RESPONSE:', xhr.responseText);
+
+                    Swal.fire("Error", xhr.responseJSON?.message || "Gagal menghapus angsuran!", "error");
+                }
             });
         });
 

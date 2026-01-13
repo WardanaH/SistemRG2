@@ -26,14 +26,32 @@ class AuthController extends Controller
 
             // Cek role user dan redirect sesuai peran
             if ($user->hasRole('operator indoor') || $user->hasRole('operator outdoor') || $user->hasRole('operator multi')) {
+                $isi = Auth::user()->username . " telah login dicabang " . Auth::user()->cabang->nama . ".";
+                $save = $this->log($isi, "Login");
                 return redirect()->route('operator.dashboard')->with('success', 'Selamat datang kembali!');
             } elseif ($user->hasRole('designer')) {
-                return redirect()->route('designer.index')->with('success', 'Selamat datang kembali!');
-            } elseif ($user->hasRole('inventaris')) {
-                return redirect()->route('inventaris.dashboard')->with('success', 'Selamat datang kembali!');
+                $isi = Auth::user()->username . " telah login dicabang " . Auth::user()->cabang->nama . ".";
+                $save = $this->log($isi, "Login");
+                return redirect()->route('designer.dashboard')->with('success', 'Selamat datang kembali!');
             } elseif ($user->hasRole('adversting')) {
+                $isi = Auth::user()->username . " telah login dicabang " . Auth::user()->cabang->nama . ".";
+                $save = $this->log($isi, "Login");
                 return redirect()->route('adversting.index')->with('success', 'Selamat datang kembali!');
-            } else {
+            } elseif ($user->hasRole('documentation')) {
+                $isi = Auth::user()->username . " telah login dicabang " . Auth::user()->cabang->nama . ".";
+                $save = $this->log($isi, "Login");
+                return redirect()->route('companies.index')->with('success', 'Selamat datang kembali!');
+            } elseif ($user->hasRole('Inventory Utama')) {
+                $isi = Auth::user()->username . " telah login dicabang " . Auth::user()->cabang->nama . ".";
+                $save = $this->log($isi, "Login");
+                return redirect()->route('gudangpusat.dashboard')->with('success', 'Selamat datang kembali!');
+            } elseif ($user->hasRole('Inventory Cabang')) {
+                $isi = Auth::user()->username . " telah login dicabang " . Auth::user()->cabang->nama . ".";
+                $save = $this->log($isi, "Login");
+                return redirect()->route('templateinventaris.dashboard')->with('success', 'Selamat datang kembali!');
+            }else {
+                $isi = Auth::user()->username . " telah login dicabang " . Auth::user()->cabang->nama . ".";
+                $save = $this->log($isi, "Login");
                 return redirect()->route('dashboard')->with('success', 'Selamat datang kembali!');
             }
         }

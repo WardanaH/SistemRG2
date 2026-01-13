@@ -2,19 +2,20 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
-use App\Models\Cabang;
-use App\Models\MProduks;
-use App\Models\MBahanBakus;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Models\StokBahanBaku;
-use App\Models\MStokBahanBakus;
-use App\Models\MRelasiBahanBaku;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use App\Models\MTransaksiPenjualans;
 use Illuminate\Support\Facades\Auth;
+use App\Models\User;
+use App\Models\Cabang;
+use App\Models\MAngsurans;
+use App\Models\MProduks;
+use App\Models\MBahanBakus;
+use App\Models\MStokBahanBakus;
+use App\Models\MRelasiBahanBaku;
+use App\Models\MTransaksiPenjualans;
 use App\Models\MSubTransaksiPenjualans;
 
 class TransaksiPenjualansController extends Controller
@@ -64,6 +65,9 @@ class TransaksiPenjualansController extends Controller
             $transaksi->user_id = Auth::id();
             $transaksi->cabang_id = Auth::user()->cabang->id ?? null;
             $transaksi->designer_id = $request->inputdesigner;
+
+            // dd($transaksi);
+
             $transaksi->save();
 
             // SIMPAN DETAIL ITEM
@@ -80,28 +84,24 @@ class TransaksiPenjualansController extends Controller
                 $sub->diskon = $item['diskon'] ?? 0;
                 $sub->no_spk = $item['no_spk'] ?? '-';
                 $sub->keterangan = $item['keterangan'] ?? '-';
-                $sub->satuan = 'PCS';
+                $sub->satuan = $produk->satuan;
                 $sub->user_id = Auth::id();
 
                 // ===== LOGIKA BARU =====
                 if ($hitungLuas == 1) {
-                    // Produk menggunakan panjang × lebar
-                    $sub->panjang = $item['panjang'] ?? 0;
-                    $sub->lebar = $item['lebar'] ?? 0;
-                    $sub->banyak = $item['kuantitas'];
-
-                    $sub->subtotal =
-                        $item['harga'] *
-                        ($item['panjang'] * $item['lebar']) *
-                        $item['kuantitas'];
+                    $sub->panjang = $item['panjang'];
+                    $sub->lebar   = $item['lebar'];
+                    $sub->banyak  = $item['kuantitas'];
                 } else {
-                    // Produk tidak menggunakan luas
                     $sub->panjang = 0;
-                    $sub->lebar = 0;
-                    $sub->banyak = $item['kuantitas'];
-
-                    $sub->subtotal = $item['harga'] * $item['kuantitas'];
+                    $sub->lebar   = 0;
+                    $sub->banyak  = $item['kuantitas'];
                 }
+
+                $sub->subtotal = $item['subtotal']; // 🔥 AMAN
+
+
+                // dd($sub);
 
                 $sub->save();
 
@@ -137,6 +137,8 @@ class TransaksiPenjualansController extends Controller
                     $stok->save();
                 }
             }
+            $isi = Auth::user()->username . " telah menambahkan transaksi penjualan dicabang " . Auth::user()->cabang->nama . " dengan nomor transaksi " . $transaksi->nomor_nota . ".";
+            $save = $this->log($isi, "Penambahan");
 
             DB::commit();
             return response()->json([
@@ -202,7 +204,6 @@ class TransaksiPenjualansController extends Controller
         return view('admin.transaksis.list', compact('datas', 'cabangs'));
     }
 
-
     public function indexdeleted(Request $request)
     {
         $user = Auth::user();
@@ -249,6 +250,11 @@ class TransaksiPenjualansController extends Controller
             $transaksi->reason_on_delete = $request->reason_on_delete ?? 'Tanpa alasan';
             $transaksi->save();
 
+            // Soft delete semua angsuran yang berhubungan
+            foreach ($transaksi->angsuran as $a) {
+                $a->delete();
+            }
+
             // Soft delete semua sub transaksi-nya
             foreach ($transaksi->subTransaksi as $sub) {
                 $sub->delete();
@@ -257,11 +263,15 @@ class TransaksiPenjualansController extends Controller
             // Soft delete transaksi utama
             $transaksi->delete();
 
+            $isi = auth()->user()->username . " telah menghapus transaksi nomor " . $transaksi->nomor_nota . " dengan alasan " . $transaksi->reason_on_delete . ".";
+            $this->log($isi, "Penghapusan");
+
             DB::commit();
 
             return redirect()->route('transaksiindex')
-                ->with('success', 'Transaksi berhasil dihapus. Alasan: ' . $transaksi->reason_on_delete);
+                ->with('success', 'Transaksi & angsuran berhasil dihapus. Alasan: ' . $transaksi->reason_on_delete);
         } catch (\Exception $e) {
+
             DB::rollBack();
             Log::error('Gagal menghapus transaksi: ' . $e->getMessage());
 
@@ -323,9 +333,17 @@ class TransaksiPenjualansController extends Controller
 
         $subtransaksis = $transaksi->subTransaksi()->with('produk')->get();
 
+        $angsurans = MAngsurans::where('transaksi_penjualan_id', '=', $id)->get();
+
         return view('admin.reports.reportpenjualan', [
             'transaksi' => $transaksi,
             'subtransaksis' => $subtransaksis,
+            'angsurans' => $angsurans
         ]);
+    }
+
+    public function show(Request $request)
+    {
+        $transaksi = MTransaksiPenjualans::findOrFail($request->id);
     }
 }

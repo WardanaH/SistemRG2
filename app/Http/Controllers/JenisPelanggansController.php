@@ -74,6 +74,9 @@ class JenisPelanggansController extends Controller
             return Response::json(['success' => true, 'message' => 'Jenis pelanggan berhasil ditambahkan.']);
         }
 
+        $isi = auth()->user()->username . " telah menambahkan jenis pelanggan " . $data->jenis_pelanggan . ".";
+        $this->log($isi, "Penambahan");
+
         return redirect()
             ->route('jenispelanggan.index')
             ->with('success', 'Jenis pelanggan berhasil ditambahkan.');
@@ -105,6 +108,9 @@ class JenisPelanggansController extends Controller
         //     $this->createlog($isi, "edit");
         // }
 
+        $isi = auth()->user()->username . " telah mengubah jenis pelanggan " . $data->jenis_pelanggan . ".";
+        $this->log($isi, "Pengubahan");
+
         return $request->ajax()
             ? Response::json(['success' => true, 'message' => 'Jenis pelanggan berhasil diperbarui.'])
             : redirect()->route('jenispelanggan.index')->with('success', 'Jenis pelanggan berhasil diperbarui.');
@@ -135,6 +141,9 @@ class JenisPelanggansController extends Controller
         //     $isi = Auth::user()->username . " menghapus jenis pelanggan {$nama}.";
         //     $this->createlog($isi, "delete");
         // }
+
+        $isi = auth()->user()->username . " telah menghapus jenis pelanggan " . $nama . ".";
+        $this->log($isi, "Penghapusan");
 
         return $request->ajax()
             ? Response::json(['success' => true, 'message' => 'Jenis pelanggan berhasil dihapus.'])
