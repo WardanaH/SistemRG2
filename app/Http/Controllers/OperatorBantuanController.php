@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\MSubBantuanTransaksiPenjualans;
+use App\Models\MTransaksiPenjualans;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
@@ -83,32 +84,52 @@ class OperatorBantuanController extends Controller
             // 3. Cek apakah ini penyelesaian item terakhir?
             if ($statusLama !== 'selesai' && $statusBaru === 'selesai') {
 
-                $transaksiUtama = $sub->transaksiUtama;
+                $transaksiBantuan = $sub->transaksiUtama;
 
-                if ($transaksiUtama) {
-                    // Cek apakah masih ada sub-transaksi LAIN dalam nota ini yang BELUM selesai
-                    $masihAda = MSubBantuanTransaksiPenjualans::where('bantuan_penjualan_id', $transaksiUtama->id)
+                if ($transaksiBantuan) {
+                    // Cek sisa item di tabel bantuan
+                    $masihAda = MSubBantuanTransaksiPenjualans::where('bantuan_penjualan_id', $transaksiBantuan->id)
                         ->where('status_sub_transaksi', '!=', 'selesai')
                         ->exists();
 
-                    // Jika TIDAK ADA yang tersisa (artinya semua item sudah selesai)
+                    // Jika SEMUA item bantuan sudah selesai
                     if (!$masihAda) {
-                        $transaksiUtama->update([
-                            'status_bantuan_transaksi' => 'selesai', // Status pengerjaan cabang B
-                            'status_transaksi'         => 'selesai'  // <--- TAMBAHAN: Status umum transaksi jadi selesai
+
+                        // A. Update Status di Tabel Bantuan (Sisi Cabang B)
+                        $transaksiBantuan->update([
+                            'status_bantuan_transaksi' => 'selesai',
+                            'status_transaksi'         => 'selesai'
                         ]);
+
+                        // B. UPDATE STATUS DI TABEL TRANSAKSI ASLI (Sisi Cabang A)
+                        // Kita cari transaksi di Cabang A yang datanya COCOK
+                        $transaksiAsli = MTransaksiPenjualans::where('cabang_id', $transaksiBantuan->cabang_id) // Cabang Peminta
+                            ->where('pelanggan_id', $transaksiBantuan->pelanggan_id)
+                            ->whereDate('tanggal', $transaksiBantuan->tanggal)
+                            ->where('total_harga', $transaksiBantuan->total_harga)
+                            ->where('status_transaksi', '!=', 'selesai') // Cari yang belum selesai
+                            ->first();
+
+                        if ($transaksiAsli) {
+                            $transaksiAsli->update([
+                                'status_transaksi' => 'selesai'
+                            ]);
+
+                            // Opsional: Log tambahan bahwa transaksi pusat sudah diupdate
+                            $this->log("Sistem otomatis menyelesaikan Transaksi Asli " . $transaksiAsli->nomor_nota, "System Auto-Update");
+                        }
                     }
                 }
             }
 
-            // 4. Logging
+            // 4. Logging Operator
             $isi = "Operator " . auth()->user()->username . " menyelesaikan bantuan produksi " . $sub->no_spk . " (" . $sub->produk->nama_produk . ")";
             $this->log($isi, "Perbaruan Bantuan");
         });
 
         return redirect()
-            ->route('operator.pesanan.bantuan') // Pastikan nama route ini benar sesuai web.php
-            ->with('success', 'Status bantuan berhasil diperbarui');
+            ->route('operator.pesanan.bantuan')
+            ->with('success', 'Status bantuan berhasil diperbarui & sinkronasi ke Cabang A selesai.');
     }
 
     // Helper Filter Role

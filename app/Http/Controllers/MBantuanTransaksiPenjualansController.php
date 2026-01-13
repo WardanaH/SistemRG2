@@ -13,6 +13,8 @@ use App\Models\MBantuanTransaksiPenjualans;
 use App\Models\MRelasiBahanBaku;
 use App\Models\MStokBahanBakus;
 use App\Models\MSubBantuanTransaksiPenjualans;
+use App\Models\MSubTransaksiPenjualans;
+use App\Models\MTransaksiPenjualans;
 use App\Models\User;
 
 use function Illuminate\Log\log;
@@ -205,85 +207,144 @@ class MBantuanTransaksiPenjualansController extends Controller
                 'items.*.produk_id' => 'required|integer',
             ]);
 
-            // 2. SIMPAN TRANSAKSI BANTUAN (Header)
-            $transaksi = new MBantuanTransaksiPenjualans();
-            // Nomor nota dibedakan (misal: BTX) agar tidak tertukar dengan transaksi internal
-            $transaksi->nomor_nota = $request->nonota ?? 'BTX-' . now()->timestamp;
-            $transaksi->tanggal = $request->inputtanggal;
-            $transaksi->nama_pelanggan = $request->inputnamapelanggan;
-            $transaksi->hp_pelanggan = $request->inputnomorpelanggan;
-            $transaksi->pelanggan_id = $request->inputpelanggan;
+            // =================================================================================
+            // PROSES 1: SIMPAN KE TRANSAKSI PENJUALAN (Laporan Keuangan Cabang A)
+            // =================================================================================
+            $transaksiJual = new MTransaksiPenjualans(); // Pastikan Model ini di-use di atas
+            // Nota TRX untuk Customer
+            $transaksiJual->nomor_nota = $request->nonota ?? 'TRX-' . now()->timestamp;
+            $transaksiJual->tanggal = $request->inputtanggal;
+            $transaksiJual->nama_pelanggan = $request->inputnamapelanggan;
+            $transaksiJual->hp_pelanggan = $request->inputnomorpelanggan;
+            $transaksiJual->pelanggan_id = $request->inputpelanggan;
 
-            $transaksi->total_harga = $this->parseRupiah($request->inputtotal);
-            $transaksi->diskon = $request->inputdiskon ?? 0;
-            $transaksi->pajak = $request->inputpajak ?? 0;
-            $transaksi->metode_pembayaran = $request->inputpembayaran;
-            $transaksi->jumlah_pembayaran = $this->parseRupiah($request->inputbayardp);
-            $transaksi->sisa_tagihan = $this->parseRupiah($request->inputsisa);
+            $transaksiJual->total_harga = $this->parseRupiah($request->inputtotal);
+            $transaksiJual->diskon = $request->inputdiskon ?? 0;
+            $transaksiJual->pajak = $request->inputpajak ?? 0;
+            $transaksiJual->metode_pembayaran = $request->inputpembayaran;
+            $transaksiJual->jumlah_pembayaran = $this->parseRupiah($request->inputbayardp);
+            $transaksiJual->sisa_tagihan = $this->parseRupiah($request->inputsisa);
 
-            $transaksi->user_id = Auth::id(); // Admin Cabang A
-            $transaksi->cabang_id = Auth::user()->cabang->id; // Cabang Asal A
-            $transaksi->bantuan_cabang_id = $request->inputcabangbantuan; // Cabang Tujuan B
-            $transaksi->designer_id = $request->inputdesigner;
+            $transaksiJual->user_id = Auth::id();
+            $transaksiJual->cabang_id = Auth::user()->cabang->id; // Cabang A
+            $transaksiJual->designer_id = $request->inputdesigner;
 
-            // Status awal bantuan adalah pending menunggu ACC Admin Cabang B
-            $transaksi->status_transaksi = 'proses';
-            $transaksi->status_bantuan_transaksi = 'proses';
-            $transaksi->status_persetujuan_bantuan_transaksi = 'pending';
-            log::info($transaksi->toJson());
+            // Status di set 'proses', tapi karena ini bantuan,
+            // secara teknis barangnya belum ada di Cabang A.
+            $transaksiJual->status_transaksi = 'proses';
 
-            $transaksi->save();
+            $transaksiJual->save();
 
-            // 3. SIMPAN DETAIL ITEM (Sub Bantuan)
+
+            // =================================================================================
+            // PROSES 2: SIMPAN KE BANTUAN TRANSAKSI (Request Produksi ke Cabang B)
+            // =================================================================================
+            $transaksiBantuan = new MBantuanTransaksiPenjualans();
+            // Nota BTX untuk Internal antar cabang (Bisa disamakan atau dibedakan)
+            $transaksiBantuan->nomor_nota = 'BTX-' . now()->timestamp;
+            $transaksiBantuan->tanggal = $request->inputtanggal;
+            $transaksiBantuan->nama_pelanggan = $request->inputnamapelanggan;
+            $transaksiBantuan->hp_pelanggan = $request->inputnomorpelanggan;
+            $transaksiBantuan->pelanggan_id = $request->inputpelanggan;
+
+            $transaksiBantuan->total_harga = $this->parseRupiah($request->inputtotal);
+            $transaksiBantuan->diskon = $request->inputdiskon ?? 0;
+            $transaksiBantuan->pajak = $request->inputpajak ?? 0;
+            $transaksiBantuan->metode_pembayaran = $request->inputpembayaran;
+            $transaksiBantuan->jumlah_pembayaran = $this->parseRupiah($request->inputbayardp);
+            $transaksiBantuan->sisa_tagihan = $this->parseRupiah($request->inputsisa);
+
+            $transaksiBantuan->user_id = Auth::id(); // Admin Cabang A
+            $transaksiBantuan->cabang_id = Auth::user()->cabang->id; // Cabang Asal A
+            $transaksiBantuan->bantuan_cabang_id = $request->inputcabangbantuan; // Cabang Tujuan B
+            $transaksiBantuan->designer_id = $request->inputdesigner;
+
+            // Status Flow Bantuan
+            $transaksiBantuan->status_transaksi = 'proses';
+            $transaksiBantuan->status_bantuan_transaksi = 'proses';
+            $transaksiBantuan->status_persetujuan_bantuan_transaksi = 'pending';
+
+            $transaksiBantuan->save();
+
+
+            // =================================================================================
+            // PROSES 3: SIMPAN DETAIL ITEM (LOOPING UNTUK KEDUA TABEL)
+            // =================================================================================
             foreach ($request->items as $item) {
                 $produk = MProduks::find($item['produk_id']);
                 $hitungLuas = $produk->hitung_luas;
 
-                $sub = new MSubBantuanTransaksiPenjualans();
-                $sub->bantuan_penjualan_id = $transaksi->id; // Foreign Key ke tabel bantuan
-                $sub->produk_id = $item['produk_id'];
-                $sub->harga_satuan = $item['harga'] ?? 0;
-                $sub->finishing = $item['finishing'] ?? 'Tanpa Finishing';
-                $sub->diskon = $item['diskon'] ?? 0;
+                // --- A. Simpan ke Sub Transaksi Penjualan (Untuk Laporan A) ---
+                $subJual = new MSubTransaksiPenjualans();
+                $subJual->penjualan_id = $transaksiJual->id;
+                $subJual->produk_id = $item['produk_id'];
+                $subJual->harga_satuan = $item['harga'] ?? 0;
+                $subJual->finishing = $item['finishing'] ?? 'Tanpa Finishing';
+                $subJual->diskon = $item['diskon'] ?? 0;
+                $subJual->no_spk = null; // Kosongkan/Strip karena diproduksi cabang lain
+                $subJual->keterangan = $item['keterangan'] ?? 'BANTUAN KE CABANG LAIN'; // Info tambahan
+                $subJual->satuan = $produk->satuan;
+                $subJual->user_id = Auth::id();
+                $subJual->subtotal = $item['subtotal'];
+                $subJual->status_sub_transaksi = 'proses';
 
-                $sub->no_spk = null; // SPK dikosongkan dulu, biar Admin B yang isi pas ACC
-
-                $sub->keterangan = $item['keterangan'] ?? '-';
-                $sub->satuan = $produk->satuan;
-                $sub->user_id = Auth::id();
-
+                // Logika Dimensi
                 if ($hitungLuas == 1) {
-                    $sub->panjang = $item['panjang'];
-                    $sub->lebar   = $item['lebar'];
-                    $sub->banyak  = $item['kuantitas'];
+                    $subJual->panjang = $item['panjang'];
+                    $subJual->lebar   = $item['lebar'];
+                    $subJual->banyak  = $item['kuantitas'];
                 } else {
-                    $sub->panjang = 0;
-                    $sub->lebar   = 0;
-                    $sub->banyak  = $item['kuantitas'];
+                    $subJual->panjang = 0;
+                    $subJual->lebar   = 0;
+                    $subJual->banyak  = $item['kuantitas'];
                 }
+                $subJual->save();
+                // CATATAN: Pastikan MSubTransaksiPenjualans TIDAK otomatis memotong stok
+                // jika menggunakan logic Observer. Jika ya, harus di-bypass.
 
-                $sub->subtotal = $item['subtotal'];
-                $sub->status_sub_transaksi = 'proses';
-                Log::info($sub->toJson());
 
-                $sub->save();
+                // --- B. Simpan ke Sub Bantuan (Untuk Produksi B) ---
+                $subBantuan = new MSubBantuanTransaksiPenjualans();
+                $subBantuan->bantuan_penjualan_id = $transaksiBantuan->id;
+                $subBantuan->produk_id = $item['produk_id'];
+                $subBantuan->harga_satuan = $item['harga'] ?? 0;
+                $subBantuan->finishing = $item['finishing'] ?? 'Tanpa Finishing';
+                $subBantuan->diskon = $item['diskon'] ?? 0;
+                $subBantuan->no_spk = null;
+                $subBantuan->keterangan = $item['keterangan'] ?? '-';
+                $subBantuan->satuan = $produk->satuan;
+                $subBantuan->user_id = Auth::id();
+                $subBantuan->subtotal = $item['subtotal'];
+                $subBantuan->status_sub_transaksi = 'proses';
+
+                // Logika Dimensi (Sama)
+                if ($hitungLuas == 1) {
+                    $subBantuan->panjang = $item['panjang'];
+                    $subBantuan->lebar   = $item['lebar'];
+                    $subBantuan->banyak  = $item['kuantitas'];
+                } else {
+                    $subBantuan->panjang = 0;
+                    $subBantuan->lebar   = 0;
+                    $subBantuan->banyak  = $item['kuantitas'];
+                }
+                $subBantuan->save();
             }
 
             // 4. LOGGING
             $cabangTujuan = Cabang::find($request->inputcabangbantuan)->nama;
-            $isi = Auth::user()->username . " meminta bantuan produksi ke cabang " . $cabangTujuan . " dengan nota " . $transaksi->nomor_nota;
+            $isi = Auth::user()->username . " membuat transaksi penjualan & meminta bantuan produksi ke " . $cabangTujuan;
             $this->log($isi, "Permintaan Bantuan");
 
             DB::commit();
 
             return response()->json([
                 'status' => 'success',
-                'message' => 'Permintaan bantuan berhasil dikirim! Menunggu konfirmasi Cabang Tujuan.',
-                'id' => encrypt($transaksi->id),
+                'message' => 'Transaksi Penjualan dicatat & Permintaan Bantuan dikirim!',
+                'id' => encrypt($transaksiBantuan->id), // Redirect ke report bantuan
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Gagal Simpan Bantuan Transaksi: ' . $e->getMessage());
+            Log::error('Gagal Simpan Double Transaksi: ' . $e->getMessage());
             return response()->json([
                 'status' => 'error',
                 'message' => 'Gagal: ' . $e->getMessage()
