@@ -34,6 +34,23 @@ class MBantuanTransaksiPenjualans extends Model
         'designer_id'
     ];
 
+    /**
+     * Relasi ke User (Admin Pembuat Transaksi)
+     */
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
+
+    /**
+     * Relasi ke User (Designer)
+     * Tambahkan ini juga karena di controller kita panggil 'designer'
+     */
+    public function designer(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'designer_id');
+    }
+
     // Relasi ke Cabang Asal (A)
     public function cabangAsal(): BelongsTo
     {

@@ -33,7 +33,7 @@ return new class extends Migration
             $table->double('diskon')->default(0);
             $table->string('finishing', 100)->nullable();
             $table->string('satuan', 20)->nullable();
-            $table->integer('no_spk')->unique();
+            $table->integer('no_spk')->unique()->nullable();
             $table->enum('status_sub_transaksi', ['proses', 'selesai', 'cancel'])->default('proses');
 
             // Foreign keys (opsional)

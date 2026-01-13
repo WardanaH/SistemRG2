@@ -34,11 +34,38 @@
                     @can('deleted-transaksipenjualan')
                     <li><a href="{{ route('transaksiindexdeleted') }}">Manajemen Transaksi Penjualan Terhapus</a></li>
                     @endcan
+
                     @can('manage-angsuranpenjualan')
                     <li><a href="{{ route('angsuran.index') }}">Manajemen Angsuran Transaksi</a></li>
                     @endcan
                     @can('manage-angsuranpenjualan')
                     <li><a href="{{ route('angsuran.indexdeleted') }}">Manajemen Angsuran Transaksi Terhapus</a></li>
+                    @endcan
+                </ul>
+            </li>
+            @endcan
+
+            @can('manage-transaksipenjualan')
+            <li>
+                <a class="has-arrow" href="javascript:void(0)" aria-expanded="false">
+                    <i class="fa fa-handshake-o"></i>
+                    <span class="nav-text">Bantuan</span>
+                </a>
+                <ul aria-expanded="false">
+                    @can('manage-transaksipenjualan')
+                    <li><a href="{{ route('bantuan') }}">Minta Bantuan Transaksi Penjualan</a></li>
+                    @endcan
+                    @can('manage-transaksipenjualan')
+                    <li><a href="{{ route('bantuan.list') }}">Manajemen Bantuan Transaksi Penjualan</a></li>
+                    @endcan
+                    @can('manage-transaksipenjualan')
+                    <li><a href="{{ route('bantuan.index') }}">Permintaan Bantuan Transaksi Penjualan</a></li>
+                    @endcan
+                    @can('manage-transaksipenjualan')
+                    <li><a href="{{ route('bantuan.riwayat_bantuan_masuk') }}">Riwayat Bantuan Transaksi Penjualan Masuk</a></li>
+                    @endcan
+                    @can('manage-transaksipenjualan')
+                    <li><a href="{{ route('bantuan.riwayat_bantuan_keluar') }}">Riwayat Bantuan Transaksi Penjualan Keluar</a></li>
                     @endcan
                 </ul>
             </li>
