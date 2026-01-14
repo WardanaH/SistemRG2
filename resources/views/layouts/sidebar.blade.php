@@ -10,7 +10,7 @@
 
             <li>
                 <a href="{{ route('dashboard') }}">
-                    <i class="icon icon-single-04"></i>
+                    <i class="la la-home"></i>
                     <span class="nav-text">Dashboard</span>
                 </a>
             </li>
@@ -21,7 +21,7 @@
             @can('manage-transaksipenjualan')
             <li>
                 <a class="has-arrow" href="javascript:void(0)" aria-expanded="false">
-                    <i class="icon icon-credit-card"></i>
+                    <i class="fa fa-credit-card"></i>
                     <span class="nav-text">Transaksi</span>
                 </a>
                 <ul aria-expanded="false">
@@ -114,7 +114,7 @@
             @can('manage-pelanggan')
             <li>
                 <a class="has-arrow" href="javascript:void(0)" aria-expanded="false">
-                    <i class="icon icon-users-mm"></i>
+                    <i class="la la-users"></i>
                     <span class="nav-text">Pelanggan</span>
                 </a>
                 <ul aria-expanded="false">
@@ -134,7 +134,7 @@
             @can('manage-cabang')
             <li>
                 <a class="has-arrow" href="javascript:void(0)" aria-expanded="false">
-                    <i class="icon icon-home"></i>
+                    <i class="la la-map-marker"></i>
                     <span class="nav-text">Cabang & Supplier</span>
                 </a>
                 <ul aria-expanded="false">
@@ -179,7 +179,7 @@
             @can('manage-gudang')
             <li>
                 <a href="{{ route('gudangpusat.dashboard') }}">
-                    <i class="icon icon-settings"></i>
+                    <i class="la la-cubes"></i>
                     <span class="nav-text">Manajemen Inventaris</span>
                 </a>
             </li>
