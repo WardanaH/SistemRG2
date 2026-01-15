@@ -18,7 +18,7 @@ use App\Http\Controllers\GudangCabangController;
 | Digunakan untuk dashboard inventory cabang
 |--------------------------------------------------------------------------
 */
-Route::middleware(['auth', 'role:Inventory Cabang'])
+Route::middleware(['auth', 'role:inventory cabang'])
     ->group(function () {
 
         // ======================
@@ -40,7 +40,7 @@ Route::middleware(['auth', 'role:Inventory Cabang'])
 | - Inventory Cabang  → hanya cabang miliknya (dikunci di controller)
 |--------------------------------------------------------------------------
 */
-Route::middleware(['auth', 'role:Inventory Utama|Inventory Cabang'])
+Route::middleware(['auth', 'role:inventory utama|inventory cabang'])
     ->prefix('cabang/{slug}')
     ->name('cabang.')
     ->group(function () {
