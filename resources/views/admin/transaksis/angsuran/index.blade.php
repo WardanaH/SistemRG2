@@ -85,7 +85,7 @@
 
                 <p>
                     Nomor Nota:
-                    <strong id="nomorNotaText">RG-{{ now()->timestamp }}</strong>
+                    <strong id="nomorNotaText">ANG-{{ now()->timestamp }}</strong>
                     <input type="hidden" id="nomorNotaInput">
                 </p>
 
@@ -339,7 +339,7 @@
             let rawSisa = $(this).data('sisa');
 
             // Generate nomor nota baru
-            let nomorNota = "RG-" + Math.floor(Date.now() / 1000);
+            let nomorNota = "ANG-" + Math.floor(Date.now() / 1000);
             $("#nomorNotaText").text(nomorNota);
             $("#nomorNotaInput").val(nomorNota);
 

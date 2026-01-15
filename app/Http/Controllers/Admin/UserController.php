@@ -10,6 +10,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Hash;
 use App\Http\Requests\StoreUserRequest;
 use App\Http\Requests\UpdateUserRequest;
+use App\Models\LogUser;
 
 class UserController extends Controller
 {
@@ -101,5 +102,12 @@ class UserController extends Controller
         $this->log($isi, "Penghapusan");
 
         return redirect()->route('users.index')->with('success', 'User dihapus.');
+    }
+
+    public function logIndex()
+    {
+        $logs = LogUser::where('user_id', '!=', auth()->user()->id)->get();
+        // dd($logs);
+        return view('admin.users.log.index', compact('logs'));
     }
 }

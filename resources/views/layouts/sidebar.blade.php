@@ -157,12 +157,15 @@
                 <ul aria-expanded="false">
                     @can('manage-users')
                     <li><a href="{{ route('users.index') }}">Manajemen User</a></li>
+                    <li><a href="{{ route('users.log') }}">Manajemen Log User</a></li>
                     @endcan
                     @can('manage-roles')
                     <li><a href="{{ route('roles.index') }}">Hak Akses</a></li>
                     @endcan
+                    @can('manage-users')
                     <li><a href="{{ route('designerindex') }}">Daftar Designer</a></li>
                     <li><a href="{{ route('operatorindex') }}">Daftar Operator</a></li>
+                    @endcan
                 </ul>
             </li>
             @endcan

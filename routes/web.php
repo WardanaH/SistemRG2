@@ -85,6 +85,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/users/{user}/edit', [UserController::class, 'edit'])->middleware('permission:edit-users')->name('users.edit');
     Route::put('/users/{user}', [UserController::class, 'update'])->middleware('permission:edit-users')->name('users.update');
     Route::delete('/users/{user}', [UserController::class, 'destroy'])->middleware('permission:delete-users')->name('users.destroy');
+    Route::get('/users/log', [UserController::class, 'logIndex'])->middleware('permission:manage-users')->name('users.log');
 });
 
 // Manajemen Cabang
