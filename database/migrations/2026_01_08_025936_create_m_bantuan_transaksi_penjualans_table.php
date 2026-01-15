@@ -13,7 +13,9 @@ return new class extends Migration
     {
         Schema::create('m_bantuan_transaksi_penjualans', function (Blueprint $table) {
             $table->bigIncrements('id');
+
             $table->string('nomor_nota', 128)->unique();
+            $table->string('nomor_nota_transaksi', 13)->unique();
             $table->string('hp_pelanggan', 13)->nullable();
             $table->string('nama_pelanggan', 100)->nullable();
 

@@ -354,6 +354,8 @@
 
                 // Loop angsuran
                 angsuran.forEach(v => {
+                    const printUrl = `{{ route('transaksi.angsurandetail.print', ':id') }}`.replace(':id', v.id);
+
                     $("#tbody-angsuran").append(`
                     <tr>
                         <td>#${v.nomor_nota}</td>
@@ -365,16 +367,17 @@
 
                         <td class="text-end">
                             <div class="btn-group btn-group-sm">
+                                @can('delete-angsuranpenjualan')
                                 <button class="btn btn-danger btn-delete-angsuran"
                                     data-id="${v.id}"
                                     data-nominal="${v.nominal_angsuran}">
                                     <i class="fa fa-trash"></i>
                                 </button>
+                                @endcan
 
-                                <button class="btn btn-success btn-print-angsuran"
-                                    data-id="${v.id}">
+                                <a href="${printUrl}" target="_blank" class="btn btn-success btn-print-angsuran">
                                     <i class="fa fa-print"></i>
-                                </button>
+                                </a>
                             </div>
                         </td>
                     </tr>

@@ -216,6 +216,7 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('/transaksi/penjualan/delete/{id}', [TransaksiPenjualansController::class, 'destroy'])->middleware('permission:delete-transaksipenjualan')->name('destroytransaksipenjualan');
     Route::get('/transaksi-penjualan/show-sub', [TransaksiPenjualansController::class, 'showSubTransaksi'])->middleware('permission:manage-transaksipenjualan')->name('showsubtransaksi');
     Route::get('/transaksi/report/{id}', [TransaksiPenjualansController::class, 'report'])->middleware('permission:manage-transaksipenjualan')->name('transaksi.report');
+    Route::get('/transaksi/report_nomor_nota/{nomor_nota}', [TransaksiPenjualansController::class, 'report_nomor_nota'])->middleware('permission:manage-transaksipenjualan')->name('transaksi.report.nomor_nota');
 });
 
 // Manajemen Bantuan

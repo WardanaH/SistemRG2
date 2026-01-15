@@ -492,10 +492,6 @@
                             <input id="add_subtotal" class="form-control" readonly>
                         </div>
                         <div class="mb-2">
-                            <label>No SPK <span style="color: red;">*</span></label>
-                            <input id="add_nospk" class="form-control" disabled>
-                        </div>
-                        <div class="mb-2">
                             <label>Keterangan</label>
                             <textarea id="add_keterangan" class="form-control"></textarea>
                         </div>

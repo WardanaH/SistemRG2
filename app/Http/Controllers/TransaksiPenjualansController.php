@@ -342,6 +342,29 @@ class TransaksiPenjualansController extends Controller
         ]);
     }
 
+    public function report_nomor_nota($nomor_nota)
+    {
+        // $nomor_nota = decrypt($nomor_nota);
+
+        $transaksi = MTransaksiPenjualans::with([
+            'user',
+            'cabang',
+            'pelanggan',
+            'designer',
+        ])->withTrashed()->where('nomor_nota', '=', $nomor_nota)->firstOrFail();
+        // dd($transaksi);
+
+        $subtransaksis = $transaksi->subTransaksi()->with('produk')->get();
+
+        $angsurans = MAngsurans::where('transaksi_penjualan_id', '=', $transaksi->id)->get();
+
+        return view('admin.reports.reportpenjualan', [
+            'transaksi' => $transaksi,
+            'subtransaksis' => $subtransaksis,
+            'angsurans' => $angsurans
+        ]);
+    }
+
     public function show(Request $request)
     {
         $transaksi = MTransaksiPenjualans::findOrFail($request->id);
