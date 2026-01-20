@@ -86,6 +86,8 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/users/{user}', [UserController::class, 'update'])->middleware('permission:edit-users')->name('users.update');
     Route::delete('/users/{user}', [UserController::class, 'destroy'])->middleware('permission:delete-users')->name('users.destroy');
     Route::get('/users/log', [UserController::class, 'logIndex'])->middleware('permission:manage-users')->name('users.log');
+    Route::post('/users/import-csv', [UserController::class, 'importCsv'])->middleware('permission:add-users')->name('users.import');
+    // Route::get('/users/download-template', [UserController::class, 'downloadTemplate'])->middleware('permission:add-users')->name('users.download-template');
 });
 
 // Manajemen Cabang
