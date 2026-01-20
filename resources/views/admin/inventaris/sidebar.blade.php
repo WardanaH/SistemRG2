@@ -13,7 +13,7 @@
             @endphp
 
             <li>
-                <a href="{{ $user->hasRole('inventory utama')
+                <a href="{{ $user->hasRole('inventory utama|owner')
                     ? route('gudangpusat.dashboard')
                     : route('templateinventaris.dashboard') }}">
                     <i class="icon icon-single-04"></i>

@@ -260,9 +260,9 @@
                 {{-- Konten Dinamis --}}
                 @yield('content')
             </div>
+            @include('layouts.footer')
         </div>
 
-        @include('layouts.footer')
     </div>
 
     {{-- ============ CORE JS ============ --}}
