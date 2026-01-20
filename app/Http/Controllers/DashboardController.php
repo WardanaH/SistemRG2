@@ -84,6 +84,7 @@ class DashboardController extends Controller
                 ->whereNull('deleted_at')
                 ->count();
         }
+        // dd($labels);
 
         /* =========================
          * PIE CHART: 5 TERLARIS (1 TAHUN)

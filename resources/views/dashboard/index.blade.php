@@ -148,8 +148,8 @@
                 <ul class="chart-legend mb-3">
                     <li><span class="legend-box" style="background: #4d7cff;"></span> Pemasukan</li>
                     <li><span class="legend-box" style="background: #2ecc71;"></span> Laba</li>
-                    <li><span class="legend-box" style="background: #f1556c;"></span> Biaya</li>
-                    <li><span class="legend-box" style="background: #ff9800;"></span> Transaksi</li>
+                    <li><span class="legend-box" style="background: #f1556c;"></span> Transaksi</li>
+                    <!-- <li><span class="legend-box" style="background: #ff9800;"></span> Transaksi</li> -->
                 </ul>
                 <div id="line-chart-performa" style="height: 350px;"></div>
             </div>
@@ -203,18 +203,24 @@
         }, {
             fullWidth: true,
             chartPadding: {
-                right: 40
+                right: 40,
+                left: 20 // Tambahkan padding kiri sedikit
             },
             axisY: {
-                onlyInteger: true
+                onlyInteger: true,
+                offset: 80, // PERBAIKAN: Tambah jarak agar angka nominal tidak terpotong
+                labelInterpolationFnc: function(value) {
+                    // Opsional: Jika angka terlalu panjang (jutaan), bisa disingkat jadi 1M, 2M dll
+                    if (value >= 1000000) return (value / 1000000) + 'M';
+                    if (value >= 1000) return (value / 1000) + 'k';
+                    return value;
+                }
             },
             showArea: false,
-            // AKTIFKAN PLUGIN DI SINI
             plugins: [
                 Chartist.plugins.tooltip({
                     class: 'chartist-tooltip',
                     appendToBody: true,
-                    // Format angka dengan titik ribuan
                     transformTooltipTextFnc: function(value) {
                         return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
                     }
