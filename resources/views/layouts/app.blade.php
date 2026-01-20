@@ -10,17 +10,16 @@
 
     {{-- ============ FOCUS TEMPLATE CORE CSS ============ --}}
     <link rel="icon" type="image/png" sizes="16x16" href="{{ asset('images/favicon.png') }}">
-    <link href="{{ asset('vendor/pg-calendar/css/pignose.calendar.min.css') }}" rel="stylesheet">
-    <link href="{{ asset('vendor/chartist/css/chartist.min.css') }}" rel="stylesheet">
     <link href="{{ asset('vendor/jqvmap/css/jqvmap.min.css') }}" rel="stylesheet">
-    <link href="{{ asset('vendor/owl-carousel/css/owl.carousel.min.css') }}" rel="stylesheet">
 
     {{-- ============ ICON PACK (commented) ============ --}}
-    <!-- <link href="{{ asset('vendor/themify-icons/themify-icons.css') }}" rel="stylesheet"> -->
+    <link href="{{ asset('vendor/themify-icons/themify-icons.css') }}" rel="stylesheet">
     <!-- <link href="{{ asset('vendor/fontawesome/css/all.min.css') }}" rel="stylesheet"> -->
 
     {{-- ============ MAIN STYLE ============ --}}
     <link href="{{ asset('css/style.css') }}" rel="stylesheet">
+
+    @stack('styles')
 
     {{-- ============ FONT FAMILY & SELECT2 CSS ============ --}}
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
@@ -261,9 +260,9 @@
                 {{-- Konten Dinamis --}}
                 @yield('content')
             </div>
+            @include('layouts.footer')
         </div>
 
-        @include('layouts.footer')
     </div>
 
     {{-- ============ CORE JS ============ --}}
@@ -272,18 +271,10 @@
     <script src="{{ asset('js/custom.min.js') }}"></script>
 
     {{-- ============ ADDITIONAL PLUGINS ============ --}}
-    <script src="{{ asset('vendor/chartist/js/chartist.min.js') }}"></script>
-    <script src="{{ asset('vendor/chartist-plugin-tooltips/js/chartist-plugin-tooltip.min.js') }}"></script>
-    <script src="{{ asset('vendor/moment/moment.min.js') }}"></script>
-    <script src="{{ asset('vendor/pg-calendar/js/pignose.calendar.min.js') }}"></script>
     <!-- <script src="{{ asset('vendor/perfect-scrollbar/perfect-scrollbar.min.js') }}"></script> -->
-    <script src="{{ asset('vendor/owl-carousel/js/owl.carousel.min.js') }}"></script>
 
     {{-- SweetAlert2 (keputusan: pakai 11.10.0 yang lengkap) --}}
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.0/dist/sweetalert2.all.min.js"></script>
-
-    {{-- ============ DASHBOARD SCRIPT ============ --}}
-    <script src="{{ asset('js/dashboard/dashboard-2.js') }}"></script>
 
     {{-- ============ PRELOADER FIX ============ --}}
     <script>

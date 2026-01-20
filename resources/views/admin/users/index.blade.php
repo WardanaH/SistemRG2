@@ -48,7 +48,7 @@
             <div class="col-md-2 mb-2">
                 <select name="role" class="form-control">
                     @foreach($roles as $role)
-                        <option value="{{ $role->name }}">{{ ucfirst($role->name) }}</option>
+                    <option value="{{ $role->name }}">{{ ucfirst($role->name) }}</option>
                     @endforeach
                 </select>
             </div>
@@ -67,7 +67,7 @@
             <div class="col-md-2 mb-2">
                 <select name="cabang_id" class="form-control">
                     @foreach($cabangs as $c)
-                        <option value="{{ $c->id }}">{{ $c->nama }}</option>
+                    <option value="{{ $c->id }}">{{ $c->nama }}</option>
                     @endforeach
                 </select>
             </div>
@@ -75,6 +75,29 @@
 
         <button class="btn btn-primary mt-2">Tambah User</button>
     </form>
+
+    <div class="card mb-4 border-success">
+        <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="card-title mb-0">Import Karyawan (.xlsx)</h5>
+
+                <a href="{{ asset('templates/contoh-import.xlsx') }}" class="btn btn-outline-primary btn-sm" download>
+                    <i class="fa fa-download"></i> Download Format Excel
+                </a>
+            </div>
+
+            <form action="{{ route('users.import') }}" method="POST" enctype="multipart/form-data">
+                @csrf
+                <div class="input-group">
+                    <input type="file" name="file_excel" class="form-control" required>
+                    <button type="submit" class="btn btn-primary">Upload & Proses</button>
+                </div>
+                <small class="text-muted d-block mt-2">
+                    * Silakan download format di atas sebagai acuan pengisian data.
+                </small>
+            </form>
+        </div>
+    </div>
 
     <div style="overflow-x:auto;">
         <table class="table table-bordered table-striped styletable">
@@ -125,33 +148,33 @@
 
 {{-- SWEETALERT DELETE --}}
 <script>
-document.addEventListener("DOMContentLoaded", function () {
+    document.addEventListener("DOMContentLoaded", function() {
 
-    const deleteButtons = document.querySelectorAll(".btn-delete");
+        const deleteButtons = document.querySelectorAll(".btn-delete");
 
-    deleteButtons.forEach(btn => {
-        btn.addEventListener("click", function () {
-            let form = this.closest("form");
+        deleteButtons.forEach(btn => {
+            btn.addEventListener("click", function() {
+                let form = this.closest("form");
 
-            Swal.fire({
-                title: "Yakin hapus user ini?",
-                text: "Data yang dihapus tidak dapat dikembalikan!",
-                icon: "warning",
-                showCancelButton: true,
-                confirmButtonColor: "#d33",
-                cancelButtonColor: "#6c757d",
-                confirmButtonText: "Ya, hapus!",
-                cancelButtonText: "Batal",
-                position: "center"
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    form.submit();
-                }
+                Swal.fire({
+                    title: "Yakin hapus user ini?",
+                    text: "Data yang dihapus tidak dapat dikembalikan!",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#d33",
+                    cancelButtonColor: "#6c757d",
+                    confirmButtonText: "Ya, hapus!",
+                    cancelButtonText: "Batal",
+                    position: "center"
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        form.submit();
+                    }
+                });
             });
         });
-    });
 
-});
+    });
 </script>
 
 @endsection

@@ -18,7 +18,7 @@ class GudangCabangController extends Controller
     {
         $user = auth()->user();
 
-        if ($user->role === 'Inventory Cabang' && $user->cabang_id !== $cabang->id) {
+        if ($user->role === 'inventory cabang' && $user->cabang_id !== $cabang->id) {
             abort(403, 'Akses cabang tidak diizinkan.');
         }
     }
@@ -401,7 +401,7 @@ public function riwayat($slug)
 public function riwayatTerima($slug, $id)
 {
     // 🔒 CEK ROLE: HANYA INVENTORY CABANG
-    if (!auth()->user()->hasRole('Inventory Cabang')) {
+    if (!auth()->user()->hasRole('inventory cabang')) {
         abort(403, 'Anda tidak memiliki hak menerima barang.');
     }
 

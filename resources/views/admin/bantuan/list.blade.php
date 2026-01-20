@@ -56,7 +56,8 @@
                         <table class="table table-hover table-bordered align-middle">
                             <thead class="table-primary text-center">
                                 <tr>
-                                    <th>No. Nota</th>
+                                    <th>No. Nota Bantuan</th>
+                                    <th>No. Nota Transaksi</th>
                                     <th>Dari Cabang</th>
                                     <th>Ke Cabang</th>
                                     <th>Tanggal</th>
@@ -74,21 +75,27 @@
                                     <td>
                                         <strong>{{ $data->nomor_nota }}</strong>
                                         @if ($data->subBantuan()->onlyTrashed()->count() > 0)
-                                            <span class="badge bg-danger ms-1" style="font-size: 0.6rem;">edited</span>
+                                        <span class="badge bg-danger ms-1" style="font-size: 0.6rem;">edited</span>
                                         @endif
                                     </td>
                                     <td>
+                                        <a href="{{ route('transaksi.report.nomor_nota', $data->nomor_nota_transaksi) }}" target="_blank" style="color: black;">
+                                            <strong>{{ $data->nomor_nota_transaksi }}</strong>
+                                        </a>
+                                    </td>
+
+                                    <td>
                                         @if($data->cabang_id == Auth::user()->cabang_id)
-                                            <span class="badge bg-success">Saya ({{ $data->cabangAsal->nama }})</span>
+                                        <span class="badge bg-success">Saya ({{ $data->cabangAsal->nama }})</span>
                                         @else
-                                            {{ $data->cabangAsal->nama }}
+                                        {{ $data->cabangAsal->nama }}
                                         @endif
                                     </td>
                                     <td>
                                         @if($data->bantuan_cabang_id == Auth::user()->cabang_id)
-                                            <span class="badge bg-info text-dark">Saya ({{ $data->cabangBantuan->nama }})</span>
+                                        <span class="badge bg-info text-dark">Saya ({{ $data->cabangBantuan->nama }})</span>
                                         @else
-                                            {{ $data->cabangBantuan->nama }}
+                                        {{ $data->cabangBantuan->nama }}
                                         @endif
                                     </td>
                                     <td>{{ \Carbon\Carbon::parse($data->created_at)->format('d/m/Y') }}</td>
@@ -101,27 +108,27 @@
                                     </td>
                                     <td class="text-center">
                                         @if($data->status_transaksi == 'proses')
-                                            <span class="badge bg-warning text-dark">proses</span>
+                                        <span class="badge bg-warning text-dark">proses</span>
                                         @elseif($data->status_transaksi == 'selesai')
-                                            <span class="badge bg-success">selesai</span>
+                                        <span class="badge bg-success">selesai</span>
                                         @else
-                                            <span class="badge bg-danger">Cancel</span>
+                                        <span class="badge bg-danger">Cancel</span>
                                         @endif
                                     </td>
                                     <td class="text-center">
                                         @if($data->status_persetujuan_bantuan_transaksi == 'pending')
-                                            <span class="badge bg-warning text-dark">Menunggu</span>
+                                        <span class="badge bg-warning text-dark">Menunggu</span>
                                         @elseif($data->status_persetujuan_bantuan_transaksi == 'acc')
-                                            <span class="badge bg-success">Disetujui</span>
+                                        <span class="badge bg-success">Disetujui</span>
                                         @else
-                                            <span class="badge bg-danger">Ditolak</span>
+                                        <span class="badge bg-danger">Ditolak</span>
                                         @endif
                                     </td>
                                     <td class="text-center">
                                         @if($data->status_bantuan_transaksi == 'selesai')
-                                            <span class="badge bg-primary">SELESAI</span>
+                                        <span class="badge bg-primary">SELESAI</span>
                                         @else
-                                            <span class="badge bg-secondary">Proses</span>
+                                        <span class="badge bg-secondary">Proses</span>
                                         @endif
                                     </td>
                                     <td class="text-center">
@@ -246,7 +253,7 @@
         document.querySelectorAll('.btn-delete').forEach(button => {
             button.addEventListener('click', function() {
                 const id = this.dataset.id;
-                if(confirm('Yakin ingin menghapus permintaan bantuan ini?')) {
+                if (confirm('Yakin ingin menghapus permintaan bantuan ini?')) {
                     document.getElementById('delete-form-' + id).submit();
                 }
             });

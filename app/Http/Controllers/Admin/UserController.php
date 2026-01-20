@@ -4,10 +4,14 @@ namespace App\Http\Controllers\Admin;
 
 use App\Models\User;
 use App\Models\Cabang;
+use App\Models\LogUser;
+use App\Imports\UsersImport;
 use Illuminate\Http\Request;
 use Spatie\Permission\Models\Role;
+use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Hash;
+use Maatwebsite\Excel\Facades\Excel;
 use App\Http\Requests\StoreUserRequest;
 use App\Http\Requests\UpdateUserRequest;
 
@@ -64,6 +68,26 @@ class UserController extends Controller
         return redirect()->route('users.index')->with('success', 'User berhasil dibuat.');
     }
 
+    public function importCsv(Request $request)
+    {
+        $request->validate([
+            'file_excel' => 'required|mimes:xlsx,xls'
+        ]);
+
+        try {
+            Excel::import(new UsersImport, $request->file('file_excel'));
+
+            // Log Aktivitas
+            $isi = auth()->user()->username . " telah mengimpor banyak user via Excel.";
+            $this->log($isi, "Penambahan");
+
+            return redirect()->route('users.index')->with('success', 'Data karyawan berhasil diimpor.');
+        } catch (\Exception $e) {
+            Log::error('Terjadi kesalahan: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+        }
+    }
+
     public function edit(User $user)
     {
         $roles = Role::pluck('name', 'name');
@@ -101,5 +125,12 @@ class UserController extends Controller
         $this->log($isi, "Penghapusan");
 
         return redirect()->route('users.index')->with('success', 'User dihapus.');
+    }
+
+    public function logIndex()
+    {
+        $logs = LogUser::where('user_id', '!=', auth()->user()->id)->get();
+        // dd($logs);
+        return view('admin.users.log.index', compact('logs'));
     }
 }

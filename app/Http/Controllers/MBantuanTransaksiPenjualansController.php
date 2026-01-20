@@ -242,6 +242,7 @@ class MBantuanTransaksiPenjualansController extends Controller
             $transaksiBantuan = new MBantuanTransaksiPenjualans();
             // Nota BTX untuk Internal antar cabang (Bisa disamakan atau dibedakan)
             $transaksiBantuan->nomor_nota = 'BTX-' . now()->timestamp;
+            $transaksiBantuan->nomor_nota_transaksi = $request->nonota ?? 'TRX-' . now()->timestamp;
             $transaksiBantuan->tanggal = $request->inputtanggal;
             $transaksiBantuan->nama_pelanggan = $request->inputnamapelanggan;
             $transaksiBantuan->hp_pelanggan = $request->inputnomorpelanggan;

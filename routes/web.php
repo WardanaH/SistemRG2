@@ -39,10 +39,10 @@ require __DIR__ . '/gudang_cabang.php';
 Route::get('/', function () {
     $user = auth()->user();
 
-    if ($user->hasRole('Inventory Utama')) {
+    if ($user->hasRole('inventory utama')) {
         return redirect()->route('gudangpusat.dashboard');
     }
-    if ($user->hasRole('Inventory Cabang')) {
+    if ($user->hasRole('inventory cabang')) {
         return redirect()->route('templateinventaris.dashboard');
     }
     if ($user->hasRole('designer')) {
@@ -85,6 +85,9 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/users/{user}/edit', [UserController::class, 'edit'])->middleware('permission:edit-users')->name('users.edit');
     Route::put('/users/{user}', [UserController::class, 'update'])->middleware('permission:edit-users')->name('users.update');
     Route::delete('/users/{user}', [UserController::class, 'destroy'])->middleware('permission:delete-users')->name('users.destroy');
+    Route::get('/users/log', [UserController::class, 'logIndex'])->middleware('permission:manage-users')->name('users.log');
+    Route::post('/users/import-csv', [UserController::class, 'importCsv'])->middleware('permission:add-users')->name('users.import');
+    // Route::get('/users/download-template', [UserController::class, 'downloadTemplate'])->middleware('permission:add-users')->name('users.download-template');
 });
 
 // Manajemen Cabang
@@ -216,6 +219,7 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('/transaksi/penjualan/delete/{id}', [TransaksiPenjualansController::class, 'destroy'])->middleware('permission:delete-transaksipenjualan')->name('destroytransaksipenjualan');
     Route::get('/transaksi-penjualan/show-sub', [TransaksiPenjualansController::class, 'showSubTransaksi'])->middleware('permission:manage-transaksipenjualan')->name('showsubtransaksi');
     Route::get('/transaksi/report/{id}', [TransaksiPenjualansController::class, 'report'])->middleware('permission:manage-transaksipenjualan')->name('transaksi.report');
+    Route::get('/transaksi/report_nomor_nota/{nomor_nota}', [TransaksiPenjualansController::class, 'report_nomor_nota'])->middleware('permission:manage-transaksipenjualan')->name('transaksi.report.nomor_nota');
 });
 
 // Manajemen Bantuan
