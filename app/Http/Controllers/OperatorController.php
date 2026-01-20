@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Models\MTransaksiPenjualans;
 use App\Models\MSubTransaksiPenjualans;
+use App\Models\MSubBantuanTransaksiPenjualans;
 
 class OperatorController extends Controller
 {
@@ -35,6 +36,10 @@ class OperatorController extends Controller
         $query = MSubTransaksiPenjualans::with('produk.kategori')
             ->whereHas('penjualan', fn($q) => $q->where('cabang_id', $cabangId));
 
+        $queryBantuan = MSubBantuanTransaksiPenjualans::with('produk.kategori')
+            ->whereHas('transaksiUtama', fn($q) => $q->where('bantuan_cabang_id', $cabangId));
+
+
         // Filter kategori jika bukan operator multi
         if ($kategoriFilter) {
             $query->whereHas(
@@ -44,10 +49,28 @@ class OperatorController extends Controller
             );
         }
 
+        // Filter kategori jika bukan operator multi
+        if ($kategoriFilter) {
+            $queryBantuan->whereHas(
+                'produk.kategori',
+                fn($q) =>
+                $q->where('nama_kategori', $kategoriFilter)
+            );
+        }
+
         $selesai = (clone $query)->where('status_sub_transaksi', 'selesai')->count();
         $belum_selesai = (clone $query)->where('status_sub_transaksi', '!=', 'selesai')->count();
 
-        return view('operator.dashboard', compact('selesai', 'belum_selesai'));
+        $belum_selesai_bantuan = (clone $queryBantuan)->where('status_sub_transaksi', '!=', 'selesai')->count();
+        $selesai_bantuan = (clone $queryBantuan)->where('status_sub_transaksi', 'selesai')->count();
+        // dd($belum_selesai_bantuan, $selesai_bantuan);
+
+        return view('operator.dashboard', compact(
+            'selesai',
+            'belum_selesai',
+            'belum_selesai_bantuan',
+            'selesai_bantuan'
+        ));
     }
 
     public function profile()

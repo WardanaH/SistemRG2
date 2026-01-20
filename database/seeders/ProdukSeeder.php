@@ -13,20 +13,28 @@ class ProdukSeeder extends Seeder
         $dataProduk = [];
         $dataBahan  = [];
 
-        $satuanList = ['KG', 'PCS', 'PAKET', 'METER', 'CENTIMETER'];
+        $satuanList = ['PCS', 'PAKET', 'METER', 'CENTIMETER'];
 
         for ($i = 1; $i <= 10; $i++) {
 
             $satuanProduk = $satuanList[array_rand($satuanList)];
             $satuanBahan  = $satuanList[array_rand($satuanList)];
 
-            // Tentukan hitung_luas berdasarkan satuan
             $hitungLuasProduk = in_array($satuanProduk, ['METER', 'CENTIMETER']) ? 1 : 0;
             $hitungLuasBahan  = in_array($satuanBahan,  ['METER', 'CENTIMETER']) ? 1 : 0;
 
-            // Harga bulat kelipatan 1000 antara 10.000 - 20.000
-            $hargaBeli = rand(10, 20) * 1000;
-            $hargaJual = rand(10, 20) * 1000;
+            // --- PERBAIKAN LOGIKA HARGA ---
+
+            // 1. Tentukan Harga Beli Dasar (Misal 5.000 - 15.000)
+            $hargaBeli = rand(5, 15) * 1000;
+
+            // 2. Tentukan Keuntungan (Misal tambahan 2.000 - 10.000)
+            $marginUntung = rand(2, 10) * 1000;
+
+            // 3. Harga Jual otomatis lebih tinggi dari Harga Beli
+            $hargaJual = $hargaBeli + $marginUntung;
+
+            // Harga Bahan Baku tetap acak karena tidak dibandingkan dengan jual
             $hargaBahan = rand(10, 20) * 1000;
 
             $dataProduk[] = [

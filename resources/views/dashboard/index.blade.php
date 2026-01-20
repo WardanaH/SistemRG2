@@ -241,7 +241,16 @@
             labelInterpolationFnc: function(value, idx) {
                 // Menampilkan persentase atau angka di pie jika cukup luas
                 return pieData.series[idx];
-            }
+            },
+            plugins: [
+                Chartist.plugins.tooltip({
+                    class: 'chartist-tooltip',
+                    appendToBody: true,
+                    transformTooltipTextFnc: function(value) {
+                        return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+                    }
+                })
+            ]
         });
     });
 </script>
