@@ -1,10 +1,23 @@
+@php
+use App\Models\MNotifications;
+
+/* Ambil notif belum dibaca */
+$notifications = MNotifications::whereDate('created_at', '>=', now()->subDays(3))
+    ->orderBy('created_at', 'desc')
+    ->limit(5)
+    ->get();
+
+/* badge hanya hitung yg belum dibaca */
+$notifCount = $notifications->where('is_read', false)->count();
+@endphp
+
 <!--**********************************
     Nav header start
 ***********************************-->
 <div class="nav-header">
     <a href="{{ route('dashboard') }}" class="brand-logo">
-        <img class="logo-abbr" 
-            src="{{ asset('images/logo_cropped.png') }}" 
+        <img class="logo-abbr"
+            src="{{ asset('images/logo_cropped.png') }}"
             alt="Logo Restu Guru Promosindo"
             style="height:75px !important; width:auto !important;">
         <span class="brand-title">
@@ -79,14 +92,14 @@ body.menu-toggle .brand-logo {
     font-size: 18px !important;
     font-weight: 700 !important;
 
-    display: block !important;        
-    white-space: normal !important;   
+    display: block !important;
+    white-space: normal !important;
     line-height: 1.2 !important;
 
     margin: 0 !important;
     padding: 0 !important;
 
-    max-width: 120px !important;     
+    max-width: 120px !important;
 }
 
 </style>
@@ -117,8 +130,8 @@ body.menu-toggle .brand-logo {
                         </span>
                         <div class="dropdown-menu p-0 m-0">
                             <form>
-                                <input id="globalSearchInput" 
-                                    class="form-control" 
+                                <input id="globalSearchInput"
+                                    class="form-control"
                                     type="search"
                                     placeholder="Search"
                                     aria-label="Search">
@@ -131,18 +144,46 @@ body.menu-toggle .brand-logo {
                 <ul class="navbar-nav header-right">
                     <li class="nav-item dropdown notification_dropdown">
                         <a class="nav-link" href="#" role="button" data-toggle="dropdown">
-                            <i class="mdi mdi-bell"></i>
+                        <i class="mdi mdi-bell"></i>
+
+                        @if($notifCount > 0)
+                            <span id="notifBadge" class="badge badge-danger"
+                                style="position:absolute; top:10px; right:10px;">
+                                {{ $notifCount }}
+                            </span>
                             <div class="pulse-css"></div>
+                        @endif
+
                         </a>
                         <div class="dropdown-menu dropdown-menu-right">
                             <ul class="list-unstyled">
-                                <li class="media dropdown-item">
-                                    <span class="success"><i class="ti-user"></i></span>
+                            @if($notifications->count())
+                            @foreach($notifications as $notif)
+                            <li class="media dropdown-item p-0">
+                            <a href="{{ route('notifications.read', $notif->id) }}"
+                            class="d-flex w-100 p-3 text-dark text-decoration-none
+                            {{ $notif->is_read ? 'notif-read' : 'notif-unread' }}">
+
+                                    <span class="warning mr-2">
+                                        <i class="ti-bell"></i>
+                                    </span>
+
                                     <div class="media-body">
-                                        <a href="#"><p><strong>Martin</strong> added a customer</p></a>
+                                        <p class="mb-1 font-weight-bold">{{ $notif->title }}</p>
+                                        <small>{{ $notif->message }}</small>
                                     </div>
-                                    <span class="notify-time">3:20 am</span>
+
+                                    <span class="notify-time ml-auto">
+                                        {{ $notif->created_at->diffForHumans() }}
+                                    </span>
+                                </a>
+                            </li>
+                            @endforeach
+                            @else
+                                <li class="dropdown-item text-center text-muted">
+                                    Tidak ada notifikasi
                                 </li>
+                            @endif
                             </ul>
                             <a class="all-notification" href="#">See all notifications <i class="ti-arrow-right"></i></a>
                         </div>
@@ -152,9 +193,9 @@ body.menu-toggle .brand-logo {
                         <a class="nav-link" href="#" role="button" data-toggle="dropdown">
                             <i class="mdi mdi-account"></i>
                         </a>
-                        <div class="dropdown-menu dropdown-menu-right">
+                        <div class="dropdown-menu dropdown-menu-right notification-box">
                             <a href="{{ route('profile') }}" class="dropdown-item">
-                                <i class="icon-user"></i> 
+                                <i class="icon-user"></i>
                                 <span class="ml-2">Profile</span>
                             </a>
 
@@ -226,6 +267,54 @@ document.addEventListener("DOMContentLoaded", function () {
             });
         }
     @endif
+    // HILANGKAN BADGE SAAT DROPDOWN DIBUKA
+    const notifDropdown = document.querySelector('.notification_dropdown');
+    const notifBadge = document.getElementById('notifBadge');
+
+    if (notifDropdown && notifBadge) {
+        notifDropdown.addEventListener('click', function () {
+            notifBadge.style.display = 'none';
+        });
+    }
 
 });
 </script>
+<style>
+.notification-box {
+    width: 340px !important;
+    max-height: 360px;
+    overflow-y: auto;
+}
+
+.notification-box .dropdown-item {
+    padding: 8px 12px !important;
+}
+
+.notification-box .media-body p {
+    font-size: 13px;
+}
+
+.notification-box small {
+    font-size: 12px;
+    color: #6c757d;
+}
+
+/* notif belum dibaca */
+.notif-unread {
+    background: rgba(0, 123, 255, 0.07);
+    transition: background 0.3s ease;
+}
+
+/* notif normal */
+.notif-read {
+    background: transparent;
+}
+
+/* ukuran dropdown */
+.notification-box {
+    width: 330px !important;
+    max-height: 360px;
+    overflow-y: auto;
+}
+</style>
+

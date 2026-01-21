@@ -266,6 +266,19 @@ class MBantuanTransaksiPenjualansController extends Controller
 
             $transaksiBantuan->save();
 
+            // ===============================
+            // NOTIFIKASI PERMINTAAN BANTUAN
+            // ===============================
+            $cabangAsal   = Auth::user()->cabang->nama;
+            $cabangTujuan = Cabang::find($request->inputcabangbantuan)->nama;
+
+            $this->createNotification(
+                'spk_bantuan',
+                'Permintaan Bantuan SPK',
+                "Cabang {$cabangAsal} meminta bantuan produksi ke cabang {$cabangTujuan}",
+                'inventory_pusat',
+                $transaksiBantuan->id
+            );
 
             // =================================================================================
             // PROSES 3: SIMPAN DETAIL ITEM (LOOPING UNTUK KEDUA TABEL)
