@@ -6,15 +6,15 @@
             <div class="pull-right hidden-xs">
                 <b>Version</b> 1.0
             </div>
-            <strong>Developped by <a href="https://www.instagram.com/runcode.id/">runcode</a>.</strong> &copy; 2018
+            <strong>Developped by <a href="https://www.instagram.com/runcode.id/" target="_blank">runcode</a>.</strong> &copy; 2018
         </div>
 
         <!-- COPYRIGHT TENGAH -->
         <div class="footer-center text-center">
-            &copy; Tim PKL Politala 2025–2026 Version 2.0 —
             <a href="https://www.instagram.com/wrdxxzz/" target="_blank">Wardana</a> |
             <a href="https://www.instagram.com/diahmfr_/" target="_blank">Diah</a> |
             <a href="https://www.instagram.com/iamfinethankyoundsinn/" target="_blank">Mujayhid</a>
+            &copy; Tim PKL Politala 2025–2026 Version 2.0
         </div>
 
         <!-- COPYRIGHT KANAN -->

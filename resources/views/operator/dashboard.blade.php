@@ -34,6 +34,7 @@
     <p class="text-muted mb-4">Ringkasan tugas Anda.</p>
     <p>Selamat datang, {{ Auth::user()->name }}</p>
     <p>Anda login sebagai operator di cabang {{ Auth::user()->cabang->nama }}</p>
+    <p>Anda login sebagai {{ Auth::user()->roles->pluck('name')->first() }}</p>
 
     <div class="row g-4">
 
@@ -62,6 +63,40 @@
                     <h6 class="text-danger fw-semibold">Tugas Belum Selesai</h6>
 
                     <div class="stat-number text-danger">{{ $belum_selesai }}</div>
+
+                    <span class="badge bg-danger px-3 py-2">
+                        Lihat Riwayat
+                    </span>
+
+                </div>
+            </a>
+        </div>
+
+        {{-- TUGAS SELESAI --}}
+        <div class="col-xl-3 col-lg-4 col-md-6">
+            <a href="{{ route('operator.riwayat.bantuan') }}" class="text-decoration-none text-dark">
+                <div class="card stat-card shadow-sm border-0 p-3">
+
+                    <h6 class="text-success fw-semibold">Permintaan Bantuan Selesai</h6>
+
+                    <div class="stat-number text-success">{{ $selesai_bantuan }}</div>
+
+                    <span class="badge bg-success px-3 py-2">
+                        Lihat Status
+                    </span>
+
+                </div>
+            </a>
+        </div>
+
+        {{-- TUGAS BELUM SELESAI --}}
+        <div class="col-xl-3 col-lg-4 col-md-6">
+            <a href="{{ route('operator.pesanan.bantuan') }}" class="text-decoration-none text-dark">
+                <div class="card stat-card shadow-sm border-0 p-3">
+
+                    <h6 class="text-danger fw-semibold">Permintaan Bantuan Belum Selesai</h6>
+
+                    <div class="stat-number text-danger">{{ $belum_selesai_bantuan }}</div>
 
                     <span class="badge bg-danger px-3 py-2">
                         Lihat Riwayat

@@ -1,10 +1,12 @@
 <?php
 
+use Faker\Guesser\Name;
 use GuzzleHttp\Middleware;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ProdukController;
+use App\Http\Controllers\LaporanController;
 use App\Http\Controllers\DesignerController;
 use App\Http\Controllers\KategoriController;
 use App\Http\Controllers\OperatorController;
@@ -28,7 +30,6 @@ use App\Http\Controllers\RangePricePelangganController;
 use App\Http\Controllers\TransaksiBahanBakusController;
 use App\Http\Controllers\TransaksiPenjualansController;
 use App\Http\Controllers\MBantuanTransaksiPenjualansController;
-use Faker\Guesser\Name;
 
 require __DIR__ . '/operator.php';
 require __DIR__ . '/designer.php';
@@ -362,6 +363,9 @@ Route::middleware(['auth'])->group(function () {
         [RangePricePelangganController::class, 'loadSpecialPriceByProduk']
     );
 });
+
+Route::get('/laporan', [LaporanController::class, 'index'])->name('laporan.index');
+Route::get('/laporan/filter', [LaporanController::class, 'filter'])->name('filter.laporan');
 
 // Route::middleware(['auth'])->group(function () {
 
