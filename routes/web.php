@@ -359,6 +359,9 @@ Route::middleware(['auth'])->group(function () {
     );
 });
 
+Route::get('/inventaris/qr/{kode}', [GudangCabangController::class, 'qrInventaris'])
+    ->name('inventaris.qr');
+
 // Route::middleware(['auth'])->group(function () {
 
 //     Route::get(

@@ -296,7 +296,7 @@ public function inventarisStore(Request $req, $slug)
     ]);
 
     // generate isi QR
-    $qrText = "Inventaris: {$req->nama_barang}\nKode: {$req->kode_barang}\nCabang: {$cabang->nama}";
+    $qrText = "http://192.168.18.240:8000/inventaris/qr/" . $req->kode_barang;
 
     // generate file SVG QR
     $svgData = QrCode::format('svg')
@@ -374,6 +374,15 @@ public function inventarisDestroy($slug, $id)
     return back()->with('success', 'Inventaris berhasil dihapus!');
 }
 
+public function qrInventaris($kode)
+{
+    $inventaris = MInventarisKantor::where('kode_barang', $kode)->firstOrFail();
+
+    // Panggil view di folder templateinventaris
+    return view('admin.inventaris.templateinventaris.inventaris_qr_detail', [
+        'inventaris' => $inventaris
+    ]);
+}
 
 /* ===========================================================
 🔹 4. RIWAYAT PENGIRIMAN KE CABANG (VERSI BARU)

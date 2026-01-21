@@ -89,6 +89,10 @@ Route::middleware(['auth', 'role:inventory utama|inventory cabang'])
         Route::delete('/inventaris-cabang/delete/{id}', [GudangCabangController::class, 'inventarisDestroy'])
             ->name('inventaris.cabang.destroy');
 
+        // Route QR publik (bisa di-scan siapa saja)
+        // Route::get('/inventaris/qr/{kode}', [GudangCabangController::class, 'qrInventaris'])
+        //     ->name('inventaris.qr');
+
         // ======================
         // RIWAYAT
         // ======================
