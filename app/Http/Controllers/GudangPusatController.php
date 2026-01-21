@@ -7,6 +7,8 @@ use App\Models\Cabang;
 use App\Models\MBahanBakus;
 use App\Models\MStokBahanBakus;
 use App\Models\MPengirimanGudang;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class GudangPusatController extends Controller
 {
@@ -350,6 +352,64 @@ public function updateStatus(Request $req, $id)
         $pengiriman->delete();
 
         return back()->with('success', 'Pengiriman berhasil dibatalkan!');
+    }
+
+    //DASHBOARD
+    public function dashboard()
+    {
+        $today = Carbon::today();
+        $gudang = $this->getGudang();
+
+        // ===== CARD =====
+        $totalBahan = \App\Models\MBahanBakus::count();
+
+        $pengirimanHariIni = \App\Models\MPengirimanGudang::where('cabang_asal_id', $gudang->id)
+            ->whereDate('created_at', Carbon::today())
+            ->count();
+
+        $stokMasukHariIni = \App\Models\MStokBahanBakus::where('cabang_id', $gudang->id)
+            ->whereDate('created_at', Carbon::today())
+            ->sum('banyak_stok');
+
+        // ===== PIE CHART: Pengiriman per Cabang (bulan ini) =====
+        $pengirimanPerCabang = \App\Models\MPengirimanGudang::select(
+                'cabangs.nama as nama_cabang',
+                DB::raw('COUNT(pengiriman_gudangs.id) as total')
+            )
+            ->join('cabangs', 'cabangs.id', '=', 'pengiriman_gudangs.cabang_tujuan_id')
+            ->where('pengiriman_gudangs.cabang_asal_id', $gudang->id)
+            ->whereMonth('pengiriman_gudangs.created_at', Carbon::now()->month)
+            ->whereYear('pengiriman_gudangs.created_at', Carbon::now()->year)
+            ->groupBy('cabangs.nama')
+            ->get();
+
+        // stok kritis
+        $stokKritis = DB::table('bahanbakus')
+            ->join('cabangs', 'cabangs.jenis', '=', DB::raw("'cabang'"))
+            ->leftJoin('stok_bahan_bakus', function ($join) {
+                $join->on('stok_bahan_bakus.bahanbaku_id', '=', 'bahanbakus.id')
+                    ->on('stok_bahan_bakus.cabang_id', '=', 'cabangs.id');
+            })
+            ->select(
+                'cabangs.nama as nama_cabang',
+                'bahanbakus.nama_bahan',
+                DB::raw('COALESCE(stok_bahan_bakus.banyak_stok, 0) as banyak_stok'),
+                'bahanbakus.batas_stok'
+            )
+            ->where(function ($q) {
+                $q->whereRaw('COALESCE(stok_bahan_bakus.banyak_stok, 0) = 0')
+                ->orWhereRaw('COALESCE(stok_bahan_bakus.banyak_stok, 0) <= bahanbakus.batas_stok');
+            })
+            ->orderBy('banyak_stok', 'asc')
+            ->paginate(5); 
+
+        return view('admin.inventaris.gudangpusat.dashboard', compact(
+            'totalBahan',
+            'pengirimanHariIni',
+            'stokMasukHariIni',
+            'pengirimanPerCabang',
+            'stokKritis'
+        ));
     }
 
 }

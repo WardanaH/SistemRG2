@@ -10,6 +10,7 @@ use App\Models\MInventarisKantor;
 use App\Models\MPengirimanGudang;
 use Illuminate\Support\Facades\Storage;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
+use Carbon\Carbon;
 
 
 class GudangCabangController extends Controller
@@ -509,4 +510,52 @@ public function riwayatTerima($slug, $id)
 
         return back()->with('success', 'Status cabang telah diperbarui.');
     }
+
+    //DASHBOARD
+    public function dashboard()
+    {
+        $today   = Carbon::today();
+        $cabangId = auth()->user()->cabang_id;
+
+        // =========================
+        // TOTAL STOK MASUK HARI INI
+        // =========================
+        $totalStokMasukHariIni = MPengirimanGudang::where('cabang_tujuan_id', $cabangId)
+            ->where('status_pengiriman', 'Diterima')
+            ->whereDate('tanggal_diterima', $today)
+            ->sum('jumlah');
+
+        // ================================
+        // TOTAL PENGIRIMAN HARI INI (SEMUA)
+        // ================================
+        $totalPengirimanHariIni = MPengirimanGudang::where('cabang_tujuan_id', $cabangId)
+            ->whereDate('tanggal_pengiriman', $today)
+            ->count();
+
+        // line chart
+        $labels = [];
+        $series = [];
+
+        for ($i = 13; $i >= 0; $i--) {
+            $date = Carbon::today()->subDays($i);
+
+            $labels[] = $date->format('d M');
+
+            $total = MPengirimanGudang::where('cabang_tujuan_id', $cabangId)
+                ->where('status_pengiriman', 'Diterima')
+                ->whereDate('tanggal_diterima', $date)
+                ->sum('jumlah');
+
+            // Chartist WAJIB number
+            $series[] = (int) $total;
+        }
+
+        return view('admin.inventaris.templateinventaris.dashboard', [
+            'totalStokMasukHariIni'   => $totalStokMasukHariIni,
+            'totalPengirimanHariIni' => $totalPengirimanHariIni,
+            'chartLabels'            => json_encode($labels),
+            'chartSeries'            => json_encode($series),
+        ]);
+    }
+
 }

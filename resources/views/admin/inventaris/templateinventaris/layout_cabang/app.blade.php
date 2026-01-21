@@ -354,6 +354,7 @@
     </script>
 
     @stack('scripts')
+    @yield('script')
 
     {{-- ============ GLOBAL TABLE SEARCH (preserve original behaviour) ============ --}}
     <script>

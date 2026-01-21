@@ -22,10 +22,8 @@ Route::middleware(['auth', 'role:inventory utama|owner'])
         | DASHBOARD
         |=====================
         */
-        Route::get('/dashboard-gudang-pusat', function () {
-            return view('admin.inventaris.gudangpusat.dashboard');
-        })->name('gudangpusat.dashboard');
-
+       Route::get('/dashboard-gudang-pusat', [GudangPusatController::class, 'dashboard'])
+        ->name('gudangpusat.dashboard');
         /*
         |=====================
         | MANAJEMEN CABANG (INVENTARIS)

@@ -74,7 +74,7 @@
             <td class="text-center">
               @if(
                     $r->status_pengiriman == 'Dikirim'
-                    && auth()->user()->hasRole('Inventory Cabang')
+                    && auth()->user()->hasRole('inventory cabang')
                 )
                 <form action="{{ route('cabang.riwayat.cabang.terima', [$cabang->slug, $r->id]) }}"
                       method="POST"

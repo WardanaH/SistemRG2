@@ -18,136 +18,146 @@
     </div>
 </div>
 
-{{-- Statistik atas --}}
+{{-- ===================== STATISTIK ATAS ===================== --}}
 <div class="row">
-    <div class="col-lg-3 col-sm-6">
+
+    {{-- Total Bahan Baku --}}
+    <div class="col-lg-4 col-md-6">
         <div class="card">
             <div class="stat-widget-one card-body">
                 <div class="stat-icon d-inline-block">
-                    <i class="ti-money text-success border-success"></i>
+                    <i class="ti-package text-primary border-primary"></i>
                 </div>
                 <div class="stat-content d-inline-block">
-                    <div class="stat-text">Profit</div>
-                    <div class="stat-digit">1,012</div>
+                    <div class="stat-text">Total Bahan Baku</div>
+                    <div class="stat-digit">{{ $totalBahan }}</div>
                 </div>
             </div>
         </div>
     </div>
-    <div class="col-lg-3 col-sm-6">
+
+    {{-- Pengiriman Hari Ini --}}
+    <div class="col-lg-4 col-md-6">
         <div class="card">
             <div class="stat-widget-one card-body">
                 <div class="stat-icon d-inline-block">
-                    <i class="ti-user text-primary border-primary"></i>
+                    <i class="ti-truck text-success border-success"></i>
                 </div>
                 <div class="stat-content d-inline-block">
-                    <div class="stat-text">Customer</div>
-                    <div class="stat-digit">961</div>
+                    <div class="stat-text">Pengiriman Hari Ini</div>
+                    <div class="stat-digit">{{ $pengirimanHariIni }}</div>
                 </div>
             </div>
         </div>
     </div>
-    <div class="col-lg-3 col-sm-6">
+
+    {{-- Stok Masuk Hari Ini --}}
+    <div class="col-lg-4 col-md-12">
         <div class="card">
             <div class="stat-widget-one card-body">
                 <div class="stat-icon d-inline-block">
-                    <i class="ti-layout-grid2 text-pink border-pink"></i>
+                    <i class="ti-import text-warning border-warning"></i>
                 </div>
                 <div class="stat-content d-inline-block">
-                    <div class="stat-text">Projects</div>
-                    <div class="stat-digit">770</div>
+                    <div class="stat-text">Stok Masuk Hari Ini</div>
+                    <div class="stat-digit">
+                        {{ number_format($stokMasukHariIni) }}
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-    <div class="col-lg-3 col-sm-6">
-        <div class="card">
-            <div class="stat-widget-one card-body">
-                <div class="stat-icon d-inline-block">
-                    <i class="ti-link text-danger border-danger"></i>
-                </div>
-                <div class="stat-content d-inline-block">
-                    <div class="stat-text">Referral</div>
-                    <div class="stat-digit">2,781</div>
-                </div>
-            </div>
-        </div>
-    </div>
+
 </div>
 
-{{-- Chart bar & pie --}}
-<div class="row">
+{{-- ================== STOK KRITIS + PIE CHART ================== --}}
+<div class="row mt-4">
+
+    {{-- ====== TABEL STOK KRITIS (LEBAR) ====== --}}
     <div class="col-lg-8">
-        <div class="card">
+        <div class="card h-100">
             <div class="card-header">
-                <h4 class="card-title">Fee Collections and Expenses</h4>
+                <h4 class="card-title">Stok Kritis & Habis Cabang</h4>
             </div>
-            <div class="card-body">
-                <div class="ct-bar-chart mt-5"></div>
-            </div>
-        </div>
-    </div>
-    <div class="col-lg-4">
-        <div class="card">
-            <div class="card-body">
-                <div class="ct-pie-chart"></div>
-            </div>
-        </div>
-    </div>
-</div>
 
-{{-- Table & Timeline --}}
-<div class="row">
-    <div class="col-lg-12">
-        <div class="card">
-            <div class="card-header">
-                <h4 class="card-title">All Exam Result</h4>
-            </div>
             <div class="card-body">
                 <div class="table-responsive">
-                    <table class="table student-data-table m-t-20">
-                        <thead>
+                    <table class="table table-striped table-hover">
+                        <thead class="thead-dark">
                             <tr>
-                                <th>Subject</th>
-                                <th>Grade Point</th>
-                                <th>Percent Form</th>
-                                <th>Percent Upto</th>
-                                <th>Date</th>
+                                <th style="width:60px">No</th>
+                                <th>Cabang</th>
+                                <th>Nama Bahan</th>
+                                <th style="width:100px">Stok</th>
+                                <th style="width:110px">Status</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
-                                <td>Class Test</td>
-                                <td>Mathmatics</td>
-                                <td>4.00</td>
-                                <td>95.00</td>
-                                <td>100</td>
-                                <td>20/04/2017</td>
-                            </tr>
-                            <tr>
-                                <td>Class Test</td>
-                                <td>English</td>
-                                <td>4.00</td>
-                                <td>95.00</td>
-                                <td>100</td>
-                                <td>20/04/2017</td>
-                            </tr>
-                            <tr>
-                                <td>Class Test</td>
-                                <td>Bangla</td>
-                                <td>4.00</td>
-                                <td>95.00</td>
-                                <td>100</td>
-                                <td>20/04/2017</td>
-                            </tr>
+                            @forelse ($stokKritis as $item)
+                                <tr>
+                                    <td>
+                                        {{ ($stokKritis->currentPage() - 1) * $stokKritis->perPage() + $loop->iteration }}
+                                    </td>
+                                    <td>{{ $item->nama_cabang }}</td>
+                                    <td>{{ $item->nama_bahan }}</td>
+                                    <td>{{ $item->banyak_stok }}</td>
+                                    <td>
+                                        @if ($item->banyak_stok == 0)
+                                            <span class="badge badge-danger">HABIS</span>
+                                        @else
+                                            <span class="badge badge-warning">KRITIS</span>
+                                        @endif
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="5" class="text-center text-muted">
+                                        Tidak ada stok kritis
+                                    </td>
+                                </tr>
+                            @endforelse
                         </tbody>
                     </table>
+                </div>
+
+                {{-- Pagination --}}
+                <div class="d-flex justify-content-end mt-3">
+                    <style>
+                        .pagination .page-link {
+                            color: #000 !important;
+                        }
+                        .pagination .page-item.active .page-link {
+                            background-color: #0f58a7;
+                            border-color: #0f58a7;
+                            color: #fff !important;
+                        }
+                    </style>
+
+                    {{ $stokKritis->links('pagination::bootstrap-4') }}
                 </div>
             </div>
         </div>
     </div>
 
+    {{-- ====== PIE CHART ====== --}}
+    <div class="col-lg-4">
+        <div class="card h-100">
+            <div class="card-header bg-primary text-white">
+                <strong>Distribusi Pengiriman per Cabang (Bulan Ini)</strong>
+            </div>
+            <div class="card-body d-flex align-items-center justify-content-center">
+                <canvas id="piePengirimanCabang" height="260"></canvas>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+{{-- ===================== BAGIAN BAWAH (TIDAK DIUBAH) ===================== --}}
+{{-- <div class="row"> --}}
     {{-- Timeline --}}
-    <div class="col-lg-6 col-xl-4 col-xxl-6 col-md-6">
+    {{-- <div class="col-lg-6 col-xl-4 col-xxl-6 col-md-6">
         <div class="card">
             <div class="card-header"><h4 class="card-title">Timeline</h4></div>
             <div class="card-body">
@@ -171,10 +181,10 @@
                 </div>
             </div>
         </div>
-    </div>
+    </div> --}}
 
     {{-- Notice Board --}}
-    <div class="col-xl-4 col-lg-6 col-xxl-6 col-md-6">
+    {{-- <div class="col-xl-4 col-lg-6 col-xxl-6 col-md-6">
         <div class="card">
             <div class="card-header"><h4 class="card-title">Notice Board</h4></div>
             <div class="card-body">
@@ -192,10 +202,10 @@
                 </div>
             </div>
         </div>
-    </div>
+    </div> --}}
 
-    {{-- Todo List --}}
-    <div class="col-xl-4 col-xxl-6 col-lg-6 col-md-12 col-sm-12">
+    {{-- Todo --}}
+    {{-- <div class="col-xl-4 col-xxl-6 col-lg-6 col-md-12 col-sm-12">
         <div class="card">
             <div class="card-header"><h4 class="card-title">Todo</h4></div>
             <div class="card-body px-0">
@@ -215,55 +225,32 @@
                 </div>
             </div>
         </div>
-    </div>
-</div>
-
-{{-- Calendar & Expense --}}
-<div class="row">
-    <div class="col-lg-4">
-        <div class="card">
-            <div class="card-body">
-                <div class="year-calendar"></div>
-            </div>
-        </div>
-    </div>
-    <div class="col-lg-8">
-        <div class="card">
-            <div class="card-header">
-                <h4 class="card-title">All Expense</h4>
-            </div>
-            <div class="card-body">
-                <div class="table-responsive">
-                    <table class="table student-data-table m-t-20">
-                        <thead>
-                            <tr>
-                                <th>Expense Type</th>
-                                <th>Amount</th>
-                                <th>Status</th>
-                                <th>Email</th>
-                                <th>Date</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>Salary</td>
-                                <td>$2000</td>
-                                <td><span class="badge badge-primary">Paid</span></td>
-                                <td>edumin@gmail.com</td>
-                                <td>10/05/2017</td>
-                            </tr>
-                            <tr>
-                                <td>Salary</td>
-                                <td>$2000</td>
-                                <td><span class="badge badge-warning">Pending</span></td>
-                                <td>edumin@gmail.com</td>
-                                <td>10/05/2017</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </div>
+    </div> --}}
 </div>
 @endsection
+
+@push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const ctx = document.getElementById('piePengirimanCabang');
+    if (!ctx) return;
+
+    new Chart(ctx, {
+        type: 'pie',
+        data: {
+            labels: {!! json_encode($pengirimanPerCabang->pluck('nama_cabang')) !!},
+            datasets: [{
+                data: {!! json_encode($pengirimanPerCabang->pluck('total')) !!}
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { position: 'bottom' }
+            }
+        }
+    });
+});
+</script>
+@endpush

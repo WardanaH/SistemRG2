@@ -352,6 +352,8 @@
             // preloader already hidden on window load listener above
         });
     </script>
+    {{-- Chart.js (WAJIB untuk pie / line chart custom) --}}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 
     @stack('scripts')
 

@@ -24,9 +24,8 @@ Route::middleware(['auth', 'role:inventory cabang'])
         // ======================
         // DASHBOARD
         // ======================
-        Route::get('/dashboard', function () {
-            return view('admin.inventaris.templateinventaris.dashboard');
-        })->name('templateinventaris.dashboard');
+        Route::get('/dashboard', [GudangCabangController::class, 'dashboard'])
+            ->name('templateinventaris.dashboard');
 
     });
 
