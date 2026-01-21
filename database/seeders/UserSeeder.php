@@ -102,11 +102,11 @@ class UserSeeder extends Seeder
         ]);
         $supervisor->assignRole('supervisor');
 
-        // --- Buar Manajemen
+        // --- Buat Manajemen
         $manajemen = User::create([
             'nama' => 'Manajemen Cabang',
             'username' => 'manajemen',
-            'email' => 'manajemen@example.com',
+            'email' => 'manajemenbjm@example.com',
             'password' => Hash::make('password'),
             'cabang_id' => $cabangBjm->id,
         ]);
@@ -144,7 +144,7 @@ class UserSeeder extends Seeder
 
         // --- Buat user Operator Indoor ---
         $operatorIndoor = User::create([
-            'nama' => 'Operator Cabang',
+            'nama' => 'Operator Cabang bjm',
             'username' => 'operatorIndoor',
             'email' => 'operatorOutdoor@example.com',
             'password' => Hash::make('password'),
@@ -154,7 +154,7 @@ class UserSeeder extends Seeder
 
         // --- Buat user Operator Outdoor ---
         $operatorOutdoor = User::create([
-            'nama' => 'Operator Cabang',
+            'nama' => 'Operator Cabang bjm',
             'username' => 'operatorOutdoor',
             'email' => 'operatorIndoor@example.com',
             'password' => Hash::make('password'),
@@ -164,11 +164,41 @@ class UserSeeder extends Seeder
 
         // --- Buat user Operator Multi ---
         $operatorMulti = User::create([
-            'nama' => 'Operator Cabang',
+            'nama' => 'Operator Cabang bjm',
             'username' => 'operatorMulti',
             'email' => 'operatorMulti@example.com',
             'password' => Hash::make('password'),
             'cabang_id' => $cabangBjm->id,
+        ]);
+        $operatorMulti->assignRole('operator multi');
+
+        // --- Buat user Operator Indoor ---
+        $operatorIndoor = User::create([
+            'nama' => 'Operator Cabang plh',
+            'username' => 'operatorIndoorplh',
+            'email' => 'operatorOutdoorplh@example.com',
+            'password' => Hash::make('password'),
+            'cabang_id' => $cabangPlh->id,
+        ]);
+        $operatorIndoor->assignRole('operator indoor');
+
+        // --- Buat user Operator Outdoor ---
+        $operatorOutdoor = User::create([
+            'nama' => 'Operator Cabang plh',
+            'username' => 'operatorOutdoorplh',
+            'email' => 'operatorIndoorplh@example.com',
+            'password' => Hash::make('password'),
+            'cabang_id' => $cabangPlh->id,
+        ]);
+        $operatorOutdoor->assignRole('operator outdoor');
+
+        // --- Buat user Operator Multi ---
+        $operatorMulti = User::create([
+            'nama' => 'Operator Cabang plh',
+            'username' => 'operatorMultiplh',
+            'email' => 'operatorMultiplh@example.com',
+            'password' => Hash::make('password'),
+            'cabang_id' => $cabangPlh->id,
         ]);
         $operatorMulti->assignRole('operator multi');
 
@@ -194,12 +224,21 @@ class UserSeeder extends Seeder
 
         $inventory = User::create([
             'nama' => 'Inventory Cabang Banjamasin',
-            'username' => 'inventory cabang bjm',
+            'username' => 'invenbjm',
             'email' => 'inventorycabangbjm@example.com',
             'password' => Hash::make('password'),
             'cabang_id' => $cabangBjm->id,
         ]);
-        $inventory->assignRole('inventory utama');
+        $inventory->assignRole('inventory cabang');
+
+        $inventory = User::create([
+            'nama' => 'Inventory Cabang Lianggang',
+            'username' => 'invenlgg',
+            'email' => 'inventorycabanglgg@example.com',
+            'password' => Hash::make('password'),
+            'cabang_id' => $cabangLgg->id,
+        ]);
+        $inventory->assignRole('inventory cabang');
 
         // --- Buat user Documentation ---
         $documentation = User::create([
