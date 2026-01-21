@@ -393,3 +393,12 @@ Route::get('/laporan/filter', [LaporanController::class, 'filter'])->name('filte
 //     Route::post('/rangepricepelanggan/store',[RangePricePelangganController::class, 'store'])->name('rangepricepelanggan.store');
 //     Route::delete('/rangepricepelanggan/{id}',[RangePricePelangganController::class, 'destroy'])->name('rangepricepelanggan.delete');
 // });
+
+//notif
+Route::get('/notifications/read/{id}', function ($id) {
+    \App\Models\MNotifications::where('id', $id)->update([
+        'is_read' => true
+    ]);
+
+    return back();
+})->name('notifications.read');
